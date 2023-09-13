@@ -52,19 +52,13 @@ Our idea is to bring this feature directly into users IDE. This way, users can l
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/ApplebaumIan">
-            <img src="https://avatars.githubusercontent.com/u/9451941?v=4" width="100;" alt="ApplebaumIan"/>
+        <a href="https://github.com/yoonjaejasonlee">
+            <img src="https://avatars.githubusercontent.com/u/97626684?v=4" width="100;" alt="JasonLee"/>
             <br />
             <sub><b>Ian Tyler Applebaum</b></sub>
         </a>
     </td>
-    <td align="center">
-        <a href="https://github.com/leighflagg">
-            <img src="https://avatars.githubusercontent.com/u/77810293?v=4" width="100;" alt="leighflagg"/>
-            <br />
-            <sub><b>Null</b></sub>
-        </a>
-    </td></tr>
+</tr>
 </table>
 
 [//]: # ( readme: collaborators -end )
