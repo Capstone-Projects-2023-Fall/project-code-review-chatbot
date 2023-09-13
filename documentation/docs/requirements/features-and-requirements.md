@@ -51,4 +51,4 @@ sidebar_position: 4
 - The code review bot will check for security vulnerabilities in the users code. For example, the bot may point out a chunk of code that is vulnerable to SQL injection attacks and give a suggestion on how to make the code more secure. 
 
 ### Error Handling Suggestions
-- The codebot will suggest places the user can add error handling to help stop the program from crashing and creating a better user experience when unexpected errors occur.
+- The codebot will suggest places the user can add error handling to help stop the program from crashing and creating a better user experience when unexpected errors occur
