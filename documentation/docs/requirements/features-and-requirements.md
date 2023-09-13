@@ -21,7 +21,22 @@ sidebar_position: 4
 - Formatting Suggestions:  The code review bot will pick up on errors in formatting such as indentation issues.  The chatbot will show the user where these errors in formatting are and how they can solve them.
 - Semicolon Usage: The review bot will pick up on missing or improperly used semicolons.  It will show the user where they may have missed a semicolon in their code.
 - Variable Naming Conventions:  If the code review bot finds poorly named varibales or varibales that are too similar to each otehr it will suggest better names to the user.
-- 
+- Redundancy Issues: The code review bot will pick up on repeated blocks of code that could be made into a funtion to reduce the amount of duplicate code.
+- Buggy or broken code:  The code review bot will pick up on code that could cause errors or may have unintended effects.  The bot will point the areas of broken code out to the developer and explain to them why it may lead to issues within the program/application they are creating.
+
+### JSON Checklist
+- After the code review bots analysis is complete it will provide a checklist of potential improvements theat could be made within the code.  
+- This checklist will be given in JSON format.
+
+### Chatbot Conversation
+- The user will be able to converse with the chatbot after it is done it's initial analysis of the users code.  The user will be able to ask the chatbot for additional explanations and suggestions regarding their code. The chat bot will be able to answer these questions and provide the user with the information they asked.
+
+### ChatGPT Integration
+- The code bot will need to integrate with ChatGPT in order to provide sophisticated and accurate repsonses in a chat like manner.
+
+### Backend API Server
+- The code review bot will implement a backend API server to securely store and manage the OpenAI token.
+- Ensure that the token management is user-friendly and secure.
 
 ## Non-Functional
 
