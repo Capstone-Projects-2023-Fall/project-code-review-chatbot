@@ -4,6 +4,7 @@ sidebar_position: 2
 
 # System Block Diagram
 
-![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/d871b9bd-d74d-45b2-b7bc-e4367fc47f98)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/7874484b-6a1a-4019-a13f-3f90426d8c7b)
+
 
 
