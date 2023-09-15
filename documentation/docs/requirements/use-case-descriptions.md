@@ -29,6 +29,13 @@ Fresh university graduate has landed a job, but is concerned about how their new
 ## User Stories
 
 ### **Story 1:**
+As a Freelance Contractor 
+I want to confirm my code is up to industry standard
+So that I can satisfy clients and allow others to easily read my code
 
+### **Story 2:**
+As a Computer Science Instrcutor 
+I want to make sure my students see pristine coding examples
+So that I can properly teach them how to organize and format code.
 
 ## External Interfaces Diagram
