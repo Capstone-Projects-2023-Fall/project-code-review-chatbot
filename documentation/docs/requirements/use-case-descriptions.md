@@ -40,7 +40,8 @@ I want to make sure my students see pristine coding examples
 So that I can properly teach them how to organize and format code.
 
 ## External Interfaces Diagram
-<img width="482" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/d69c15a7-c6ed-47bf-b114-9e07d812eaf9">
+
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/d69c15a7-c6ed-47bf-b114-9e07d812eaf9)
 
 ### User Persona Google Developer
 
