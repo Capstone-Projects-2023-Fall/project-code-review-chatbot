@@ -26,6 +26,17 @@ The fresh university graduate has landed a job but is concerned about how their 
 5. The user reads the suggestions and makes adjustments
 7. The user is relieved that the bot caught mistakes before co-workers could see.
 
+### **Case 3:**
+Sarah a computer science student who loves to code but has difficulties writing efficient and organized code.
+1. Sarah downloads and installs the ChatGPT Code Review Extension from the Visual Studio Code marketplace. The installation is quick and seamless.
+2. With her assignment code open in Visual Studio Code, Sarah activates the ChatGPT extension by clicking the chat icon in the sidebar. She submits her code for review, specifying the programming language she's using and attaching a brief description of the assignment's requirements.
+3. ChatGPT quickly analyzes her code and provides feedback within seconds. It highlights potential issues, such as inefficient algorithms, naming conventions, and code readability problems.
+4. Sarah engages in an interactive discussion with ChatGPT. She asks specific questions about the highlighted issues to gain a deeper understanding of the recommendations. ChatGPT responds with clear explanations, examples, and links to relevant documentation.
+5. Using the guidance from ChatGPT, Sarah makes iterative improvements to her code. She receives real-time feedback as she implements changes, ensuring she's on the right track.
+6. After several rounds of interaction and code improvements, Sarah is satisfied with her code's quality. She submits her assignment, confident that it meets the required standards.
+
+
+
 
 ## User Stories
 
