@@ -18,8 +18,8 @@ This is the description page for the different components that will be involved 
 ## Laravel
     Laravel is a PHP framework that is used to develop web applications and APIs. We will be utilizing laravel to connect our chabot with our servers and database utilzing the PHP language.
 
-## JavaScript
-    JavaScript will be used for the construction of the front-end.
+## React.js
+    A component based web development framework for designing web applications. We will use React to construct our front-end.
 
 ## VS Code
     VS Code will be utilized as our primary IDE. Since the goal of our project is creating a extension for VS code, this will be the only IDE that is going to be utilized for this particular project. 
