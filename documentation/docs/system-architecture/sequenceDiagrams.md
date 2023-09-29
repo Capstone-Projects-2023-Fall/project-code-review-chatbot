@@ -55,7 +55,7 @@ sidebar_position: 2
 ### Use Case 5
 **Experienced programmer uses bot to proof code before pushing**
 
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram5.png)
+![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/main/documentation/static/img/sequenceDiagram5.png)
 
 1. Bob goes to commit work
 2. CodeReviewChatbot catches the commit process, and sends bob feedback on his work
