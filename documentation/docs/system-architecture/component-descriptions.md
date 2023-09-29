@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Component Descriptions
@@ -16,10 +16,10 @@ This is the description page for the different components that will be involved 
     SQLite is a server-less SQL database engine that will be utilzed for the project. We will utilzed the data base to store user data and the chat history for individual users. 
 
 ## Laravel
-    Laravel is a PHP framework that is used to develop web applications and APIs. We will be utilizing laravel to connect our chabot with our servers and database.
+    Laravel is a PHP framework that is used to develop web applications and APIs. We will be utilizing laravel to connect our chabot with our servers and database utilzing the PHP language.
 
-## PHP
-    PH
+## JavaScript
+    JavaScript will be used for the construction of the front-end.
 
 ## VS Code
     VS Code will be utilized as our primary IDE. Since the goal of our project is creating a extension for VS code, this will be the only IDE that is going to be utilized for this particular project. 
