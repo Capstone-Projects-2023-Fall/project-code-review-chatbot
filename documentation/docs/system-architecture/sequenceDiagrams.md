@@ -7,7 +7,7 @@ sidebar_position: 2
 ## Use Case 1
 **A student has just started taking coding classes. They are completely new to coding and want to have a convenient way to learn proper code etiquette & styles**
 
-![image](/documentation/static/img/SequenceDiagram1.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram1.png)
 
 1. Student tries their first class assignment and commits the code
 2. Extension finds various issues, but only send the user 2 suggestions
@@ -19,7 +19,7 @@ sidebar_position: 2
 ### Use Case 2
 **A fresh university graduate has landed a job but is concerned about how their new co-workers will judge their code**
 
-![image](/documentation/static/img/SequenceDiagram2.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram2.png)
 
 1. Graduate takes their existing, working code and compiles it
 2. CodeReview finds ways to improve readability to professional standards
@@ -30,7 +30,7 @@ sidebar_position: 2
 ### Use Case 3
 **A computer science student who loves to code but has difficulties writing efficient and organized code**
 
-![image](/documentation/static/img/SequenceDiagram3.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram3.png)
 
 1. Sarah downloads and installs the ChatGPT Code Review Extension from the Visual Studio Code marketplace. The installation is quick and seamless.
 2. With her assignment code open in Visual Studio Code, Sarah activates the ChatGPT extension by clicking the chat icon in the sidebar. She submits her code for review, specifying the programming language she's using and attaching a brief description of the assignment's requirements.
@@ -42,7 +42,7 @@ sidebar_position: 2
 ### Use Case 4
 **User gets stuck on an error while coding a perosnal project**
 
-![image](/documentation/static/img/SequenceDiagram4.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram4.png)
 
 1. User finds errors in running their code
 2. User searches online for a quick fix, but is having trouble finding a simple fix
@@ -55,7 +55,7 @@ sidebar_position: 2
 ### Use Case 5
 **Experienced programmer uses bot to proof code before pushing**
 
-![image](/documentation/static/img/SequenceDiagram5.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram5.png)
 
 1. Bob goes to commit work
 2. CodeReviewChatbot catches the commit process, and sends bob feedback on his work
@@ -66,7 +66,7 @@ sidebar_position: 2
 ### Use Case 6
 **Code Review Bot lets user know they are using bad practice by writing all code in main function**
 
-![image](/documentation/static/img/SequenceDiagram6.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram6.png)
 
 1. Anna works on code for a couple hours and decides to commit her work
 2. CodeReviewChatbot catches the commit process, and sends anna feedback
@@ -77,7 +77,7 @@ sidebar_position: 2
 ### Use Case 7
 **User converses with chatbot on how to improve code after initial commit**
 
-![image](/documentation/static/img/SequenceDiagram7.png)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/main/documentation/static/img/SequenceDiagram7.png)
 
 1. Nai writes a couple of comments into pre-existing code to have a commit
 2. CodeReviewChatbot catches the commit process, and sends Nai feedback on their work
