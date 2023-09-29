@@ -42,7 +42,7 @@ sidebar_position: 2
 ### Use Case 4
 **User gets stuck on an error while coding a perosnal project**
 
-![image](/documentation/static/img/SequenceDiagram2.png)
+![image](/documentation/static/img/SequenceDiagram4.png)
 
 1. User finds errors in running their code
 2. User searches online for a quick fix, but is having trouble finding a simple fix
@@ -51,3 +51,15 @@ sidebar_position: 2
 5. Extension informs user of the syntax error and how to solve it
 6. User is given the suggestion on how to write some tests to mitigate these issues in the future
 7. User fixes error and code now compiles, thus saving them time in their busy life
+
+### Use Case 5
+**Experienced programmer uses bot to proof code before pushing**
+
+![image](/documentation/static/img/SequenceDiagram5.png)
+
+1. Bob goes to commit work
+2. CodeReviewChatbot catches the commit process, and sends bob feedback on his work
+3. The commit is halted, as now Bob wants to fix his work
+4. Bob commits again, fixing his work. This time he receives little feedback
+5. Bob now feels confident in pushing his work
+
