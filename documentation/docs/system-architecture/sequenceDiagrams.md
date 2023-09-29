@@ -63,3 +63,26 @@ sidebar_position: 2
 4. Bob commits again, fixing his work. This time he receives little feedback
 5. Bob now feels confident in pushing his work
 
+### Use Case 6
+**Code Review Bot lets user know they are using bad practice by writing all code in main function**
+
+![image](/documentation/static/img/SequenceDiagram6.png)
+
+1. Anna works on code for a couple hours and decides to commit her work
+2. CodeReviewChatbot catches the commit process, and sends anna feedback
+3. Specifically, CodeReviewChatbot informs anna of code that she has repeated throughout her program
+4. Then CodeReviewChatbot suggests making some functions
+5. Anna implements this, making her code shorter, more concise, and overall less repetitive
+
+### Use Case 7
+**User converses with chatbot on how to improve code after initial commit**
+
+![image](/documentation/static/img/SequenceDiagram7.png)
+
+1. Nai writes a couple of comments into pre-existing code to have a commit
+2. CodeReviewChatbot catches the commit process, and sends Nai feedback on their work
+3. The commit is halted and Nai wants further explanations of the feedback
+4. CodeReviewChatbot further explains the suggestions made
+5. Nai now asks again where the suggestions are coming from and if they are alternatives
+6. CodeReviewChatbot answers the additional questions and gives Nai more information
+
