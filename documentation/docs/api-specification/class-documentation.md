@@ -70,7 +70,7 @@ Classes
 
 **Description**: Resets the conversation state and clears the conversaton history
 
-**Returns** : {Promise<void>} A Promise that resolves when the conversation is successfully reset.
+**Returns** : {Promise} A Promise that resolves when the conversation is successfully reset.
 
 ### 8. public async function : `search()`
 
@@ -78,7 +78,7 @@ Classes
 
 **Params** : {string | undefined} prompt - The user's input prompt.
 
-**Returns** : {Promise<void>} A Promise that resolves when the conversation is successfully reset.
+**Returns** : {Promise} A Promise that resolves when the conversation is successfully reset.
 
 ### 9. private function : `_getHtmlForWebview()`
 
