@@ -22,11 +22,11 @@ description: What should be in this section.
     * Exceptions Thrown: If the extension did not end.
 
 ## Setting
-* Class Purpose: This class gives the users the choice to change the setting to their own needs.
+* Class Purpose: This class allows the users to change the setting to their own needs.
 *Data Fields:
    * setting
-      * Type: Json
-      * Purpose: Display all the current settings of the applicaiton
+      * Type: JSON
+      * Purpose: Display all the current settings of the application
 
 * methods:
   
@@ -34,5 +34,5 @@ description: What should be in this section.
     * Purpose: get the current setting for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
-    * Parameters: context – The extension's context.
+    * Parameters: None.
     * Exceptions Thrown: If the extension did not start
