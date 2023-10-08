@@ -35,6 +35,7 @@ description: What should be in this section.
 * methods:
 
    **getSettings()**
+  
     * Purpose: get the current setting for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
@@ -42,6 +43,7 @@ description: What should be in this section.
     * Exceptions Thrown: None.
 
     **setSettings()**
+  
     * Purpose: apply changes to the current setting for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
