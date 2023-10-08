@@ -51,3 +51,20 @@ description: What should be in this section.
     * post-condition: None.
     * Parameters: None.
     * Exceptions Thrown: None.
+
+## ChatGPTHandler
+* Class Purpose: This class will handle generating the web view from chatGPT
+* Data Fields:
+   * responseFromChatGPT
+    * Type: String.
+    * Purpose: Store the input from ChatGpt.
+      
+* methods:
+  
+  **_getHtmlForWebview()**
+  
+    * Purpose: generate web view from the GPT response.
+    * pre-condition: Vaild input.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: Null input from ChatGPT.
