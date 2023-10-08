@@ -7,6 +7,7 @@ description: What should be in this section.
 * Class Purpose: This class starts the extension or turns it off.
 
 * methods:
+
   **activate()**
     * Purpose: Activates extension for the user.
     * pre-condition: Vailded user.
