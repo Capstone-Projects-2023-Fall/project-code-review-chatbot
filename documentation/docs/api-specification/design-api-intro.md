@@ -5,13 +5,17 @@ description: What should be in this section.
 
 ## switch
 * Class Purpose: This class starts the extension or turns it off.
+ *Data Fields:
+  * ApiKey
+     * Type: string
+     * Purpose: Store the API key 
 * methods:
 
   **activate()**
     * Purpose: Activates extension for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
-    * Parameters: context – The extension's context.
+    * Parameters: ApiKey 
     * Exceptions Thrown: If the extension did not start
 
   **deactivate()**
