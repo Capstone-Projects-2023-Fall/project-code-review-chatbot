@@ -39,4 +39,13 @@ description: What should be in this section.
     * pre-condition: Vailded user.
     * post-condition: None.
     * Parameters: None.
-    * Exceptions Thrown: If the extension did not start
+    * Exceptions Thrown: None.
+
+   **setSettings()**
+      * Purpose: apply changes to the current setting for the user.
+      * pre-condition: None.
+      * post-condition: None.
+      * Parameters: None.
+      * Exceptions Thrown: Null entry.
+
+  
