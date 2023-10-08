@@ -8,4 +8,8 @@ description: What should be in this section.
 
 * methods:
     1. activate()
-    * Purpose:
+    * Purpose: Activates extension for the user.
+    * pre-condition: Vailded user.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: If the extension did not start
