@@ -1,0 +1,82 @@
+# Frontend Class Documentation
+
+## ExtensionContainer
+
+<details open="True"> 
+<summary>The ExtensionContainer component encapsulates the entire extension interface.</summary>
+
+### Data fields
+- #### Object avatarInfo
+    - [click here](#object-avatarinfo)
+- #### Array inventory
+    - [click here](#array-inventory)
+
+### Methods
+- #### setInventory(inventoryList)
+    - [click here](#setinventoryinventorylist)
+- #### setAvatarInfo(avatarObject)
+    - [click here](#setavatarinfoavatarobject)
+
+</details>
+
+## SuggestionList
+
+<details open="True">
+<summary>The SuggestionList component is responsible for displaying Zan array of ListItems corresponding to suggestions from ChatGPT.</summary>
+
+</details>
+
+## InputBar
+
+<details open="True">
+<summary>The InputBar component is a box in which a user can input a prompt to ask ChatGPT directly.</summary>
+
+</details>
+
+## IconButton
+
+<details open="True">
+<summary>The IconButton component creates and formats a clickable icon that acts as a button. This button will perform a certain action.</summary>
+
+</details>
+
+## ListItem
+
+<details open="True">
+<summary>The ListItem component shows a ChatGPT suggestion. It consists of the title of the suggestion and a dropdown icon to display the DropDownContainer component for the corresponding suggestion.</summary>
+
+</details>
+
+## DropDownContainer
+<details open="True">
+<summary>The DropDownContainer component contains information about a suggestion and is hidden until the dropdown button in the ListItem component is triggered.</summary>
+
+</details>
+
+## ExplainButton
+<details open="True">
+<summary>The ExplainButton component belongs to a ListItem component and prompts ChatGPT to explain how to implement the corresponding suggestion and why it is important to implement it.</summary>
+
+</details>
+
+## LocateButton
+
+<details open="True">
+<summary>The LocateButton component belongs to a ListItem component and prompts ChatGPT to provide the code sections within the analyzed file that are related to the suggestion.</summary>
+
+</details>
+
+## CheckButton
+
+<details open="True">
+<summary>The CheckButton component belongs to a ListItem component and displays a checkmark if clicked, denoting that the corresponding suggestion has been implemented</summary>
+
+</details>
+
+
+## ResponseContainer
+
+<details open="True">
+<summary>The ResponseContainer component displays ChatGPT's response to an InputBar prompt or a LocateButton/ExplainButton trigger.</summary>
+
+</details>
