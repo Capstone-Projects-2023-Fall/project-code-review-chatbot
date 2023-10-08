@@ -27,7 +27,7 @@ description: What should be in this section.
 
 ## Setting
 * Class Purpose: This class allows the users to change the setting to their own needs.
-*Data Fields:
+* Data Fields:
    * setting
       * Type: JSON
       * Purpose: Display all the current settings of the application
