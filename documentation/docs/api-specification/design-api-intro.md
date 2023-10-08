@@ -67,4 +67,31 @@ description: What should be in this section.
     * pre-condition: Vaild input.
     * post-condition: None.
     * Parameters: None.
-    * Exceptions Thrown: Null input from ChatGPT.
+    * Exceptions Thrown: Null input from ChatGPT
+    * Return Valid: HTML web view.
+ 
+## Search
+* Class Purpose: This class will provide the capability for the user to type in questions to search.
+* Data Fields:
+  * inputForChatGPT
+   * Type: String.
+   * Purpose: Store the input from the user.
+ 
+* methods:
+  
+  **search()**
+  
+    * Purpose: provide the ability for the user to type in whatever they want into the ChatGPT.
+    * pre-condition: Vaild input.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: Null input from the user.
+    * Return Valid: Response from the ChatGPT.
+      
+   **resetConversation()**
+  
+    * Purpose: provide the ability for the user to erase the previous conversation.
+    * pre-condition: If there were any data.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: If there weren't any data to delete.
