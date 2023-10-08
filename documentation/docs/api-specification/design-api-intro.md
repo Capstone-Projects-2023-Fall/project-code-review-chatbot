@@ -31,6 +31,7 @@ description: What should be in this section.
 * methods:
   
  **getSettings()**
+    
     * Purpose: get the current setting for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
