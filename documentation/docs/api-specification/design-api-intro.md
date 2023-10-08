@@ -29,9 +29,8 @@ description: What should be in this section.
       * Purpose: Display all the current settings of the application
 
 * methods:
-  
- **getSettings()**
-    
+
+  **getSettings()**
     * Purpose: get the current setting for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
