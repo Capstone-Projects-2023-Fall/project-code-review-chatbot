@@ -1,6 +1,8 @@
 ---
-sidebar_position: 1
-description: What should be in this section.
+title: Design API Intro 
+description: Design API Intro
+hide_table_of_contents: true
+sidebar_position: 2
 ---
 
 ## switch
