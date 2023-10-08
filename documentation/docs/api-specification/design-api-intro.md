@@ -12,6 +12,7 @@ description: What should be in this section.
 * methods:
 
   **activate()**
+  
     * Purpose: Activates extension for the user.
     * pre-condition: Vailded user.
     * post-condition: None.
@@ -19,6 +20,7 @@ description: What should be in this section.
     * Exceptions Thrown: If the extension did not start
 
   **deactivate()**
+  
     * Purpose: Deactivate extension for the user.
     * pre-condition: It has already started.
     * post-condition: None.
@@ -49,7 +51,3 @@ description: What should be in this section.
     * post-condition: None.
     * Parameters: None.
     * Exceptions Thrown: None.
-
-
-apply changes to the current setting for the user.
-  
