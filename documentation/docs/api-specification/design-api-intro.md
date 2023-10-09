@@ -1,41 +1,99 @@
 ---
-sidebar_position: 1
-description: What should be in this section.
+title: Design API Intro 
+description: Design API Intro
+hide_table_of_contents: true
+sidebar_position: 2
 ---
 
-Design Document - Part II API
-=============================
+## switch
+* Class Purpose: This class starts the extension or turns it off.
+ *Data Fields:
+  * ApiKey
+     * Type: string
+     * Purpose: Store the API key 
+* methods:
 
-**Purpose**
+  **activate()**
+  
+    * Purpose: Activates extension for the user.
+    * pre-condition: Vailded user.
+    * post-condition: None.
+    * Parameters: ApiKey 
+    * Exceptions Thrown: If the extension did not start
 
-This Design Document gives the complete design of the software implementation. This information should be in structured comments (e.g. Javadoc) in the source files. We encourage the use of a documentation generation tool to generate a draft of your API that you can augment to include the following details.
+  **deactivate()**
+  
+    * Purpose: Deactivate extension for the user.
+    * pre-condition: It has already started.
+    * post-condition: None.
+    * Parameters: context –> The extension's context.
+    * Exceptions Thrown: If the extension did not end.
 
-**Requirements**
+## Setting
+* Class Purpose: This class allows the users to change the setting to their own needs.
+* Data Fields:
+   * setting
+      * Type: JSON
+      * Purpose: Display all the current settings of the application
 
-In addition to the general documentation requirements the Design Document - Part II API will contain:
+* methods:
 
-General review of the software architecture for each module specified in Design Document - Part I Architecture. Please include your class diagram as an important reference.
+   **getSettings()**
+  
+    * Purpose: get the current setting for the user.
+    * pre-condition: Vailded user.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: None.
 
-**For each class define the data fields, methods.**
+    **setSettings()**
+  
+    * Purpose: apply changes to the current setting for the user.
+    * pre-condition: Vailded user.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: None.
 
-The purpose of the class.
-
-The purpose of each data field.
-
-The purpose of each method
-
-Pre-conditions if any.
-
-Post-conditions if any.
-
-Parameters and data types
-
-Return value and output variables
-
-Exceptions thrown\* (PLEASE see note below for details).
-
-An example of an auto-generated and then augmented API specification is here ([Fiscal Design Document 2\_API.docx](https://templeu.instructure.com/courses/106563/files/16928898?wrap=1 "Fiscal Design Document 2_API.docx") )
-
-This group developed their API documentation by hand ([Design Document Part 2 API-1\_MovieMatch.docx](https://templeu.instructure.com/courses/106563/files/16928899?wrap=1 "Design Document Part 2 API-1_MovieMatch.docx") )
-
-\*At the top level, or where appropriate, all exceptions should be caught and an error message that is meaningful to the user generated. It is not OK to say ("xxxx has encountered a problem and will now close (OK?)". Error messages and recovery procedures should be documented in the User’s Manual.
+## ChatGPTHandler
+* Class Purpose: This class will handle generating the web view from chatGPT
+* Data Fields:
+   * responseFromChatGPT
+    * Type: String.
+    * Purpose: Store the input from ChatGpt.
+      
+* methods:
+  
+  **_getHtmlForWebview()**
+  
+    * Purpose: generate web view from the GPT response.
+    * pre-condition: Vaild input.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: Null input from ChatGPT
+    * Return Valid: HTML web view.
+ 
+## Search
+* Class Purpose: This class will provide the capability for the user to type in questions to search.
+* Data Fields:
+  * inputForChatGPT
+   * Type: String.
+   * Purpose: Store the input from the user.
+ 
+* methods:
+  
+  **search()**
+  
+    * Purpose: provide the ability for the user to type in whatever they want into the ChatGPT.
+    * pre-condition: Vaild input.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: Null input from the user.
+    * Return Valid: Response from the ChatGPT.
+      
+   **resetConversation()**
+  
+    * Purpose: provide the ability for the user to erase the previous conversation.
+    * pre-condition: If there were any data.
+    * post-condition: None.
+    * Parameters: None.
+    * Exceptions Thrown: If there weren't any data to delete.
