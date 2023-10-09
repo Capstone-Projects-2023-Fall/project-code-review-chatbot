@@ -27,7 +27,7 @@
 
 5. Navigate to /server/code-review-chatbot and run the following command:
 
-    `composer update'
+    `composer update`
 
    *If you receive a permission error, you may need to change the owner of the files to the current user.*
    
