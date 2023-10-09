@@ -9,6 +9,27 @@
 
 </div>
 
+# Installation Instructions
+
+## Backend Setup
+
+1. In order to run the server client on windows, the Windows Subsystem for Linux must be installed via PowerShell:
+
+    `wsl --install`
+
+2. PHP, Docker Desktop, and Composer are required to be downloaded:
+
+   PHP Installation Tutorial: https://www.geeksforgeeks.org/how-to-install-php-in-windows-10/#
+   
+   Composer Link: https://getcomposer.org/
+   
+   Docker: https://www.docker.com/
+   
+3. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
+   
+4. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
+   
+   `./vendor/bin/sail up`
 
 ## Keywords
 
