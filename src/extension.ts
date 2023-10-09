@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { ChatGPTAPI } from 'chatgpt';
 
 
-type AuthInfo = {apiKey?: string};
+export type AuthInfo = {apiKey?: string};
 type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string};
 
 
@@ -95,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-class ChatGPTViewProvider implements vscode.WebviewViewProvider {
+export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'chatgpt.chatView';
 	private _view?: vscode.WebviewView;
 
