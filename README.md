@@ -17,19 +17,25 @@
 
     `wsl --install`
 
-2. PHP, Docker Desktop, and Composer are required to be downloaded:
-
-   PHP Installation Tutorial: https://www.geeksforgeeks.org/how-to-install-php-in-windows-10/#
-   
-   Composer Link: https://getcomposer.org/
+2. Docker Desktop is required to be downloaded:
    
    Docker: https://www.docker.com/
+
+3. node, npm, PHP, and composer must be installed on your Linux subsystem.
    
-3. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
+4. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
+
+5. Navigate to /server/code-review-chatbot and run the following command:
+
+    `composer update'
+
+   *If you receive a permission error, you may need to change the owner of the files to the current user.*
    
-4. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
+6. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
    
    `./vendor/bin/sail up`
+
+   *If you receive a docker error, you may need to modify the docker config file in ~/.docker/config.json and change credsStore to credStore*
 
 ## Keywords
 
