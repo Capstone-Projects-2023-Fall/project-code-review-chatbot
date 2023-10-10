@@ -90,7 +90,7 @@ const config = {
         specs: [
           {
             id: 'using-single-yaml',
-            spec: 'static/openapi.yml.yaml',
+            spec: 'static/KROOSVI_1-CodeReviewChatBot-1-resolved.yaml',
             route: '/api/',
           },
         ],
