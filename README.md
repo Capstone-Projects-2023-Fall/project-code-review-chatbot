@@ -9,6 +9,40 @@
 
 </div>
 
+# Installation Instructions
+
+## Backend Setup
+
+1. In order to run the server client on Windows, the Windows Subsystem for Linux must be installed via PowerShell:
+
+    `wsl --install`
+
+2. Docker Desktop is required to be downloaded:
+   
+   Docker: https://www.docker.com/
+
+3. node, npm, PHP, and composer must be installed on your Linux subsystem.
+   ```
+   sudo apt-get install npm
+   sudo apt-get install php
+   sudo apt-get install php-curl
+   sudo apt-get install php-xml
+   sudo apt-get install composer
+   ```
+   
+5. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
+
+6. Navigate to /server/code-review-chatbot and run the following command:
+
+    `composer update`
+
+   *If you receive a permission error, you may need to change the owner of the files to the current user.*
+   
+7. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
+   
+   `./vendor/bin/sail up`
+
+   *If you receive a docker error, you may need to modify the docker config file in ~/.docker/config.json and change credsStore to credStore*
 
 ## Keywords
 
