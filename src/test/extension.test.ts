@@ -65,7 +65,7 @@ import { ChatGPTAPI } from 'chatgpt';
 import { ChatGPTViewProvider  } from '../extension';
 
 describe('ChatGPTViewProvider', () => {
-
+     
     let chatGPTViewProvider: ChatGPTViewProvider;
   
     beforeEach(() => {
