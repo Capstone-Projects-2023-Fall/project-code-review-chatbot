@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('Suggestions', function (Blueprint $table) {
             $table->id('ID');
             $table->string('FilePath');
-            $table->integer('LineNumber');
+            $table->integer('LineNumber')->nullable();
             $table->string('SuggestionDescription');
-            $table->foreignId('RepositoryID');
-            $table->foreignId('UserID');
+            $table->string('RepositoryGitHubID')->nullable();
+            $table->string('UserGitHubID')->nullable();
             $table->timestamps();
+
+            $table->index('UserGitHubID');
+            $table->index('RepositoryGitHubID');
         });
     }
 
