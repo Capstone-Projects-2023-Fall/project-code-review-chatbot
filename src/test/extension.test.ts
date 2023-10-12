@@ -73,7 +73,7 @@ describe('ChatGPTViewProvider', () => {
     });
   
     it('Setting Authentication Info', () => {
-      const authInfo = { apiKey: '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' };
+      const authInfo = { apiKey: 'test' };
   
       chatGPTViewProvider.setAuthenticationInfo(authInfo);
 
