@@ -95,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-class ChatGPTViewProvider implements vscode.WebviewViewProvider {
+export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'chatgpt.chatView';
 	private _view?: vscode.WebviewView;
 
