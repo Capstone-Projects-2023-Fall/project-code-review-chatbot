@@ -61,7 +61,7 @@ jest.mock('vscode', () => {
   //---------------------start of unit testing code--------------------
 
 import * as vscode from 'vscode';
-import { ChatGPTAPI } from 'chatgpt';
+import { ChatGPTAPI } from 'chatgpt'; 
 import { ChatGPTViewProvider  } from '../extension';
 
 describe('ChatGPTViewProvider', () => {
