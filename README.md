@@ -42,7 +42,7 @@
 
    ```
    cp .env.example .env
-    php artisan key:generate
+   php artisan key:generate
    ```
    
 9. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
