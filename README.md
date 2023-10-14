@@ -29,6 +29,7 @@
    sudo apt-get install php-xml
    sudo apt-get install composer
    sudo apt install sqlite3
+   sudo apt install php-sqlite3
    ```
    
 5. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
