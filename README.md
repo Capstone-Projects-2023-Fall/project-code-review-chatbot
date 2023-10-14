@@ -21,13 +21,15 @@
    
    Docker: https://www.docker.com/
 
-3. node, npm, PHP, and composer must be installed on your Linux subsystem.
+3. node, npm, PHP, SQLite, and composer must be installed on your Linux subsystem.
    ```
    sudo apt-get install npm
    sudo apt-get install php
    sudo apt-get install php-curl
    sudo apt-get install php-xml
    sudo apt-get install composer
+   sudo apt install sqlite3
+   sudo apt install php-sqlite3
    ```
    
 5. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
