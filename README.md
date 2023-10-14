@@ -37,12 +37,17 @@
     `composer update`
 
    *If you receive a permission error, you may need to change the owner of the files to the current user.*
+
+7. To generate a new application key upon cloning, you must run the following commands:
+   `cp .env.example .env
+    php artisan key:generate`
    
-7. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
+8. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
    
    `./vendor/bin/sail up`
 
    *If you receive a docker error, you may need to modify the docker config file in ~/.docker/config.json and change credsStore to credStore*
+
 
 ## Keywords
 
