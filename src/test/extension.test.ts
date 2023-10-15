@@ -94,8 +94,5 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.getSettings).toHaveBeenCalledTimes(1);
     });
     
+
   });
-
-
-
-
