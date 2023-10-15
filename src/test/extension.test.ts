@@ -82,3 +82,14 @@ describe('ChatGPTViewProvider', () => {
     });
     
   });
+
+//checks if the getSettings func is called proper amount of times
+describe('ChatGPTViewProviderTest2', () => {
+  let gptsetting: ChatGPTViewProvider;
+  it('gets settings', () => {
+    gptsetting.getSettings();
+
+    expect(gptsetting.getSettings).toHaveBeenCalledTimes(1);
+  });
+
+});
