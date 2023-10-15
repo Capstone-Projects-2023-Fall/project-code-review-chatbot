@@ -93,9 +93,15 @@ describe('ChatGPTViewProvider', () => {
 //checks if the getSettings func is called proper amount of times
 describe('ChatGPTViewProviderTest2', () => {
   let gptsetting: ChatGPTViewProvider;
+
+  beforeEach(() => {
+    gptsetting = new ChatGPTViewProvider(vscode.Uri.parse('../extension'));
+  });
+
   it('gets settings', () => {
     gptsetting.getSettings();
 
+    expect(gptsetting.getSettings).toBeCalled();
     expect(gptsetting.getSettings).toHaveBeenCalledTimes(1);
   });
 
