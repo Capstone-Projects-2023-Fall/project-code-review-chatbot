@@ -80,6 +80,13 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.setAuthenticationInfo).toHaveBeenCalledWith(authInfo);
       expect(chatGPTViewProvider.setAuthenticationInfo).toHaveBeenCalledTimes(1);
     });
+
+    it('Resetting Conversation', () => {
+      chatGPTViewProvider.resetConversation();
+
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+      expect(chatGPTViewProvider.resetConversation).toHaveBeenCalledTimes(1);
+    });
     
   });
 
@@ -93,3 +100,7 @@ describe('ChatGPTViewProviderTest2', () => {
   });
 
 });
+
+
+
+
