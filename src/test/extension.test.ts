@@ -63,6 +63,7 @@ jest.mock('vscode', () => {
 import * as vscode from 'vscode';
 import { ChatGPTAPI } from 'chatgpt'; 
 import { ChatGPTViewProvider  } from '../extension';
+import { resolve } from 'path';
 
 describe('ChatGPTViewProvider', () => {
      
@@ -94,11 +95,24 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.getSettings).toHaveBeenCalledTimes(1);
     });
 
-    it('Search Functionality', () => {
-      chatGPTViewProvider.search();
-      expect(chatGPTViewProvider.search).toBeCalled();
-      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(1);
+    it('set settings', () => {
+      const setttings = {
+        apiURL: 'https://example.com/api',
+        model: 'newModel',
+      };
+      chatGPTViewProvider.setSettings(setttings);
+
+      expect(chatGPTViewProvider.setSettings).toBeCalledWith(setttings)
+      expect(chatGPTViewProvider.setSettings).toBeCalledTimes(1);
+
     });
+
+      
     
+
   });
 
+ 
+
+
+  
