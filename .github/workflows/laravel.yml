@@ -22,7 +22,7 @@ jobs:
     - name: Install Dependencies
       working-directory: ./server/code-review-chatbot
       run: |
-        composer self-update --1
+        composer self-update --stable
         composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
     - name: Generate key
       working-directory: ./server/code-review-chatbot
