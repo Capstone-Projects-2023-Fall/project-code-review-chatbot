@@ -95,6 +95,12 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.getSettings).toHaveBeenCalledTimes(1);
     });
 
+    it('Search Functionality', () => {
+      chatGPTViewProvider.search();
+      expect(chatGPTViewProvider.search).toBeCalled();
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(1);
+    });
+
     it('set settings', () => {
       const setttings = {
         apiURL: 'https://example.com/api',
