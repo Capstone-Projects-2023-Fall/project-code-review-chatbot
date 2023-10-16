@@ -23,7 +23,7 @@ class DBConnectionTest extends TestCase
      */
     public function test_is_user_missing(): void
     {
-        $this->assertDatabaseMissing('users', ['email' => 'randomEmail@notreal.com']);
+        $this->assertDatabaseMissing('Suggestions', ['UserGitHubID' => '11111111']);
     }
 
 }
