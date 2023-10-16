@@ -88,7 +88,19 @@ Our idea is to bring this feature directly into users IDE. This way, users can l
 
 ## Required Resources
 
+## [Code Review Chatbot](https://capstone-projects-2023-fall.github.io/project-code-review-chatbot/) GitHub Stats
 
+### Number of opened pull requests made by each team member
+
+![Code Review Chatbot pull requests](https://courses.ianapplebaum.com/api/pull-requests/Capstone-Projects-2023-Fall/project-code-review-chatbot)
+
+### Number of code reviews made by each team member
+
+![Code Review Chatbot reviews](https://courses.ianapplebaum.com/api/reviews/Capstone-Projects-2023-Fall/project-code-review-chatbot)
+
+### Number of commits made by each team member
+
+![Code Review Chatbot commits](https://courses.ianapplebaum.com/api/commits/Capstone-Projects-2023-Fall/project-code-review-chatbot)
 
 ## Collaborators
 
