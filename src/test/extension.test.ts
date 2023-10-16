@@ -93,19 +93,12 @@ describe('ChatGPTViewProvider', () => {
   
       expect(chatGPTViewProvider.getSettings).toHaveBeenCalledTimes(1);
     });
+
+    it('Search Functionality', () => {
+      chatGPTViewProvider.search();
+      expect(chatGPTViewProvider.search).toBeCalled();
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(1);
+    });
+    
   });
 
-  // test that the search function is only called once
-describe('ChatGPTViewProviderTest3', () => {
-  let gptSearch: ChatGPTViewProvider;
-
-  beforeEach(() => {
-    gptSearch = new ChatGPTViewProvider(vscode.Uri.parse('../extension'));
-  });
-
-  it('Search Functionality', () => {
-    gptSearch.search();
-    expect(gptSearch.search).toBeCalled();
-    expect(gptSearch.search).toHaveBeenCalledTimes(1);
-  });
-});
