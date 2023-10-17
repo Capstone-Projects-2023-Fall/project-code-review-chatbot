@@ -1,12 +1,14 @@
 #!/bin/bash
 # Script for commit intervention.
 
-echo "Do you want to run code review before committing? (y/n)"
-read choice
+# Change this to true to enable commit intervention
+export RUN_CODE_REVIEW=false
 
-if [ "$choice" = "y" ]; then
-    # Put command to run code review here
+if [ "$RUN_CODE_REVIEW" = "true" ]; then
+    # Put code review command from extension here
     echo "Running code review."
+    exit 0 
 else
     echo "Skipping code review."
+    exit 0
 fi
