@@ -1,0 +1,12 @@
+#!/bin/bash
+# Script for commit intervention.
+
+echo "Do you want to run code review before committing? (y/n)"
+read choice
+
+if [ "$choice" = "y" ]; then
+    # Put command to run code review here
+    echo "Running code review."
+else
+    echo "Skipping code review."
+fi
