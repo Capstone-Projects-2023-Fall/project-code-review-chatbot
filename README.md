@@ -88,8 +88,6 @@ Our idea is to bring this feature directly into users IDE. This way, users can l
 
 ## Required Resources
 
-
-
 ## Collaborators
 
 [//]: # ( readme: collaborators -start )
