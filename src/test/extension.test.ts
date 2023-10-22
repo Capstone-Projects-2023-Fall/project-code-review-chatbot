@@ -108,7 +108,7 @@ describe('ChatGPTViewProvider', () => {
       };
       chatGPTViewProvider.setSettings(setttings);
 
-      expect(chatGPTViewProvider.setSettings).toBeCalledWith(setttings)
+      expect(chatGPTViewProvider.setSettings).toBeCalledWith(setttings);
       expect(chatGPTViewProvider.setSettings).toBeCalledTimes(1);
 
     });

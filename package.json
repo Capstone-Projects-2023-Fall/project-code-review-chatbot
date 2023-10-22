@@ -7,7 +7,7 @@
   "icon": "resources/extensionIcon.png",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/timkmecl/chatgpt-vscode"
+    "url": "git+https://github.com/timkmecl/chatgpt-vscode.git"
   },
   "engines": {
     "vscode": "^1.73.0"
@@ -274,8 +274,17 @@
   },
   "dependencies": {
     "chatgpt": "^5.2.5",
+    "cypress": "^13.3.2",
     "gpt3-tokenizer": "^1.1.5",
     "node-fetch": "^3.3.0",
     "yarn": "^1.22.19"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/timkmecl/chatgpt-vscode/issues"
+  },
+  "homepage": "https://github.com/timkmecl/chatgpt-vscode#readme",
+  "directories": {
+    "example": "examples"
+  },
+  "author": ""
 }
