@@ -152,8 +152,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			console.warn("API key or API URL not set, please go to extension settings (read README.md for more info)");
 		}else{	
 			this._chatGPTAPI = new ChatGPTAPI({
-				//apiKey: this._authInfo.apiKey || "xx",
-				apiKey: "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",
+				apiKey: this._authInfo.apiKey || "xx",
 				apiBaseUrl: this._settings.apiUrl,
 				completionParams: { model:this._settings.model || "gpt-3.5-turbo" },
 			});
