@@ -2,11 +2,16 @@
 # Script for commit intervention.
 
 # Change this to true to enable commit intervention
-export RUN_CODE_REVIEW=false
+export RUN_CODE_REVIEW=true
+
 
 if [ "$RUN_CODE_REVIEW" = "true" ]; then
-    # Put code review command from extension here
-    echo "Running code review."
+
+    echo "Running code review..."
+    # code --command "chatgpt.findProblems"
+
+    # Added shortcut "ctrl+alt+p" to my keybinding settings in vscode and this line force presses it
+    powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
     exit 0 
 else
     echo "Skipping code review."

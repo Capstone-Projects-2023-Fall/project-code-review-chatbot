@@ -53,7 +53,9 @@
       },
       {
         "command": "chatgpt.findProblems",
-        "title": "ChatGPT: Find problems"
+        "title": "ChatGPT: Find problems",
+        "key": "ctrl+alt+p",
+        "when": "editorTextFocus"
       },
       {
         "command": "chatgpt.optimize",
