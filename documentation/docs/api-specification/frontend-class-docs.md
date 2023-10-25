@@ -1,7 +1,5 @@
 # Frontend Class Documentation
 
-## User Interface Mockup
-![image](/documentation/static/img/crc_mockup.png)
 
 ## ExtensionContainer
 
