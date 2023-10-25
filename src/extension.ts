@@ -1,6 +1,11 @@
 import * as vscode from 'vscode';
 import { ChatGPTAPI } from 'chatgpt';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
+
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 
 type AuthInfo = {apiKey?: string};
 type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string};
@@ -155,7 +160,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			console.warn("API key or API URL not set, please go to extension settings (read README.md for more info)");
 		}else{	
 			this._chatGPTAPI = new ChatGPTAPI({
-				apiKey: "YOUR_API_KEY_HERE",
+				apiKey: OPENAI_API_KEY,
 				apiBaseUrl: this._settings.apiUrl,
 				completionParams: { model:this._settings.model || "gpt-3.5-turbo" },
 			});
