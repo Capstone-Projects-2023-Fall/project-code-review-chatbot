@@ -11,4 +11,6 @@ On Linux: Navigate to projects root directory and run `cp src/commitIntervention
 
 2. Make the script executable by running the following command in your repository's root directory: `chmod +x .git/hooks/pre-commit` (Linux Only).
 
-3. Change line 5 of the script `export RUN_CODE_REVIEW=false` to `export RUN_CODE_REVIEW=true` to toggle automatic review when commit on. (Remember to re-copy file to `.git/hooks/` after changing this variable).
+3. Open "Keyboard Shortcuts" settings in VSCode and add a keybind for "ctrl+alt+p" that runs the "ChatGpt:Find Problems" command
+
+4. Change line 5 of the script `export RUN_CODE_REVIEW=false` to `export RUN_CODE_REVIEW=true` to toggle automatic review when commit on. (Remember to re-copy file to `.git/hooks/` after changing this variable).
