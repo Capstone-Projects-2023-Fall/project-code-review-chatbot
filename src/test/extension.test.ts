@@ -166,7 +166,7 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
       
       chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
-      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.opimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
 
       chatGPTViewProvider.search('ChatGPTAPI.explain', false);
       expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.explain', false);
@@ -230,7 +230,7 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
 
       chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
-      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.opimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
 
       chatGPTViewProvider.resetConversation();
       expect(chatGPTViewProvider.resetConversation).toBeCalled();
@@ -245,7 +245,7 @@ describe('ChatGPTViewProvider', () => {
       chatGPTViewProvider.search('ChatGPTAPI.refactor', true);
       expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.refactor', true);
       chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
-      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.opimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
 
 
       chatGPTViewProvider.search('ChatGPTAPI.explain', false);
