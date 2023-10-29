@@ -38,6 +38,12 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "keybindings":[
+      {
+        "command": "chatgpt.findProblems",
+        "key": "ctrl+alt+p"
+      }
+    ],
     "commands": [
       {
         "command": "chatgpt.ask",
@@ -236,15 +242,7 @@
           "order": 11
         }
       }
-    },
-    "keybindings":[
-      {
-        "command": "chatgpt.findProblems",
-        "title": "ChatGPT: Find problems",
-        "key": "ctrl+alt+p",
-        "mac": "ctrl+option+p"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
