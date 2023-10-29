@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { ChatGPTAPI } from 'chatgpt';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import axios from "axios";
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -232,7 +233,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 		// Check if the ChatGPTAPI instance is defined
 		if (!this._chatGPTAPI) {
-			this._newAPI();
+			//this._newAPI();
 		}
 
 		// focus gpt activity from activity bar
@@ -276,6 +277,43 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._currentMessageNumber++;
 		let currentMessageNumber = this._currentMessageNumber;
 
+
+		try {
+			// Send the search prompt to the ChatGPTAPI instance and store the response
+			const res =
+     		 await axios.post("http://localhost/api/review",
+			  this._fullPrompt 
+			  
+			  );
+
+			if (this._currentMessageNumber !== currentMessageNumber) {
+				return;
+			}
+
+
+			console.log(res);
+
+			response = res.data.text;
+			if (res.data.detail?.usage?.total_tokens) {
+				response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
+			}
+
+			if (this._settings.keepConversation){
+				this._conversation = {
+					parentMessageId: res.data.id
+				};
+			}
+
+		} catch (e:any) {
+			console.error(e);
+			if (this._currentMessageNumber === currentMessageNumber){
+				response = this._response;
+				response += `\n\n---\n[ERROR] ${e}`;
+			}
+		}
+		
+
+		/*
 		if (!this._chatGPTAPI) {
 			response = '[ERROR] "API key not set or wrong, please go to extension settings to set it (read README.md for more info)"';
 		} else {
@@ -286,7 +324,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 			this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 
+
+
+
+			
 			const agent = this._chatGPTAPI;
+
+
+			
 
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
@@ -336,7 +381,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 		if (this._currentMessageNumber !== currentMessageNumber) {
 			return;
-		}
+		}*/
 
 		// Saves the response
 		this._response = response;
