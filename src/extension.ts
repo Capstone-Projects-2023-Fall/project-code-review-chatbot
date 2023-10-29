@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
 		keepConversation: config.get('keepConversation') || false,
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
-		model: config.get('model') || 'gpt-3.5-turbo'
+		model: config.get('model') || 'gpt-4'
 	});
 
 	// Register the provider with the extension's context
@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 			provider.setSettings({ apiUrl: url });
 		} else if (event.affectsConfiguration('chatgpt.model')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ model: config.get('model') || 'gpt-3.5-turbo' }); 
+			provider.setSettings({ model: config.get('model') || 'gpt-4' }); 
 		} else if (event.affectsConfiguration('chatgpt.selectedInsideCodeblock')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			provider.setSettings({ selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false });
@@ -123,7 +123,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		keepConversation: true,
 		timeoutLength: 60,
 		apiUrl: BASE_URL,
-		model: 'gpt-3.5-turbo'
+		model: 'gpt-4'
 	};
 	private _authInfo?: AuthInfo;
 
@@ -163,7 +163,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._chatGPTAPI = new ChatGPTAPI({
 				apiKey: OPENAI_API_KEY,
 				apiBaseUrl: this._settings.apiUrl,
-				completionParams: { model:this._settings.model || "gpt-3.5-turbo" },
+				completionParams: { model:this._settings.model || "gpt-4" },
 			});
 			// console.log( this._chatGPTAPI );
 		}
@@ -277,12 +277,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._currentMessageNumber++;
 		let currentMessageNumber = this._currentMessageNumber;
 
+		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
+		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 
 		try {
 			// Send the search prompt to the ChatGPTAPI instance and store the response
 			const res =
      		 await axios.post("http://localhost/api/review",
-			  this._fullPrompt 
+			  {prompt: this._fullPrompt, model: this._settings.model}
 			  
 			  );
 
@@ -291,8 +293,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			}
 
 
-			console.log(res);
-
+			
 			response = res.data.text;
 			if (res.data.detail?.usage?.total_tokens) {
 				response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
@@ -377,11 +378,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
-		}
+		}*/
 
 		if (this._currentMessageNumber !== currentMessageNumber) {
 			return;
-		}*/
+		}
 
 		// Saves the response
 		this._response = response;

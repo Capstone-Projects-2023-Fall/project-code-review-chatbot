@@ -24,7 +24,8 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+            $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+            $out->writeln($e);
         });
     }
 }

@@ -22,15 +22,47 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/review', function (Request $request) {
     
-    echo $request;
+    $out = new \Symfony\Component\Console\Output\ConsoleOutput();
 
 
-    $result = OpenAI::completions()->create([
-        'model' => 'text-davinci-003',
-        'prompt' => 'PHP is',
+    $out->writeln($request->input('prompt'));
+    $out->writeln($request->input('model'));
+
+    $finaltext = "";
+
+
+    /*$mods = OpenAI::models()->list();
+
+
+    foreach ($mods->data as $result) {
+        $out->writeln($result->id); // 'gpt-3.5-turbo-instruct'
+        // ...
+    }*/
+
+
+
+    $response = OpenAI::chat()->create([
+        'model' => $request->input('model'),
+        'messages' => [
+            ['role' => 'user', 'content' => $request->input('prompt')],
+        ],
     ]);
 
-    echo $result['choices'][0]['text']; // an open-source, widely-used, server-side scripting language.
 
-    return $result['choices'][0];
+    foreach ($response->choices as $result) {
+        $out->writeln($result->message->content);
+        $finaltext .= $result->message->content;
+       
+    }
+
+    
+    $out->writeln($finaltext);
+
+
+
+    return response()->json([
+        'text' => $finaltext,
+        'id' => $response['id'],
+        'usage' => $response['usage']
+    ]);
 });
