@@ -3,9 +3,9 @@ import { ChatGPTAPI } from 'chatgpt';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
+
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-
 
 type AuthInfo = {apiKey?: string};
 type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string};
@@ -44,22 +44,25 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 
-	const commandHandler = (command:string) => {
+	const commandHandler = (command:string, useEntireFile: boolean = false) => {
 		const config = vscode.workspace.getConfiguration('chatgpt');
 		const prompt = config.get(command) as string;
-		provider.search(prompt);
+		provider.search(prompt, useEntireFile); 
 	};
 
-	// Register the commands that can be called from the extension's package.json
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () => 
 			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-			.then((value) => provider.search(value))
+			.then((value) => {
+				if (value) {
+					provider.search(value);
+				}
+			})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
-		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
+		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems',true)),
 		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
 	);
@@ -158,7 +161,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			console.warn("API key or API URL not set, please go to extension settings (read README.md for more info)");
 		}else{	
 			this._chatGPTAPI = new ChatGPTAPI({
-				//apiKey: this._authInfo.apiKey || "xx",
 				apiKey: OPENAI_API_KEY,
 				apiBaseUrl: this._settings.apiUrl,
 				completionParams: { model:this._settings.model || "gpt-3.5-turbo" },
@@ -223,7 +225,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 
-	public async search(prompt?:string) {
+	public async search(prompt?: string, useEntireFile: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
@@ -243,20 +245,27 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		
 		let response = '';
 		this._response = '';
+
+		let documentText: string | undefined;
 		// Get the selected text of the active editor
 		const selection = vscode.window.activeTextEditor?.selection;
 		const selectedText = vscode.window.activeTextEditor?.document.getText(selection);
+
+		if (useEntireFile) {
+			documentText = vscode.window.activeTextEditor?.document.getText();
+		} else if (selection && selectedText) {
+			documentText = selectedText;
+		}
 		// Get the language id of the selected text of the active editor
 		// If a user does not want to append this information to their prompt, leave it as an empty string
 		const languageId = (this._settings.codeblockWithLanguageId ? vscode.window.activeTextEditor?.document?.languageId : undefined) || "";
 		let searchPrompt = '';
 
-		if (selection && selectedText) {
-			// If there is a selection, add the prompt and the selected text to the search prompt
+		if (documentText) {
 			if (this._settings.selectedInsideCodeblock) {
-				searchPrompt = `${prompt}\n\`\`\`${languageId}\n${selectedText}\n\`\`\``;
+				searchPrompt = `${prompt}\n\`\`\`${languageId}\n${documentText}\n\`\`\``;
 			} else {
-				searchPrompt = `${prompt}\n${selectedText}\n`;
+				searchPrompt = `${prompt}\n${documentText}\n`;
 			}
 		} else {
 			// Otherwise, just use the prompt if user typed it

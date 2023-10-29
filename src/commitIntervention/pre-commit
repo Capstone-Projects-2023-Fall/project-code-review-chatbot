@@ -2,11 +2,21 @@
 # Script for commit intervention.
 
 # Change this to true to enable commit intervention
-export RUN_CODE_REVIEW=false
+export RUN_CODE_REVIEW=true
 
 if [ "$RUN_CODE_REVIEW" = "true" ]; then
-    # Put code review command from extension here
-    echo "Running code review."
+
+    echo "Running code review..."
+    
+    if [[ "$(uname)" == "Darwin" ]]; then
+        osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
+    elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
+        echo "detected windows device"
+        powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
+    else
+        echo "Unsupported OS."
+    fi
+    
     exit 0 
 else
     echo "Skipping code review."
