@@ -186,7 +186,7 @@ describe('ChatGPTViewProvider', () => {
       chatGPTViewProvider.search('ChatGPTAPI.refctor', true);
       chatGPTViewProvider.search('ChatGPTAPI.explain', true);
 
-      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes("9");//9 times as there are 3 steps in each repeition
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(9);//9 times as there are 3 steps in each repeition
 
       chatGPTViewProvider.resetConversation();
       expect(chatGPTViewProvider.resetConversation).toBeCalled();
@@ -252,7 +252,7 @@ describe('ChatGPTViewProvider', () => {
       chatGPTViewProvider.search('ChatGPTAPI.explain', false);
       chatGPTViewProvider.search('ChatGPTAPI.explain', false);
       expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.explain', false);
-      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes("5");
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(5);
 
 
       chatGPTViewProvider.resetConversation();
