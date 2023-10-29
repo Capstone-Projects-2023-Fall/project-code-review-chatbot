@@ -201,7 +201,7 @@
         },
         "chatgpt.promptPrefix.findProblems": {
           "type": "string",
-          "default": "Provide a list of suggestions on how this code can be improved upon. Do not make any suggestions relating to syntax. Each suggestion shall have a title in bold as the first line, and have a description of the suggestion under that.  Do not number the suggestions. Do not include 'Suggestions:' in the title. Do not provide any actual code in your answer.",
+          "default": "Provide a list of suggestions on how this code can be improved upon. Do not make any suggestions relating to syntax. Each suggestion shall have a title in bold as the first line, and have a description of the suggestion under that. THe title shall be surrounded by two astrisks on both sides. (for example, **Title**) The description shall be under the title on a separate line. Between each suggestion, there shall be a line of ten dashes (----------). Do not number the suggestions. Do not include 'Suggestions:' in the title. Do not provide any actual code in your answer.",
           "description": "The prompt prefix used for finding problems in the selected code",
           "order": 5
         },
