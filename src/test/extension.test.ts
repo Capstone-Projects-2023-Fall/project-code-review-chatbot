@@ -113,8 +113,56 @@ describe('ChatGPTViewProvider', () => {
 
     });
 
+    /*Start of Integration Tests based off of Use Cases
+    Comments specify what use case the following test is for.
+    For more information use cases can be found at the following link:
+    https://capstone-projects-2023-fall.github.io/project-code-review-chatbot/docs/requirements/use-case-descriptions */
+  
+
+    //Use Case 1
+    it('Refactors', () => {
+
+
+    });
+
+    //Use Case 2
+    it('Refactors + Documents', () => {
       
+
+    });  
+
+    //Use Case 3
+    it('Multiple Optimizations, Explanations, and Refactors', () => {
+      
+
+    });
+
+    //Use Case 4
+    it('Prompt + Finds problems and Explains', () => {
+      //No prompt feature has been made yet so this part will be skipped for now
+
+
+    });
+
+    //Use Case 5
+    it('Finds, refactors, optimize, repeat', () => {
+      
+
+    });
     
+    //Use Case 6
+    it('Catch commit and Optimize', () => {
+      
+
+    });
+
+    //Use Case 7
+    it('Explain loop', () => {
+      
+
+    });
+
+/* End of Integration Tests */
 
   });
 
