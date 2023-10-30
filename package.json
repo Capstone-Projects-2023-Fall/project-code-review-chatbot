@@ -34,6 +34,7 @@
     "onCommand:chatgpt.refactor",
     "onCommand:chatgpt.optimize",
     "onCommand:chatgpt.findProblems",
+    "onCommand:chatgpt.findProblemsNormal",
     "onCommand:chatgpt.documentation"
   ],
   "main": "./dist/extension.js",
@@ -59,6 +60,10 @@
       },
       {
         "command": "chatgpt.findProblems",
+        "title": "ChatGPT: Find problems"
+      },
+      {
+        "command": "chatgpt.findProblemsNormal",
         "title": "ChatGPT: Find problems"
       },
       {
@@ -96,16 +101,17 @@
           "group": "chatgpt-menu-group@3"
         },
         {
-          "command": "chatgpt.findProblems",
+          "command": "chatgpt.optimize",
+          "when": "editorHasSelection",
           "group": "chatgpt-menu-group@4"
         },
         {
-          "command": "chatgpt.optimize",
+          "command": "chatgpt.documentation",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@5"
         },
         {
-          "command": "chatgpt.documentation",
+          "command": "chatgpt.findProblemsNormal",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@6"
         }
@@ -123,7 +129,8 @@
           "when": "editorHasSelection"
         },
         {
-          "command": "chatgpt.findProblems"
+          "command": "chatgpt.findProblemsNormal",
+          "when": "editorHasSelection"
         },
         {
           "command": "chatgpt.optimize",
