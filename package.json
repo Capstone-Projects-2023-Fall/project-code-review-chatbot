@@ -154,6 +154,12 @@
       "title": "chatGPT",
       "type": "object",
       "properties": {
+        "chatgpt.useServerApi": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use Server API instead of your own",
+          "order": -1
+        },
         "chatgpt.apiKey": {
           "markdownDescription": "OpenAI API key from [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)",
           "type": "string",
