@@ -44,7 +44,7 @@
   "contributes": {
     "keybindings":[
       {
-        "command": "chatgpt.findProblems",
+        "command": "chatgpt.codeReview",
         "key": "ctrl+alt+p"
       }
     ],
