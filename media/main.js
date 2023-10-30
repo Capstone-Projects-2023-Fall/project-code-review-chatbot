@@ -27,22 +27,6 @@
     }
   });
 
-  /*
-  function fixCodeBlocks(response) {
-    // Use a regular expression to find all occurrences of the substring in the string
-    const REGEX_CODEBLOCK = new RegExp('\`\`\`', 'g');
-    const matches = response.match(REGEX_CODEBLOCK);
-
-    // Return the number of occurrences of the substring in the response, check if even
-    const count = matches ? matches.length : 0;
-    if (count % 2 === 0) {
-      return response;
-    } else {
-      // else append ``` to the end to make the last code block complete
-      return response.concat('\n\`\`\`');
-    }
-
-  }*/
 
   function setResponse() {
     var converter = new showdown.Converter({
@@ -54,54 +38,20 @@
     });
     // response = fixCodeBlocks(response);
     //html = converter.makeHtml(response);
-  
+
     // Render the main content in "main-content"
     //document.getElementById("main-content").innerHTML = html;
-  
+
     // Clear the existing suggestions before rendering new ones
     const suggestionsContainer = document.getElementById("suggestions-container");
     if (suggestionsContainer) {
       suggestionsContainer.innerHTML = '';
-  
+
       // Render the suggestions as an HTML list
       renderSuggestions(response);
     }
 
-    /*
-        var preCodeBlocks = document.querySelectorAll("pre code");
-        for (var i = 0; i < preCodeBlocks.length; i++) {
-          preCodeBlocks[i].classList.add(
-            "p-2",
-            "my-2",
-            "block",
-            "overflow-x-scroll"
-          );
-        }
-    
-    
-        var codeBlocks = document.querySelectorAll('code'); 
-            for (var i = 0; i < codeBlocks.length; i++) {
-                // Check if innertext starts with "Copy code"
-                if (codeBlocks[i].innerText.startsWith("Copy code")) {
-                    codeBlocks[i].innerText = codeBlocks[i].innerText.replace("Copy code", "");
-                }
-    
-                codeBlocks[i].classList.add("inline-flex", "max-w-full", "overflow-hidden", "rounded-sm", "cursor-pointer");
-    
-                codeBlocks[i].addEventListener('click', function (e) {
-                    e.preventDefault();
-                    vscode.postMessage({
-                        type: 'codeSelected',
-                        value: this.innerText
-                    });
-                });
-    
-                const d = document.createElement('div');
-                d.innerHTML = codeBlocks[i].innerHTML;
-                codeBlocks[i].innerHTML = null;
-                codeBlocks[i].appendChild(d);
-                d.classList.add("code");
-            }*/
+
 
     microlight.reset('code');
 
@@ -116,24 +66,41 @@
       return;
     }
 
-    // Create an ordered (or unordered) list for the suggestions
-    const listType = suggestions[0].title.toLowerCase().includes('do not number') ? 'ul' : 'ol';
 
     // Create the list
-    const list = document.createElement(listType);
+    const list = document.createElement('ol');
 
     // Add each suggestion as a list item
     suggestions.forEach((suggestion) => {
       const listItem = document.createElement("li");
       const titleElement = document.createElement("strong");
+      const caretButton = document.createElement("button");
+      const descriptionElement = document.createElement("div");
+
       titleElement.textContent = suggestion.title;
+      caretButton.textContent = "▼"; // Down arrow for dropdown
+
+      // Add click event to toggle description visibility
+      caretButton.addEventListener("click", () => {
+        descriptionElement.classList.toggle("hidden");
+        if (descriptionElement.classList.contains("hidden")) {
+          caretButton.textContent = "▼";
+        } else {
+          caretButton.textContent = "▲"; // Up arrow when description is visible
+        }
+      });
+
+
+      // Set up description element
+      descriptionElement.textContent = suggestion.description;
+      descriptionElement.classList.add("hidden"); // Hide by defaul
+
       listItem.appendChild(titleElement);
-      listItem.appendChild(document.createTextNode(suggestion.description));
+      listItem.appendChild(caretButton);
+      listItem.appendChild(descriptionElement);
+      //listItem.appendChild(document.createTextNode(suggestion.description));
       list.appendChild(listItem);
     });
-
-    // Clear the existing suggestions and add the new list
-    suggestionsContainer.innerHTML = '';
     suggestionsContainer.appendChild(list);
   }
 
@@ -152,8 +119,8 @@
           // Save the previous suggestion
           suggestions.push({ title: currentTitle, description: currentDescription });
         }
-        // Remove the leading "**" and trailing ":"
-        currentTitle = line.slice(2, -1);
+        // Remove the leading "**" and trailing "**"
+        currentTitle = line.slice(2, -2);
         currentDescription = '';
       } else if (line === suggestionDelimiter) {
         // Save the description when a delimiter is encountered
