@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 
 type AuthInfo = {apiKey?: string};
-type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string};
+type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean};
 
 
 const BASE_URL = 'https://api.openai.com/v1';
@@ -34,7 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
 		keepConversation: config.get('keepConversation') || false,
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
-		model: config.get('model') || 'gpt-4'
+		model: config.get('model') || 'gpt-4',
+		useServerApi: config.get('useServerApi') || false
 	});
 
 	// Register the provider with the extension's context
@@ -96,6 +97,10 @@ export function activate(context: vscode.ExtensionContext) {
 		} else if (event.affectsConfiguration('chatgpt.timeoutLength')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			provider.setSettings({ timeoutLength: config.get('timeoutLength') || 60 });
+		} else if (event.affectsConfiguration('chatgpt.useServerApi')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ useServerApi: config.get('useServerApi') || false });
+
 		}
 	});
 }
@@ -123,7 +128,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		keepConversation: true,
 		timeoutLength: 60,
 		apiUrl: BASE_URL,
-		model: 'gpt-4'
+		model: 'gpt-4',
+		useServerApi: false
 	};
 	private _authInfo?: AuthInfo;
 
@@ -232,8 +238,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		};
 
 		// Check if the ChatGPTAPI instance is defined
-		if (!this._chatGPTAPI) {
-			//this._newAPI();
+		if (!this._chatGPTAPI && !this._settings.useServerApi) {
+			this._newAPI();
 		}
 
 		// focus gpt activity from activity bar
@@ -280,94 +286,29 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 
-		try {
-			// Send the search prompt to the ChatGPTAPI instance and store the response
-			const res =
-     		 await axios.post("http://localhost/api/review",
-			  {prompt: this._fullPrompt, model: this._settings.model}
-			  
-			  );
-
-			if (this._currentMessageNumber !== currentMessageNumber) {
-				return;
-			}
-
-
-			
-			response = res.data.text;
-			if (res.data.detail?.usage?.total_tokens) {
-				response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
-			}
-
-			if (this._settings.keepConversation){
-				this._conversation = {
-					parentMessageId: res.data.id
-				};
-			}
-
-		} catch (e:any) {
-			console.error(e);
-			if (this._currentMessageNumber === currentMessageNumber){
-				response = this._response;
-				response += `\n\n---\n[ERROR] ${e}`;
-			}
-		}
-		
-
-		/*
-		if (!this._chatGPTAPI) {
-			response = '[ERROR] "API key not set or wrong, please go to extension settings to set it (read README.md for more info)"';
-		} else {
-			// If successfully signed in
-			console.log("sendMessage");
-			
-			// Make sure the prompt is shown
-			this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
-			this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
-
-
-
-
-			
-			const agent = this._chatGPTAPI;
-
-
-			
-
+		if (this._settings.useServerApi) {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
-				const res = await agent.sendMessage(searchPrompt, {
-					onProgress: (partialResponse) => {
-						// If the message number has changed, don't show the partial response
-						if (this._currentMessageNumber !== currentMessageNumber) {
-							return;
-						}
-						console.log("onProgress");
-						if (this._view && this._view.visible) {
-							response = partialResponse.text;
-							this._response = response;
-							this._view.webview.postMessage({ type: 'addResponse', value: response });
-						}
-					},
-					timeoutMs: (this._settings.timeoutLength || 60) * 1000,
-					...this._conversation
-				});
+				const res =
+				await axios.post("http://localhost/api/review",
+				{prompt: this._fullPrompt, model: this._settings.model}
+				
+				);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
 
-				console.log(res);
-
-				response = res.text;
-				if (res.detail?.usage?.total_tokens) {
-					response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
+				
+				response = res.data.text;
+				if (res.data.detail?.usage?.total_tokens) {
+					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
 				}
 
 				if (this._settings.keepConversation){
 					this._conversation = {
-						parentMessageId: res.id
+						parentMessageId: res.data.id
 					};
 				}
 
@@ -378,7 +319,68 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
-		}*/
+		} 
+		else {
+			if (!this._chatGPTAPI) {
+				response = '[ERROR] "API key not set or wrong, please go to extension settings to set it (read README.md for more info)"';
+			} else {
+				// If successfully signed in
+				console.log("sendMessage");
+				
+				// Make sure the prompt is shown
+				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
+				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
+	
+				
+				const agent = this._chatGPTAPI;
+	
+	
+				try {
+					// Send the search prompt to the ChatGPTAPI instance and store the response
+					const res = await agent.sendMessage(searchPrompt, {
+						onProgress: (partialResponse) => {
+							// If the message number has changed, don't show the partial response
+							if (this._currentMessageNumber !== currentMessageNumber) {
+								return;
+							}
+							console.log("onProgress");
+							if (this._view && this._view.visible) {
+								response = partialResponse.text;
+								this._response = response;
+								this._view.webview.postMessage({ type: 'addResponse', value: response });
+							}
+						},
+						timeoutMs: (this._settings.timeoutLength || 60) * 1000,
+						...this._conversation
+					});
+	
+					if (this._currentMessageNumber !== currentMessageNumber) {
+						return;
+					}
+	
+	
+					response = res.text;
+					if (res.detail?.usage?.total_tokens) {
+						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
+					}
+	
+					if (this._settings.keepConversation){
+						this._conversation = {
+							parentMessageId: res.id
+						};
+					}
+	
+				} catch (e:any) {
+					console.error(e);
+					if (this._currentMessageNumber === currentMessageNumber){
+						response = this._response;
+						response += `\n\n---\n[ERROR] ${e}`;
+					}
+				}
+			}
+		}
+		
+		
 
 		if (this._currentMessageNumber !== currentMessageNumber) {
 			return;
