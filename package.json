@@ -160,12 +160,6 @@
       "title": "chatGPT",
       "type": "object",
       "properties": {
-        "chatgpt.useServerApi": {
-          "type": "boolean",
-          "default": false,
-          "description": "Use Server API instead of your own",
-          "order": -1
-        },
         "chatgpt.apiKey": {
           "markdownDescription": "OpenAI API key from [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)",
           "type": "string",
@@ -183,7 +177,7 @@
             "gpt-3.5-turbo",
             "gpt-4"
           ],
-          "default": "gpt-4",
+          "default": "gpt-3.5-turbo",
           "description": "Which GPT model to use",
           "order": 1
         },
@@ -284,7 +278,6 @@
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
-    "axios": "^1.6.0",
     "chatgpt": "^5.2.5",
     "dotenv": "^16.3.1",
     "gpt3-tokenizer": "^1.1.5",
