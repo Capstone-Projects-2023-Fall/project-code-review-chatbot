@@ -364,7 +364,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
 					}
 	
-					if (this._settings.keepConversation){
+					if (this._settings.keepConversation) {
 						this._conversation = {
 							parentMessageId: res.id
 						};
