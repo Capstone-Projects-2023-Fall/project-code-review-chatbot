@@ -113,8 +113,153 @@ describe('ChatGPTViewProvider', () => {
 
     });
 
+    /*
+    Start of Integration Tests based off of Use Cases
+    Comments specify what use case the following test is for.
+    For more information use cases can be found at the following link:
+    https://capstone-projects-2023-fall.github.io/project-code-review-chatbot/docs/requirements/use-case-descriptions
+    */
+  
+
+    //Use Case 1
+    it('Refactors', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
       
+      const selectedText = "this is an example of text";
+      expect(selectedText).toBe('this is an example of text');
+      
+      chatGPTViewProvider.search('ChatGPTAPI.refactor', false);
+      expect(chatGPTViewProvider.search).toBeCalled();
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.refactor', false);
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
+
+    //Use Case 2
+    it('Refactors + Documents', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+      
+      const selectedText = "this is an example of text";
+      expect(selectedText).toBe('this is an example of text');
+      
+      chatGPTViewProvider.search('ChatGPTAPI.refactor', false);
+      expect(chatGPTViewProvider.search).toBeCalled();
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.refactor', false);
+
+      chatGPTViewProvider.search('ChatGPTAPI.documentation', true);
+      expect(chatGPTViewProvider.search).toBeCalled();
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.documentation', true);
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });  
+
+    //Use Case 3
+    it('Multiple Optimizations, Explanations, and Refactors', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+      
+      chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
+
+      chatGPTViewProvider.search('ChatGPTAPI.explain', false);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.explain', false);
+
+      const selectedText = "updated test text to be refactored";
+      expect(selectedText).toBe('updated test text to be refactored');
+
+      chatGPTViewProvider.search('ChatGPTAPI.refactor', false);      
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.refactor', false);
+
+      //repeat process as explained in use case. For argument's sake it was done three times
+      chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
+      chatGPTViewProvider.search('ChatGPTAPI.refctor', true);
+      chatGPTViewProvider.search('ChatGPTAPI.explain', true);
+
+      chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
+      chatGPTViewProvider.search('ChatGPTAPI.refctor', true);
+      chatGPTViewProvider.search('ChatGPTAPI.explain', true);
+
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(9);//9 times as there are 3 steps in each repeition
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
+
+    //Use Case 4
+    it('Prompt + Finds problems and Explains', () => {
+      //No prompt feature has been made yet so this part will be skipped for now
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+
+      chatGPTViewProvider.search('ChatGPTAPI.findProblems', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.findProblems', true);
+
+      chatGPTViewProvider.search('ChatGPTAPI.explain', false);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.explain', false);
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
+
+    //Use Case 5
+    it('Finds', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+
+      chatGPTViewProvider.search('ChatGPTAPI.findProblems', true);
+      chatGPTViewProvider.search('ChatGPTAPI.findProblems', true);
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(2);
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
     
+    //Use Case 6
+    it('Catch commit and Optimize', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+
+      chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
+
+    //Use Case 7
+    it('Explain loop', () => {
+      const authInfo = {apiKey: 'testKey' };
+      chatGPTViewProvider.setAuthenticationInfo(authInfo);
+      expect(chatGPTViewProvider.setAuthenticationInfo).toBeCalled();
+
+      chatGPTViewProvider.search('ChatGPTAPI.refactor', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.refactor', true);
+      chatGPTViewProvider.search('ChatGPTAPI.optimize', true);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.optimize', true);
+
+
+      chatGPTViewProvider.search('ChatGPTAPI.explain', false);
+      chatGPTViewProvider.search('ChatGPTAPI.explain', false);
+      chatGPTViewProvider.search('ChatGPTAPI.explain', false);
+      expect(chatGPTViewProvider.search).toBeCalledWith('ChatGPTAPI.explain', false);
+      expect(chatGPTViewProvider.search).toHaveBeenCalledTimes(5);
+
+
+      chatGPTViewProvider.resetConversation();
+      expect(chatGPTViewProvider.resetConversation).toBeCalled();
+    });
+
+/* End of Integration Tests */
 
   });
 
