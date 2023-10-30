@@ -33,6 +33,7 @@
     "onView:chatgpt.chatView",
     "onCommand:chatgpt.ask",
     "onCommand:chatgpt.explain",
+    "onCommand:chatgpt.codeReview",
     "onCommand:chatgpt.refactor",
     "onCommand:chatgpt.optimize",
     "onCommand:chatgpt.findProblems",
@@ -55,6 +56,10 @@
       {
         "command": "chatgpt.explain",
         "title": "ChatGPT: Explain selection"
+      },
+      {
+        "command": "chatgpt.codeReview",
+        "title": "ChatGPT: Code Review"
       },
       {
         "command": "chatgpt.refactor",
@@ -116,6 +121,11 @@
           "command": "chatgpt.findProblemsNormal",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@6"
+        },
+        {
+          "command": "chatgpt.codeReview",
+          "when": "editorHasSelection",
+          "group": "chatgpt-menu-group@7"
         }
       ],
       "commandPalette": [
@@ -124,6 +134,10 @@
         },
         {
           "command": "chatgpt.explain",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "chatgpt.codeReview",
           "when": "editorHasSelection"
         },
         {
@@ -255,6 +269,12 @@
           "default": true,
           "description": "Append language id of the selected code to the codeblock (```language...code...```)",
           "order": 11
+        },
+        "chatgpt.promptPrefix.codeReview": {
+          "type": "string",
+          "default": "Perform a code review on the following code: ",
+          "description": "The prompt prefix used for reviewing a chunk of code.",
+          "order": 12
         }
       }
     }
