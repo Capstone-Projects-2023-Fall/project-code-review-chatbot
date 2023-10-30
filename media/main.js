@@ -66,6 +66,8 @@
       return;
     }
 
+    const header = document.createElement('h3');
+    header.innerHTML = `Before you commit your code, here are some suggestions on how your code can be improved:`;
 
     // Create the list
     const list = document.createElement('ol');
@@ -76,6 +78,8 @@
       const titleElement = document.createElement("strong");
       const caretButton = document.createElement("button");
       const descriptionElement = document.createElement("div");
+
+      listItem.classList.add("my-3");
 
       titleElement.textContent = suggestion.title;
       caretButton.textContent = "▼"; // Down arrow for dropdown
