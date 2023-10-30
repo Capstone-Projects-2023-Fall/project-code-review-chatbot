@@ -171,7 +171,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				apiBaseUrl: this._settings.apiUrl,
 				completionParams: { model:this._settings.model || "gpt-4" },
 			});
-			// console.log( this._chatGPTAPI );
+			// console.log( this._chatGPTAPI ); 
 		}
 	}
 
