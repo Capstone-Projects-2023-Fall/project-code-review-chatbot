@@ -34,6 +34,7 @@
     "onCommand:chatgpt.ask",
     "onCommand:chatgpt.explain",
     "onCommand:chatgpt.codeReview",
+    "onCommand:chatgpt.codeReviewAddComments",
     "onCommand:chatgpt.refactor",
     "onCommand:chatgpt.optimize",
     "onCommand:chatgpt.findProblems",
@@ -60,6 +61,10 @@
       {
         "command": "chatgpt.codeReview",
         "title": "ChatGPT: Code Review"
+      },
+      {
+        "command": "chatgpt.codeReviewAddComments",
+        "title": "ChatGPT: Code Review and Add Comments"
       },
       {
         "command": "chatgpt.refactor",
@@ -126,6 +131,11 @@
           "command": "chatgpt.codeReview",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@7"
+        },
+        {
+          "command": "chatgpt.codeReviewAddComments",
+          "when": "editorHasSelection",
+          "group": "chatgpt-menu-group@8"
         }
       ],
       "commandPalette": [
@@ -138,6 +148,10 @@
         },
         {
           "command": "chatgpt.codeReview",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "chatgpt.codeReviewAddComments",
           "when": "editorHasSelection"
         },
         {
@@ -272,7 +286,13 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Perform a code review on the following code: ",
+          "default": "Perform a code review on the following code focus on ways to improve code quality, readability, and maintainability: ",
+          "description": "The prompt prefix used for reviewing a chunk of code.",
+          "order": 12
+        },
+        "chatgpt.promptPrefix.codeReviewAddComments": {
+          "type": "string",
+          "default": "Perform a code review on the following code focus on ways to improve code quality, readability, and maintainability. Also tell me where I can add comments to make my code more clear to other people who may be viewing it: ",
           "description": "The prompt prefix used for reviewing a chunk of code.",
           "order": 12
         }
