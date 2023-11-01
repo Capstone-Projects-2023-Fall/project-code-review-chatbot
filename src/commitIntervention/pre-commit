@@ -10,14 +10,24 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
     
     if [[ "$(uname)" == "Darwin" ]]; then
         osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
+        user_choice=$(osascript -e 'display dialog "Do you want to proceed with the commit?" buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
     elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
         echo "detected windows device"
         powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
+        user_choice=$(powershell.exe -command "$a = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if ($a -eq 'Yes') {'Yes'} else {'No'}")
     else
         echo "Unsupported OS."
+        exit 1
     fi
     
-    exit 0 
+    if [ "$user_choice" == "Yes" ]; then
+        echo "Proceeding with the commit."
+        exit 0
+    else
+        echo "Commit aborted by the user."
+        exit 1
+    fi
+
 else
     echo "Skipping code review."
     exit 0
