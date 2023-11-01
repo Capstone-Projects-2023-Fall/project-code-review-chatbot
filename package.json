@@ -35,6 +35,8 @@
     "onCommand:chatgpt.explain",
     "onCommand:chatgpt.codeReview",
     "onCommand:chatgpt.codeReviewAddComments",
+    "onCommand:chatgpt.testSuggestions",
+    "onCommand:chatgpt.legibilitySuggestions",
     "onCommand:chatgpt.refactor",
     "onCommand:chatgpt.optimize",
     "onCommand:chatgpt.findProblems",
@@ -65,6 +67,14 @@
       {
         "command": "chatgpt.codeReviewAddComments",
         "title": "ChatGPT: Code Review and Add Comments"
+      },
+      {
+        "command": "chatgpt.testSuggestions",
+        "title": "ChatGPT: Test Suggestions"
+      },
+      {
+        "command": "chatgpt.legibilitySuggestions",
+        "title": "ChatGPT: Legibiliity Suggestions"
       },
       {
         "command": "chatgpt.refactor",
@@ -136,6 +146,16 @@
           "command": "chatgpt.codeReviewAddComments",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@8"
+        },
+        {
+          "command": "chatgpt.testSuggestions",
+          "when": "editorHasSelection",
+          "group": "chatgpt-menu-group@9"
+        },
+        {
+          "command": "chatgpt.legibilitySuggestions",
+          "when": "editorHasSelection",
+          "group": "chatgpt-menu-group@10"
         }
       ],
       "commandPalette": [
@@ -152,6 +172,14 @@
         },
         {
           "command": "chatgpt.codeReviewAddComments",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "chatgpt.testSuggestions",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "chatgpt.legibilitySuggestions",
           "when": "editorHasSelection"
         },
         {
@@ -293,8 +321,20 @@
         "chatgpt.promptPrefix.codeReviewAddComments": {
           "type": "string",
           "default": "Perform a code review on the following code focus on ways to improve code quality, readability, and maintainability. Also tell me where I can add comments to make my code more clear to other people who may be viewing it: ",
-          "description": "The prompt prefix used for reviewing a chunk of code.",
-          "order": 12
+          "description": "The prompt prefix used for reviewing a chunk of code and suggesting comments.",
+          "order": 13
+        },
+        "chatgpt.promptPrefix.testSuggestions": {
+          "type": "string",
+          "default": "Suggest some tests I can write for the following code. Avoid atually wirting the tests out, but explain what some benenfical tests would be:",
+          "description": "The prompt prefix used for the bot to sugget ways to test code.",
+          "order": 14
+        },
+        "chatgpt.promptPrefix.legibilitySuggestions": {
+          "type": "string",
+          "default": "Suggest some ways I can make the following code more legible and less complex:",
+          "description": "The prompt prefix used for the bot to suggest ways to improve legibility and make code less complex.",
+          "order": 15
         }
       }
     }
