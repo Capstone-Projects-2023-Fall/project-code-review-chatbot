@@ -321,8 +321,8 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Perform a code review on the following code focus on ways to improve code quality, readability, and maintainability: ",
-          "description": "The prompt prefix used for reviewing a chunk of code.",
+          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, and Legibility. Do not give me specific answers on how to fix the code, suggestions only based on the review.",
+          "description": "Code Review of the whole file.",
           "order": 12
         },
         "chatgpt.promptPrefix.codeReviewAddComments": {
