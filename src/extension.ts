@@ -540,13 +540,17 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			<body>
 				<section id="extension-description" class="p-4">
 					<h1>Code Review Chatbot</h1>
-					<p>Welcome to <strong>Welcome To Code Review Chatbot</strong>! This tool is designed to help you review your code effectively</p>
+					<p>Welcome to <strong>Welcome To Code Review Chatbot</strong>!<br>This tool is designed to help you review your code effectively</p>
 					<p>Here's how you can get started:</p>
 					<ol>
-						<li><strong>Pre-commit Hook Setup:</strong> explain code review here.</li>
-						<li><strong>Commit Detection:</strong> explain commit detection here.</li>
+						<li><strong>Pre-commit Hook Setup:</strong><br>pre-commit github hook has to be setup in order for this extension to work. <br>
+						If you missed the notification upon lauch, you can go to settings -> extension settings, and toggle the pre-hook automation on. 
+						You should see the notification popup again on the bottom right hand corner.</li><br><br>
+						<li><strong>Code Review:</strong><br>A Code Review Can be triggered in various ways.<br> 1. Highlight a code block, and run code review commands by selected one by right clicking.<br>
+						2. If pre-commit is successfully set up, your code should automatically run a code review upon commit </li>
 						<!-- Add more features as needed -->
 					</ol>
+					<br>
 					<p>For more information, visit our Github Repository <a href="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot" target="_blank">documentation</a>.</p>
 				</section>
 				
