@@ -103,12 +103,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
-		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview')),
+		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview',true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.findProblemsNormal', () => commandHandler('promptPrefix.findProblems')),
-		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems',true)),
+		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
 		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
 	);
@@ -510,7 +510,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
 		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
 		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-	
+
 		return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -538,20 +538,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<section id="extension-description" class="p-4">
-					<h1>Code Review Chatbot</h1>
-					<p>Welcome to <strong>Welcome To Code Review Chatbot</strong>! This tool is designed to help you review your code effectively</p>
-					<p>Here's how you can get started:</p>
-					<ol>
-						<li><strong>Pre-commit Hook Setup:</strong> explain code review here.</li>
-						<li><strong>Commit Detection:</strong> explain commit detection here.</li>
-						<!-- Add more features as needed -->
-					</ol>
-					<p>For more information, visit our Github Repository <a href="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot" target="_blank">documentation</a>.</p>
-				</section>
+				<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
 				
-				<!-- The rest of your webview content -->
-	
+				<div id="response" class="pt-4 text-sm">
+				</div>
+
 				<script src="${scriptUri}"></script>
 			</body>
 			</html>`;
