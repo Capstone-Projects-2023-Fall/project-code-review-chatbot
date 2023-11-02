@@ -22,10 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// Create a new ChatGPTViewProvider instance and register it with the extension's context
 	const provider = new ChatGPTViewProvider(context.extensionUri);
 
-	// Put configuration settings into the provider
-	provider.setAuthenticationInfo({
-		apiKey: config.get('apiKey')
-	});
 	provider.setSettings({
 		selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false,
 		codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false,
@@ -36,6 +32,14 @@ export function activate(context: vscode.ExtensionContext) {
 		model: config.get('model') || 'gpt-4',
 		useServerApi: config.get('useServerApi') || false
 	});
+	// Put configuration settings into the provider
+	if (!config.get('useServerApi')) {
+		provider.setAuthenticationInfo({
+			apiKey: config.get('apiKey')
+		});
+	}
+	
+	
 
 	// Register the provider with the extension's context
 	context.subscriptions.push(
@@ -146,6 +150,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public setAuthenticationInfo(authInfo: AuthInfo) {
 		this._authInfo = authInfo;
 		this._newAPI();
+			
 	}
 
 	public setSettings(settings: Settings) {
@@ -155,7 +160,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 		this._settings = {...this._settings, ...settings};
 
-		if (changeModel) {
+		if (changeModel && !settings.useServerApi) {
 			this._newAPI();
 		}
 	}
@@ -285,7 +290,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		
 		// Increment the message number
 		this._currentMessageNumber++;
-		let currentMessageNumber = this._currentMessageNumber;
+		let currentMessageNumber = this._currentMessageNumber; 
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
