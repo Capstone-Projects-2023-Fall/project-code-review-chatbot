@@ -3,6 +3,7 @@ import { ChatGPTAPI } from 'chatgpt';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
+import * as fs from 'fs';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -15,6 +16,41 @@ const BASE_URL = 'https://api.openai.com/v1';
 
 export function activate(context: vscode.ExtensionContext) {
 
+	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
+        const userApproval = await vscode.window.showInformationMessage(
+            'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
+            'Yes', 'No'
+        );
+
+        if (userApproval === 'Yes') {
+            try {
+                const workspaceFolders = vscode.workspace.workspaceFolders;
+                if (!workspaceFolders) {
+                    vscode.window.showErrorMessage('No workspace is open.');
+                    return;
+                }
+
+                const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+                const scriptPath = path.join(gitHooksPath, 'pre-commit');
+
+                if (!fs.existsSync(gitHooksPath)) {
+                    vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
+                    return;
+                }
+
+                const scriptContent = getScriptContent();
+                fs.writeFileSync(scriptPath, scriptContent);
+                fs.chmodSync(scriptPath, '755'); 
+
+                vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+            } catch (error) {
+                vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
+                console.error(error);
+            }
+        }
+    });
+	context.subscriptions.push(disposable);
+	
 	console.log('activating extension "chatgpt"');
 	// Get the settings from the extension's configuration
 	const config = vscode.workspace.getConfiguration('chatgpt');
@@ -108,12 +144,73 @@ export function activate(context: vscode.ExtensionContext) {
 		} else if (event.affectsConfiguration('chatgpt.useServerApi')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			provider.setSettings({ useServerApi: config.get('useServerApi') || false });
-
 		}
 	});
+
+	vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+            const config = vscode.workspace.getConfiguration('chatgpt');
+            const enableHook = config.get('enablePreCommitHook', false);
+            if (enableHook) {
+                setupPreCommitHookIfNecessary();
+            }
+        }
+    });
+
+	setupPreCommitHookIfNecessary();
 }
 
+async function setupPreCommitHookIfNecessary() {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+        const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+        const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
+        if (!fs.existsSync(scriptPath)) {
+            await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
+        }
+    }
+}
+
+function getScriptContent(): string {
+    return `
+#!/bin/bash
+# Script for commit intervention.
+
+# Change this to true to enable commit intervention
+export RUN_CODE_REVIEW=true
+
+if [ "$RUN_CODE_REVIEW" = "true" ]; then
+
+	echo "Running code review..."
+	
+	if [[ "$(uname)" == "Darwin" ]]; then
+		osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
+		user_choice=$(osascript -e 'display dialog "Do you want to proceed with the commit?" buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
+	elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
+		echo "detected windows device"
+		powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
+		user_choice=$(powershell.exe -command "$a = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if ($a -eq 'Yes') {'Yes'} else {'No'}")
+	else
+		echo "Unsupported OS."
+		exit 1
+	fi
+	
+	if [ "$user_choice" == "Yes" ]; then
+		echo "Proceeding with the commit."
+		exit 0
+	else
+		echo "Commit aborted by the user."
+		exit 1
+	fi
+
+else
+	echo "Skipping code review."
+	exit 0
+fi
+	
+    `;
+}
 
 
 
@@ -405,13 +502,15 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
+	
+
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
 		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
 		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-
+	
 		return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -439,11 +538,20 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Ask ChatGPT something" id="prompt-input" />
+				<section id="extension-description" class="p-4">
+					<h1>Code Review Chatbot</h1>
+					<p>Welcome to <strong>Welcome To Code Review Chatbot</strong>! This tool is designed to help you review your code effectively</p>
+					<p>Here's how you can get started:</p>
+					<ol>
+						<li><strong>Pre-commit Hook Setup:</strong> explain code review here.</li>
+						<li><strong>Commit Detection:</strong> explain commit detection here.</li>
+						<!-- Add more features as needed -->
+					</ol>
+					<p>For more information, visit our Github Repository <a href="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot" target="_blank">documentation</a>.</p>
+				</section>
 				
-				<div id="response" class="pt-4 text-sm">
-				</div>
-
+				<!-- The rest of your webview content -->
+	
 				<script src="${scriptUri}"></script>
 			</body>
 			</html>`;
