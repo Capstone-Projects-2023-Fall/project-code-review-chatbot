@@ -540,7 +540,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			<body>
 				<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
 				
-				<div id="response" class="pt-4 text-sm">
+				<div id="response" class="pt-4 text-sm"> 
 				</div>
 
 				<script src="${scriptUri}"></script>
