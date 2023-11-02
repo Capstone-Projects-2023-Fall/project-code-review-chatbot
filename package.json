@@ -232,6 +232,12 @@
           "description": "Use Server API instead of your own",
           "order": -1
         },
+        "chatgpt.enablePreCommitHook":{
+          "type": "boolean",
+          "default":false,
+          "description": "Enable automatic setup of the pre-commit hook.",
+          "order": -2
+        },
         "chatgpt.apiKey": {
           "markdownDescription": "OpenAI API key from [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)",
           "type": "string",

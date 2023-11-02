@@ -147,6 +147,16 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+            const config = vscode.workspace.getConfiguration('chatgpt');
+            const enableHook = config.get('enablePreCommitHook', false);
+            if (enableHook) {
+                setupPreCommitHookIfNecessary();
+            }
+        }
+    });
+
 	setupPreCommitHookIfNecessary();
 }
 
@@ -500,7 +510,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
 		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
 		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-
+	
 		return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -528,11 +538,20 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Ask ChatGPT something" id="prompt-input" />
+				<section id="extension-description" class="p-4">
+					<h1>Code Review Chatbot</h1>
+					<p>Welcome to <strong>Welcome To Code Review Chatbot</strong>! This tool is designed to help you review your code effectively</p>
+					<p>Here's how you can get started:</p>
+					<ol>
+						<li><strong>Pre-commit Hook Setup:</strong> explain code review here.</li>
+						<li><strong>Commit Detection:</strong> explain commit detection here.</li>
+						<!-- Add more features as needed -->
+					</ol>
+					<p>For more information, visit our Github Repository <a href="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot" target="_blank">documentation</a>.</p>
+				</section>
 				
-				<div id="response" class="pt-4 text-sm">
-				</div>
-
+				<!-- The rest of your webview content -->
+	
 				<script src="${scriptUri}"></script>
 			</body>
 			</html>`;
