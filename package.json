@@ -30,6 +30,7 @@
     "refactor"
   ],
   "activationEvents": [
+    "*",
     "onView:chatgpt.chatView",
     "onCommand:chatgpt.ask",
     "onCommand:chatgpt.explain",
