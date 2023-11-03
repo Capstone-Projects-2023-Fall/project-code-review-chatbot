@@ -106,8 +106,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.codeReview', () => {
 			commandHandler('promptPrefix.codeReview', true);
 			console.log("codeReview has been selected");
+			provider.sendWebviewMessage('codeReviewCommandExecuted');
 			
-
 		}),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
@@ -255,6 +255,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._newAPI();
 
 	}
+
+	public sendWebviewMessage(type: string, data?: any) {
+		this._view?.webview.postMessage({type, data});
+	}
+	
 
 	public setSettings(settings: Settings) {
 		let changeModel = false;
@@ -557,6 +562,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					<div id="response" class="pt-4 text-sm"> 
 					</div>
 				</div>
+				<p id="test-p"></p>
 
 				<!-- Your button at the bottom -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>

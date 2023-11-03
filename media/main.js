@@ -34,6 +34,9 @@
         }
         break;
       }
+      case "codeReviewCommandExecuted": {
+        document.getElementById("test-p").innerHTML = `codeReview selected`;
+      }
     }
   });
 
