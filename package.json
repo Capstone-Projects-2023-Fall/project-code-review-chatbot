@@ -104,6 +104,10 @@
       {
         "command": "chatgpt.tryAgain",
         "title": "Retry ChatGPT request"
+      },
+      {
+        "command": "chatgpt.learnMore",
+        "title": "Learn More"
       }
     ],
     "menus": {
@@ -342,6 +346,12 @@
           "default": "Suggest some ways I can make the following code more legible and less complex:",
           "description": "The prompt prefix used for the bot to suggest ways to improve legibility and make code less complex.",
           "order": 15
+        },
+        "chatgpt.promptPrefix.learnMore":{
+          "type": "string",
+          "default": "Would like to learn More about the previous suggestion.",
+          "description": "LearnMore function for the responses",
+          "order": 16
         }
       }
     }

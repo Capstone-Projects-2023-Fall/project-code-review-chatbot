@@ -7,6 +7,13 @@
 
   let response = '';
 
+  document.getElementById('learn-more-button').addEventListener('click', () => {
+    // Send a message to your extension to execute the command
+    vscode.postMessage({
+        type: 'learnMore'
+    });
+});
+
   // Handle messages sent from the extension to the webview
   window.addEventListener("message", (event) => {
     const message = event.data;
@@ -21,7 +28,9 @@
         break;
       }
       case "setPrompt": {
-        document.getElementById("prompt-input").value = message.value;
+        if (message.value !== undefined) {
+          document.getElementById("prompt-input").value = message.value;
+        }
         break;
       }
     }
