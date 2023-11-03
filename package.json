@@ -337,7 +337,7 @@
         },
         "chatgpt.promptPrefix.testSuggestions": {
           "type": "string",
-          "default": "Suggest some tests I can write for the following code. Avoid atually wirting the tests out, but explain what some benenfical tests would be:",
+          "default": "Suggest some tests I can write for the following code. Avoid actually writing the tests out, but explain what some benefical tests would be:",
           "description": "The prompt prefix used for the bot to sugget ways to test code.",
           "order": 14
         },

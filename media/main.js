@@ -12,6 +12,7 @@
     vscode.postMessage({
         type: 'learnMore'
     });
+
 });
 
   // Handle messages sent from the extension to the webview

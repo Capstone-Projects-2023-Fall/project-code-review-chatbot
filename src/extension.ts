@@ -9,48 +9,48 @@ import * as fs from 'fs';
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 
-type AuthInfo = {apiKey?: string};
-type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean};
+type AuthInfo = { apiKey?: string };
+type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
 
 const BASE_URL = 'https://api.openai.com/v1';
 
 export function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
-        const userApproval = await vscode.window.showInformationMessage(
-            'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
-            'Yes', 'No'
-        );
+		const userApproval = await vscode.window.showInformationMessage(
+			'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
+			'Yes', 'No'
+		);
 
-        if (userApproval === 'Yes') {
-            try {
-                const workspaceFolders = vscode.workspace.workspaceFolders;
-                if (!workspaceFolders) {
-                    vscode.window.showErrorMessage('No workspace is open.');
-                    return;
-                }
+		if (userApproval === 'Yes') {
+			try {
+				const workspaceFolders = vscode.workspace.workspaceFolders;
+				if (!workspaceFolders) {
+					vscode.window.showErrorMessage('No workspace is open.');
+					return;
+				}
 
-                const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
-                const scriptPath = path.join(gitHooksPath, 'pre-commit');
+				const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+				const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
-                if (!fs.existsSync(gitHooksPath)) {
-                    vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
-                    return;
-                }
+				if (!fs.existsSync(gitHooksPath)) {
+					vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
+					return;
+				}
 
-                const scriptContent = getScriptContent();
-                fs.writeFileSync(scriptPath, scriptContent);
-                fs.chmodSync(scriptPath, '755'); 
+				const scriptContent = getScriptContent();
+				fs.writeFileSync(scriptPath, scriptContent);
+				fs.chmodSync(scriptPath, '755');
 
-                vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
-            } catch (error) {
-                vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
-                console.error(error);
-            }
-        }
-    });
+				vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+			} catch (error) {
+				vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
+				console.error(error);
+			}
+		}
+	});
 	context.subscriptions.push(disposable);
-	
+
 	console.log('activating extension "chatgpt"');
 	// Get the settings from the extension's configuration
 	const config = vscode.workspace.getConfiguration('chatgpt');
@@ -74,36 +74,41 @@ export function activate(context: vscode.ExtensionContext) {
 			apiKey: config.get('apiKey')
 		});
 	}
-	
-	
+
+
 
 	// Register the provider with the extension's context
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(ChatGPTViewProvider.viewType, provider,  {
+		vscode.window.registerWebviewViewProvider(ChatGPTViewProvider.viewType, provider, {
 			webviewOptions: { retainContextWhenHidden: true }
 		})
 	);
 
 
-	const commandHandler = (command:string, useEntireFile: boolean = false) => {
+	const commandHandler = (command: string, useEntireFile: boolean = false) => {
 		const config = vscode.workspace.getConfiguration('chatgpt');
 		const prompt = config.get(command) as string;
-		provider.search(prompt, useEntireFile); 
+		provider.search(prompt, useEntireFile);
 	};
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.ask', () => 
+		vscode.commands.registerCommand('chatgpt.ask', () =>
 			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-			.then((value) => {
-				if (value) {
-					provider.search(value);
-				}
-			})
+				.then((value) => {
+					if (value) {
+						provider.search(value);
+					}
+				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
-		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview',true)),
+		vscode.commands.registerCommand('chatgpt.codeReview', () => {
+			commandHandler('promptPrefix.codeReview', true);
+			console.log("codeReview has been selected");
+			
+
+		}),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
@@ -119,14 +124,14 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
 		if (event.affectsConfiguration('chatgpt.apiKey')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setAuthenticationInfo({apiKey: config.get('apiKey')});
-		}else if (event.affectsConfiguration('chatgpt.apiUrl')) {
+			provider.setAuthenticationInfo({ apiKey: config.get('apiKey') });
+		} else if (event.affectsConfiguration('chatgpt.apiUrl')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
-			let url = config.get('apiUrl')as string || BASE_URL;
+			let url = config.get('apiUrl') as string || BASE_URL;
 			provider.setSettings({ apiUrl: url });
 		} else if (event.affectsConfiguration('chatgpt.model')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ model: config.get('model') || 'gpt-4' }); 
+			provider.setSettings({ model: config.get('model') || 'gpt-4' });
 		} else if (event.affectsConfiguration('chatgpt.selectedInsideCodeblock')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			provider.setSettings({ selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false });
@@ -149,32 +154,32 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
-            const config = vscode.workspace.getConfiguration('chatgpt');
-            const enableHook = config.get('enablePreCommitHook', false);
-            if (enableHook) {
-                setupPreCommitHookIfNecessary();
-            }
-        }
-    });
+		if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const enableHook = config.get('enablePreCommitHook', false);
+			if (enableHook) {
+				setupPreCommitHookIfNecessary();
+			}
+		}
+	});
 
 	setupPreCommitHookIfNecessary();
 }
 
 async function setupPreCommitHookIfNecessary() {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
-        const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
-        const scriptPath = path.join(gitHooksPath, 'pre-commit');
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+		const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+		const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
-        if (!fs.existsSync(scriptPath)) {
-            await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
-        }
-    }
+		if (!fs.existsSync(scriptPath)) {
+			await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
+		}
+	}
 }
 
 function getScriptContent(): string {
-    return `
+	return `
 #!/bin/bash
 # Script for commit intervention.
 
@@ -243,12 +248,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	constructor(private readonly _extensionUri: vscode.Uri) {
 
 	}
-	
+
 	// Set the API key and create a new API instance based on this key
 	public setAuthenticationInfo(authInfo: AuthInfo) {
 		this._authInfo = authInfo;
 		this._newAPI();
-			
+
 	}
 
 	public setSettings(settings: Settings) {
@@ -256,7 +261,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		if (settings.apiUrl || settings.model) {
 			changeModel = true;
 		}
-		this._settings = {...this._settings, ...settings};
+		this._settings = { ...this._settings, ...settings };
 
 		if (changeModel && !settings.useServerApi) {
 			this._newAPI();
@@ -272,11 +277,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		console.log("New API");
 		if (!this._authInfo || !this._settings?.apiUrl) {
 			console.warn("API key or API URL not set, please go to extension settings (read README.md for more info)");
-		}else{	
+		} else {
 			this._chatGPTAPI = new ChatGPTAPI({
 				apiKey: OPENAI_API_KEY,
 				apiBaseUrl: this._settings.apiUrl,
-				completionParams: { model:this._settings.model || "gpt-4" },
+				completionParams: { model: this._settings.model || "gpt-4" },
 			});
 			// console.log( this._chatGPTAPI ); 
 		}
@@ -362,7 +367,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		} else {
 			this._view?.show?.(true);
 		}
-		
+
 		let response = '';
 		this._response = '';
 
@@ -392,10 +397,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			searchPrompt = prompt;
 		}
 		this._fullPrompt = searchPrompt;
-		
+
 		// Increment the message number
 		this._currentMessageNumber++;
-		let currentMessageNumber = this._currentMessageNumber; 
+		let currentMessageNumber = this._currentMessageNumber;
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
@@ -404,17 +409,17 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-				await axios.post("http://localhost/api/review",
-				{prompt: this._fullPrompt, model: this._settings.model}
-				
-				);
+					await axios.post("http://localhost/api/review",
+						{ prompt: this._fullPrompt, model: this._settings.model }
+
+					);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
 
-				
+
 				response = res.data.text;
 				if (res.data.detail?.usage?.total_tokens) {
 					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
@@ -433,22 +438,22 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
-		} 
+		}
 		else {
 			if (!this._chatGPTAPI) {
 				response = '[ERROR] "API key not set or wrong, please go to extension settings to set it (read README.md for more info)"';
 			} else {
 				// If successfully signed in
 				console.log("sendMessage");
-				
+
 				// Make sure the prompt is shown
 				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
-	
-				
+
+
 				const agent = this._chatGPTAPI;
-	
-	
+
+
 				try {
 					// Send the search prompt to the ChatGPTAPI instance and store the response
 					const res = await agent.sendMessage(searchPrompt, {
@@ -467,34 +472,34 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						timeoutMs: (this._settings.timeoutLength || 60) * 1000,
 						...this._conversation
 					});
-	
+
 					if (this._currentMessageNumber !== currentMessageNumber) {
 						return;
 					}
-	
-	
+
+
 					response = res.text;
 					if (res.detail?.usage?.total_tokens) {
 						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
 					}
-	
+
 					if (this._settings.keepConversation) {
 						this._conversation = {
 							parentMessageId: res.id
 						};
 					}
-	
-				} catch (e:any) {
+
+				} catch (e: any) {
 					console.error(e);
-					if (this._currentMessageNumber === currentMessageNumber){
+					if (this._currentMessageNumber === currentMessageNumber) {
 						response = this._response;
 						response += `\n\n---\n[ERROR] ${e}`;
 					}
 				}
 			}
 		}
-		
-		
+
+
 
 		if (this._currentMessageNumber !== currentMessageNumber) {
 			return;
@@ -510,7 +515,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
-	
+
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
@@ -563,4 +568,4 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
