@@ -110,6 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.findProblemsNormal', () => commandHandler('promptPrefix.findProblems')),
 		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
 		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
+		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
 	);
 
@@ -301,6 +302,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 		// add an event listener for messages received by the webview
 		webviewView.webview.onDidReceiveMessage(data => {
+			console.log("Received message:", data);
+			console.log(data.type);
 			switch (data.type) {
 				case 'codeSelected':
 					{
@@ -318,6 +321,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				case 'prompt':
 					{
 						this.search(data.value);
+					}
+				case 'learnMore':
+					{
+						vscode.commands.executeCommand("chatgpt.learnMore");
+						break;
 					}
 			}
 		});
@@ -537,11 +545,16 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 				</style>
 			</head>
-			<body>
-				<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
-				
-				<div id="response" class="pt-4 text-sm"> 
+			<body style="display: flex; flex-direction: column; height: 100vh;">
+				<div style="flex: 1;">
+					<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
+
+					<div id="response" class="pt-4 text-sm"> 
+					</div>
 				</div>
+
+				<!-- Your button at the bottom -->
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 
 				<script src="${scriptUri}"></script>
 			</body>
