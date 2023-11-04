@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ trau3-patch-1 ]
     paths:
       -  'server/code-review-chatbot/**'
 
