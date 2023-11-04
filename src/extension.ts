@@ -345,6 +345,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 
+
 	public async search(prompt?: string, useEntireFile: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
@@ -395,16 +396,24 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		
 		// Increment the message number
 		this._currentMessageNumber++;
-		let currentMessageNumber = this._currentMessageNumber; 
+		let currentMessageNumber = this._currentMessageNumber;
+		
+		
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
-		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
+		this._view?.webview.postMessage({ type: 'addResponse', value: '' });
+
+		if (this._view) {
+			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
+			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString()});
+		}
+		
 
 		if (this._settings.useServerApi) {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-				await axios.post("http://localhost/api/review",
+				await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
 				{prompt: this._fullPrompt, model: this._settings.model}
 				
 				);
@@ -542,6 +551,39 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 				h1, h2, h3, h4, h5, h6 {
 					font-weight: bold !important;
+				}
+
+				.center {
+					display: block;
+					margin: auto;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					width: 10%;
+				}
+				
+				#spin-animation {
+					animation-name: spin-animation;
+					animation-duration: 1500ms;
+					animation-iteration-count: infinite;
+					animation-timing-function: ease-in-out;
+					
+				}
+				
+				@keyframes spin-animation {
+					0% {
+						transform: rotate(0deg);
+					}
+					25% {
+						transform: rotate(0deg);
+					}
+					75% {
+						transform: rotate(360deg);
+					}
+					100%{
+						transform: rotate(360deg);
+					}
 				}
 				</style>
 			</head>
