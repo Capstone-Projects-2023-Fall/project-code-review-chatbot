@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       -  'server/code-review-chatbot/**'
+  workflow_dispatch:
 
 jobs:
   deploy:
