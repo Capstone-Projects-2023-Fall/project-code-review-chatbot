@@ -35,6 +35,7 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
+        npm run build
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       working-directory: ./server/code-review-chatbot
       env:
