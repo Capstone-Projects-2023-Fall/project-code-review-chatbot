@@ -30,11 +30,13 @@ jobs:
     - name: Directory Permissions
       working-directory: ./server/code-review-chatbot
       run: chmod -R 777 storage bootstrap/cache
-    - name: Create Database
+    - name: Create Database & Install npm modules
       working-directory: ./server/code-review-chatbot
       run: |
         mkdir -p database
         touch database/database.sqlite
+        npm install
+        npm run build
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       working-directory: ./server/code-review-chatbot
       env:
