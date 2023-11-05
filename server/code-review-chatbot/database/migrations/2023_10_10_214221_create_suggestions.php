@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Suggestions', function (Blueprint $table) {
-            $table->id('ID');
-            $table->string('FilePath');
-            $table->integer('LineNumber')->nullable();
-            $table->string('SuggestionDescription');
-            $table->string('RepositoryGitHubID')->nullable();
-            $table->string('UserGitHubID')->nullable();
+        Schema::create('suggestions', function (Blueprint $table) {
+            $table->id();
+            $table->string('file_path');
+            $table->integer('line_number')->nullable();
+            $table->string('suggestion_description');
+            $table->string('repository_id')->nullable()->index();
+            $table->foreignId('user_id')->nullable()->index();
             $table->timestamps();
 
-            $table->index('UserGitHubID');
-            $table->index('RepositoryGitHubID');
         });
     }
 
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('Suggestions');
+        Schema::dropIfExists('suggestions');
     }
 };
