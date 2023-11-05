@@ -23,13 +23,7 @@
 
 3. node, npm, PHP, SQLite, and composer must be installed on your Linux subsystem.
    ```
-   sudo apt-get install npm
-   sudo apt-get install php
-   sudo apt-get install php-curl
-   sudo apt-get install php-xml
-   sudo apt-get install composer
-   sudo apt install sqlite3
-   sudo apt install php-sqlite3
+   sudo apt-get install npm php php-curl php-xml composer sqlite3 php-sqlite3
    ```
    
 5. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
@@ -45,6 +39,13 @@
    ```
    cp .env.example .env
    php artisan key:generate
+   ```
+
+8. Run the following commands to generate the required dependencies:
+   ```
+   npm install
+   npm run build
+   php artisan migrate
    ```
    
 9. You can run the image by navigating to /server/code-review-chatbot in your Linux console and running the following command:
