@@ -15,7 +15,7 @@ class DBConnectionTest extends TestCase
      */
     public function test_suggestions_table_count_is_0(): void
     {
-        $this->assertDatabaseCount('Suggestions', 0);
+        $this->assertDatabaseCount('suggestions', 0);
     }
 
     /**
@@ -23,7 +23,7 @@ class DBConnectionTest extends TestCase
      */
     public function test_is_user_missing(): void
     {
-        $this->assertDatabaseMissing('Suggestions', ['UserGitHubID' => '11111111']);
+        $this->assertDatabaseMissing('suggestions', ['user_id' => '11111111']);
     }
 
 }
