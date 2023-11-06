@@ -109,17 +109,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 		//to start or focus the chatbot 
 		context.subscriptions.push(
-			vscode.commands.registerCommand('catCoding.start', () => {
+			vscode.commands.registerCommand('chatbot', () => {
+				//current vew can be instantiate or uninstantiated
+				let currentBotView: vscode.WebviewPanel | undefined = undefined;
+
 				// Create and show a new webview
-				const botView = vscode.window.createWebviewPanel(
-				  'chatBot',  // Identifies the type of the webview. Used internally
-				  'Chat bot', // Title of the panel displayed to the user
-				  vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-				  {} // Webview options
-				);
+				const columnToShowIn = vscode.window.activeTextEditor
+        		? vscode.window.activeTextEditor.viewColumn
+        		: undefined;
+
+				//start or focus functionality
+				if (currentBotView) {
+					// If we already have a panel, show it in the target column
+					currentBotView.reveal(columnToShowIn);
+				  } else {
+					// Otherwise, create a new panel
+					currentBotView = vscode.window.createWebviewPanel(
+					  'chatBot',
+					  'Chat Bot',
+					  columnToShowIn || vscode.ViewColumn.One,
+					  {}
+					);
+				  }
 			
 				//set the HTML contents that the view is going to display
-				botView.webview.html = getHtmlFortheBot();
+				currentBotView.webview.html = getHtmlFortheBot();
+
+				//when the view is close by the user the view is going to be destory
+				currentBotView.onDidDispose(
+					() => {
+					  // When the panel is closed, cancel any future updates to the webview content
+					  
+					  //TODO: action needed here!
+					},
+					null,
+					context.subscriptions
+				  );
 			})//bot view ends
 		);
 
