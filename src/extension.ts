@@ -4,8 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
-import { get } from 'http';
-import { URI } from 'vscode-uri';
+import { promises as fsPromises } from 'fs';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -17,6 +16,49 @@ type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: fa
 const BASE_URL = 'https://api.openai.com/v1';
 
 export function activate(context: vscode.ExtensionContext) {
+
+	//start or focus the chatbot 
+	//current view can be instantiate or uninstantiated
+	let currentBotView: vscode.WebviewPanel | undefined = undefined;
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatbot', () => {
+			// Create and show a new webview
+			const columnToShowIn = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+			//start or focus functionality
+			if (currentBotView){
+				// If we already have a panel, show it in the target column
+				currentBotView.reveal(columnToShowIn);
+			} 
+			else{
+				// Otherwise, create a new panel
+				currentBotView = vscode.window.createWebviewPanel(
+				  'chatBot',
+				  'Chat Bot',
+				  columnToShowIn || vscode.ViewColumn.One,
+				  {}
+				);
+			}
+		
+			//set the HTML contents that the view is going to display
+			currentBotView.webview.html = getHtmlFortheBot();
+
+			//when the view is close by the user the view is going to be destory
+			currentBotView.onDidDispose(
+				() => {
+				  // When the panel is closed, cancel any future updates to the webview content
+				  
+				  //TODO: action needed here!
+				},
+				null,
+				context.subscriptions
+			  );
+		})
+	);//bot view ends
+
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
         const userApproval = await vscode.window.showInformationMessage(
@@ -45,6 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
                 fs.chmodSync(scriptPath, '755'); 
 
                 vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+				await config.update('enablePreCommitHook', true, vscode.ConfigurationTarget.Global);
             } catch (error) {
                 vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
                 console.error(error);
@@ -93,7 +136,15 @@ export function activate(context: vscode.ExtensionContext) {
 		provider.search(prompt, useEntireFile); 
 	};
 
-	
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.ask', () => 
+			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
+			.then((value) => {
+				if (value) {
+					provider.search(value);
+				}
+			})
+		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
@@ -105,48 +156,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
 		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
-
-		//to start or focus the chatbot 
-		context.subscriptions.push(
-			vscode.commands.registerCommand('chatbot', () => {
-				//current vew can be instantiate or uninstantiated
-				let currentBotView: vscode.WebviewPanel | undefined = undefined;
-
-				// Create and show a new webview
-				const columnToShowIn = vscode.window.activeTextEditor
-        		? vscode.window.activeTextEditor.viewColumn
-        		: undefined;
-
-				//start or focus functionality
-				if (currentBotView) {
-					// If we already have a panel, show it in the target column
-					currentBotView.reveal(columnToShowIn);
-				  } else {
-					// Otherwise, create a new panel
-					currentBotView = vscode.window.createWebviewPanel(
-					  'chatBot',
-					  'Chat Bot',
-					  columnToShowIn || vscode.ViewColumn.One,
-					  {}
-					);
-				  }
-			
-				//set the HTML contents that the view is going to display
-				currentBotView.webview.html = getHtmlFortheBot();
-
-				//when the view is close by the user the view is going to be destory
-				currentBotView.onDidDispose(
-					() => {
-					  // When the panel is closed, cancel any future updates to the webview content
-					  
-					  //TODO: action needed here!
-					},
-					null,
-					context.subscriptions
-				  );
-			})//bot view ends
-		);
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
+	);
 
 
 	// Change the extension's session token or settings when configuration is changed
@@ -188,7 +199,9 @@ export function activate(context: vscode.ExtensionContext) {
             const enableHook = config.get('enablePreCommitHook', false);
             if (enableHook) {
                 setupPreCommitHookIfNecessary();
-            }
+            } else{
+				deletePreCommitHookIfNecessary();
+			}
         }
     });
 
@@ -220,6 +233,29 @@ function getHtmlFortheBot() {
   </body>
   </html>`;
 }
+
+
+async function deletePreCommitHookIfNecessary(): Promise<void> {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+	  const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+	  const scriptPath = path.join(gitHooksPath, 'pre-commit');
+  
+	  try {
+		await fsPromises.stat(scriptPath); 
+      	await fsPromises.unlink(scriptPath); 
+		  vscode.window.showInformationMessage('The pre-commit hook was successfully disabled.');
+	  } catch (error: any) { 
+		if (error.code === 'ENOENT') {
+		  // The pre-commit hook does not exist, no need to delete
+		  vscode.window.showInformationMessage('No pre-commit hook to delete.');
+		} else {
+		  // An error occurred while trying to delete the pre-commit hook
+		  vscode.window.showErrorMessage('An error occurred while trying to delete the pre-commit hook: ' + error.message);
+		}
+	  }
+	}
+  }
 
 function getScriptContent(): string {
     return `
@@ -346,7 +382,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		};
 
 		// set the HTML for the webview
-		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+		//webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
 		// add an event listener for messages received by the webview
 		webviewView.webview.onDidReceiveMessage(data => {
@@ -452,8 +488,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._view?.webview.postMessage({ type: 'addResponse', value: '' });
 
 		if (this._view) {
-			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
-			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString()});
+			//const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
+			//this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString()});
 		}
 		
 
@@ -565,90 +601,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view.show?.(true);
 			this._view.webview.postMessage({ type: 'addResponse', value: response });
 		}
-	}
-
-	
-
-	private _getHtmlForWebview(webview: vscode.Webview) {
-
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
-		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
-		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
-		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-
-		return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<script src="${tailwindUri}"></script>
-				<script src="${showdownUri}"></script>
-				<script src="${microlightUri}"></script>
-				<style>
-				.code {
-					white-space: pre;
-				}
-				p {
-					padding-top: 0.3rem;
-					padding-bottom: 0.3rem;
-				}
-				/* overrides vscodes style reset, displays as if inside web browser */
-				ul, ol {
-					list-style: initial !important;
-					margin-left: 10px !important;
-				}
-				h1, h2, h3, h4, h5, h6 {
-					font-weight: bold !important;
-				}
-
-				.center {
-					display: block;
-					margin: auto;
-					top: 0;
-					left: 0;
-					right: 0;
-					bottom: 0;
-					width: 10%;
-				}
-				
-				#spin-animation {
-					animation-name: spin-animation;
-					animation-duration: 1500ms;
-					animation-iteration-count: infinite;
-					animation-timing-function: ease-in-out;
-					
-				}
-				
-				@keyframes spin-animation {
-					0% {
-						transform: rotate(0deg);
-					}
-					25% {
-						transform: rotate(0deg);
-					}
-					75% {
-						transform: rotate(360deg);
-					}
-					100%{
-						transform: rotate(360deg);
-					}
-				}
-				</style>
-			</head>
-			<body style="display: flex; flex-direction: column; height: 100vh;">
-				<div style="flex: 1;">
-					<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
-
-					<div id="response" class="pt-4 text-sm"> 
-					</div>
-				</div>
-
-				<!-- Your button at the bottom -->
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
-
-				<script src="${scriptUri}"></script>
-			</body>
-			</html>`;
 	}
 }
 
