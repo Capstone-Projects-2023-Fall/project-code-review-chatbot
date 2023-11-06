@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
+import { promises as fsPromises } from 'fs';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -42,13 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
 				fs.writeFileSync(scriptPath, scriptContent);
 				fs.chmodSync(scriptPath, '755');
 
-				vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
-			} catch (error) {
-				vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
-				console.error(error);
-			}
-		}
-	});
+                vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+				await config.update('enablePreCommitHook', true, vscode.ConfigurationTarget.Global);
+            } catch (error) {
+                vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
+                console.error(error);
+            }
+        }
+    });
 	context.subscriptions.push(disposable);
 
 	console.log('activating extension "chatgpt"');
@@ -154,14 +156,16 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.workspace.onDidChangeConfiguration(e => {
-		if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			const enableHook = config.get('enablePreCommitHook', false);
-			if (enableHook) {
-				setupPreCommitHookIfNecessary();
+        if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+            const config = vscode.workspace.getConfiguration('chatgpt');
+            const enableHook = config.get('enablePreCommitHook', false);
+            if (enableHook) {
+                setupPreCommitHookIfNecessary();
+            } else{
+				deletePreCommitHookIfNecessary();
 			}
-		}
-	});
+        }
+    });
 
 	setupPreCommitHookIfNecessary();
 }
@@ -172,11 +176,34 @@ async function setupPreCommitHookIfNecessary() {
 		const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
 		const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
-		if (!fs.existsSync(scriptPath)) {
-			await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
-		}
-	}
+        if (!fs.existsSync(scriptPath)) {
+            await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
+        }
+    }
 }
+
+
+async function deletePreCommitHookIfNecessary(): Promise<void> {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+	  const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+	  const scriptPath = path.join(gitHooksPath, 'pre-commit');
+  
+	  try {
+		await fsPromises.stat(scriptPath); 
+      	await fsPromises.unlink(scriptPath); 
+		  vscode.window.showInformationMessage('The pre-commit hook was successfully disabled.');
+	  } catch (error: any) { 
+		if (error.code === 'ENOENT') {
+		  // The pre-commit hook does not exist, no need to delete
+		  vscode.window.showInformationMessage('No pre-commit hook to delete.');
+		} else {
+		  // An error occurred while trying to delete the pre-commit hook
+		  vscode.window.showErrorMessage('An error occurred while trying to delete the pre-commit hook: ' + error.message);
+		}
+	  }
+	}
+  }
 
 function getScriptContent(): string {
 	return `
@@ -355,6 +382,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 
+
 	public async search(prompt?: string, useEntireFile: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
@@ -406,18 +434,26 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Increment the message number
 		this._currentMessageNumber++;
 		let currentMessageNumber = this._currentMessageNumber;
+		
+		
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
-		this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
+		this._view?.webview.postMessage({ type: 'addResponse', value: '' });
+
+		if (this._view) {
+			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
+			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString()});
+		}
+		
 
 		if (this._settings.useServerApi) {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-					await axios.post("http://localhost/api/review",
-						{ prompt: this._fullPrompt, model: this._settings.model }
-
-					);
+				await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
+				{prompt: this._fullPrompt, model: this._settings.model}
+				
+				);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
@@ -552,6 +588,39 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 				h1, h2, h3, h4, h5, h6 {
 					font-weight: bold !important;
+				}
+
+				.center {
+					display: block;
+					margin: auto;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					width: 10%;
+				}
+				
+				#spin-animation {
+					animation-name: spin-animation;
+					animation-duration: 1500ms;
+					animation-iteration-count: infinite;
+					animation-timing-function: ease-in-out;
+					
+				}
+				
+				@keyframes spin-animation {
+					0% {
+						transform: rotate(0deg);
+					}
+					25% {
+						transform: rotate(0deg);
+					}
+					75% {
+						transform: rotate(360deg);
+					}
+					100%{
+						transform: rotate(360deg);
+					}
 				}
 				</style>
 			</head>

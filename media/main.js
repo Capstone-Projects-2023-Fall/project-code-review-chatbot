@@ -36,6 +36,13 @@
       }
       case "codeReviewCommandExecuted": {
         document.getElementById("test-p").innerHTML = `codeReview selected`;
+      case "loadResponse": {
+        document.getElementById("response").innerHTML = `
+        <br>
+        <div id="spin-animation">
+          <img src="${message.value}" class="center" style="opacity:0.5">
+        </div>`;
+        break;
       }
     }
   });
