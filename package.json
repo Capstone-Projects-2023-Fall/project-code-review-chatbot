@@ -325,7 +325,7 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, and Legibility. Do not give me specific answers on how to fix the code, suggestions only based on the review.",
+          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, and Legibility. Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'.",
           "description": "Code Review of the whole file.",
           "order": 12
         },
