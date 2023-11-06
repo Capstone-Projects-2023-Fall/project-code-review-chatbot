@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
+import { promises as fsPromises } from 'fs';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -43,6 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
                 fs.chmodSync(scriptPath, '755'); 
 
                 vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+				await config.update('enablePreCommitHook', true, vscode.ConfigurationTarget.Global);
             } catch (error) {
                 vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
                 console.error(error);
@@ -154,7 +156,9 @@ export function activate(context: vscode.ExtensionContext) {
             const enableHook = config.get('enablePreCommitHook', false);
             if (enableHook) {
                 setupPreCommitHookIfNecessary();
-            }
+            } else{
+				deletePreCommitHookIfNecessary();
+			}
         }
     });
 
@@ -172,6 +176,29 @@ async function setupPreCommitHookIfNecessary() {
         }
     }
 }
+
+
+async function deletePreCommitHookIfNecessary(): Promise<void> {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+	  const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+	  const scriptPath = path.join(gitHooksPath, 'pre-commit');
+  
+	  try {
+		await fsPromises.stat(scriptPath); 
+      	await fsPromises.unlink(scriptPath); 
+		  vscode.window.showInformationMessage('The pre-commit hook was successfully disabled.');
+	  } catch (error: any) { 
+		if (error.code === 'ENOENT') {
+		  // The pre-commit hook does not exist, no need to delete
+		  vscode.window.showInformationMessage('No pre-commit hook to delete.');
+		} else {
+		  // An error occurred while trying to delete the pre-commit hook
+		  vscode.window.showErrorMessage('An error occurred while trying to delete the pre-commit hook: ' + error.message);
+		}
+	  }
+	}
+  }
 
 function getScriptContent(): string {
     return `
