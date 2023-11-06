@@ -4,6 +4,8 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
+import { get } from 'http';
+import { URI } from 'vscode-uri';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -109,13 +111,16 @@ export function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(
 			vscode.commands.registerCommand('catCoding.start', () => {
 				// Create and show a new webview
-				const panel = vscode.window.createWebviewPanel(
+				const botView = vscode.window.createWebviewPanel(
 				  'chatBot',  // Identifies the type of the webview. Used internally
 				  'Chat bot', // Title of the panel displayed to the user
 				  vscode.ViewColumn.One, // Editor column to show the new webview panel in.
 				  {} // Webview options
 				);
-			})
+			
+				//set the HTML contents that the view is going to display
+				botView.webview.html = getHtmlFortheBot();
+			})//bot view ends
 		);
 
 

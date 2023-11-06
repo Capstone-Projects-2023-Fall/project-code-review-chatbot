@@ -393,7 +393,9 @@
     "dotenv": "^16.3.1",
     "gpt3-tokenizer": "^1.1.5",
     "node-fetch": "^3.3.0",
+    "uri": "^0.1.0",
     "vscode": "^1.1.37",
+    "vscode-uri": "^3.0.8",
     "yarn": "^1.22.19"
   }
 }
