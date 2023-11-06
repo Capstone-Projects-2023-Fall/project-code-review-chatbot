@@ -91,15 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 		provider.search(prompt, useEntireFile); 
 	};
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.ask', () => 
-			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-			.then((value) => {
-				if (value) {
-					provider.search(value);
-				}
-			})
-		),
+	
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
@@ -111,8 +103,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
 		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
-	);
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
+
+		//to start or focus the chatbot 
+		context.subscriptions.push(
+			vscode.commands.registerCommand('catCoding.start', () => {
+				// Create and show a new webview
+				const panel = vscode.window.createWebviewPanel(
+				  'chatBot',  // Identifies the type of the webview. Used internally
+				  'Chat bot', // Title of the panel displayed to the user
+				  vscode.ViewColumn.One, // Editor column to show the new webview panel in.
+				  {} // Webview options
+				);
+			})
+		);
 
 
 	// Change the extension's session token or settings when configuration is changed
@@ -171,6 +175,20 @@ async function setupPreCommitHookIfNecessary() {
             await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
         }
     }
+}
+
+function getHtmlFortheBot() {
+	return `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>Cat Coding</title>
+  </head>
+  <body>
+	  <h1>TODO: web view start here!
+  </body>
+  </html>`;
 }
 
 function getScriptContent(): string {

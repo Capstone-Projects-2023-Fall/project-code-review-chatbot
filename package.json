@@ -19,8 +19,6 @@
     "chatgpt",
     "openai",
     "gpt3",
-
-    
     "gpt4",
     "copilot",
     "ai",
@@ -46,7 +44,7 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "keybindings":[
+    "keybindings": [
       {
         "command": "chatgpt.codeReview",
         "key": "ctrl+alt+p"
@@ -236,9 +234,9 @@
           "description": "Use Server API instead of your own",
           "order": -1
         },
-        "chatgpt.enablePreCommitHook":{
+        "chatgpt.enablePreCommitHook": {
           "type": "boolean",
-          "default":false,
+          "default": false,
           "description": "Enable automatic setup of the pre-commit hook.",
           "order": -2
         },
@@ -347,7 +345,7 @@
           "description": "The prompt prefix used for the bot to suggest ways to improve legibility and make code less complex.",
           "order": 15
         },
-        "chatgpt.promptPrefix.learnMore":{
+        "chatgpt.promptPrefix.learnMore": {
           "type": "string",
           "default": "Would like to learn More about the previous suggestion.",
           "description": "LearnMore function for the responses",
@@ -395,6 +393,7 @@
     "dotenv": "^16.3.1",
     "gpt3-tokenizer": "^1.1.5",
     "node-fetch": "^3.3.0",
+    "vscode": "^1.1.37",
     "yarn": "^1.22.19"
   }
 }
