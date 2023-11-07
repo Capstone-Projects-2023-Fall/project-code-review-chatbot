@@ -87,10 +87,10 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 
-	const commandHandler = (command: string, useEntireFile: boolean = false) => {
+	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
 		const config = vscode.workspace.getConfiguration('chatgpt');
 		const prompt = config.get(command) as string;
-		provider.search(prompt, useEntireFile);
+		provider.search(prompt, useEntireFile, isCodeReview);
 	};
 
 	context.subscriptions.push(
@@ -105,12 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
 		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
-		vscode.commands.registerCommand('chatgpt.codeReview', () => {
-			commandHandler('promptPrefix.codeReview', true);
-			console.log("codeReview has been selected");
-			provider.sendWebviewMessage('codeReviewCommandExecuted');
-			
-		}),
+		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
@@ -383,7 +378,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 
-	public async search(prompt?: string, useEntireFile: boolean = false) {
+	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
@@ -438,7 +433,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
-		this._view?.webview.postMessage({ type: 'addResponse', value: '' });
+		if (isCodeReview) {
+			this._view?.webview.postMessage({ type: 'codeReviewCommandExecuted', value: '' });
+		}
+		else {
+			this._view?.webview.postMessage({ type: 'addResponse', value: '' });
+		}
+		
 
 		if (this._view) {
 			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
@@ -507,7 +508,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 							if (this._view && this._view.visible) {
 								response = partialResponse.text;
 								this._response = response;
-								this._view.webview.postMessage({ type: 'addResponse', value: response });
+								if(isCodeReview) {
+									this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
+								}
+								else {
+									this._view.webview.postMessage({ type: 'addResponse', value: response });
+								}
+								
 							}
 						},
 						timeoutMs: (this._settings.timeoutLength || 60) * 1000,
@@ -552,7 +559,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Show the view and send a message to the webview with the response
 		if (this._view) {
 			this._view.show?.(true);
-			this._view.webview.postMessage({ type: 'addResponse', value: response });
+			if (isCodeReview) {
+				this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
+			}
+			else {
+				this._view.webview.postMessage({ type: 'addResponse', value: response });
+			}
+		
 		}
 	}
 
