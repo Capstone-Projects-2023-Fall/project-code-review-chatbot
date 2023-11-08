@@ -347,7 +347,7 @@
         },
         "chatgpt.promptPrefix.learnMore": {
           "type": "string",
-          "default": "Would like to learn More about the previous suggestion.",
+          "default": "Would like to learn More about the previous suggestion. In the same format, but more specific.",
           "description": "LearnMore function for the responses",
           "order": 16
         }
