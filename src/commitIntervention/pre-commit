@@ -4,10 +4,7 @@
 # Change this to true to enable commit intervention
 
 
-# Redirect output to stderr.
-exec 1>&2
-# enable user input
-exec < /dev/tty
+
 
 
 export RUN_CODE_REVIEW=true
@@ -16,10 +13,14 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
     
     # Sending the keystrokes for both GUI and command-line environments
     if [[ "$(uname)" == "Darwin" ]]; then
-        echo "Running Code Reivew...."
         osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
 
         if [ -t 1 ]; then
+            echo "Running Code Reivew...."
+            # Redirect output to stderr.
+            exec 1>&2
+            # enable user input
+            exec < /dev/tty
             read -p "Do you want to proceed with the commit? Check the code review before selecting. (y/n): " user_choice
             if [[ "$user_choice" == "y" || "$user_choice" == "yes" ]]; then
                 echo "Proceeding with the commit."
@@ -42,10 +43,14 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
         fi
 
     elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-        echo "Running Code Reivew...."
         powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
         
         if [ -t 1 ]; then
+            echo "Running Code Reivew...."
+            # Redirect output to stderr.
+            exec 1>&2
+            # enable user input
+            exec < /dev/tty
             read -p "Do you want to proceed with the commit? Check the code review before selecting. (y/n): " user_choice
             if [[ "$user_choice" == "y" || "$user_choice" == "yes" ]]; then
                 echo "Proceeding with the commit."
