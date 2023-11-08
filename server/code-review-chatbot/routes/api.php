@@ -21,45 +21,48 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::post('/review', function (Request $request) {
+    
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
-    $promptCommand = $request->input('prompt'); // This is the command ("learnMore") from the user
-    $model = $request->input('model');
-    
-    // The full prompt to send to OpenAI if the command is "learnMore"
-    $learnMorePrompt = "Would like to learn more about the previous suggestion. In the same format, but more specific.";
-    
-    // Check if the incoming command is "learnMore"
-    $isLearnMoreCommand = strcasecmp(trim($promptCommand), 'learnMore') === 0;
-    
-    // Retrieve the session ID if the incoming command is "learnMore"
-    $sessionId = $isLearnMoreCommand ? $request->session()->get('openai_session_id', null) : null;
 
-    // Make the API call
+
+    $out->writeln($request->input('prompt'));
+    $out->writeln($request->input('model'));
+
+    $finaltext = "";
+
+
+    /*$mods = OpenAI::models()->list();
+
+
+    foreach ($mods->data as $result) {
+        $out->writeln($result->id); // 'gpt-3.5-turbo-instruct'
+        // ...
+    }*/
+
+
+
     $response = OpenAI::chat()->create([
-        'model' => $model,
-        'session_id' => $sessionId,
+        'model' => $request->input('model'),
         'messages' => [
-            ['role' => 'user', 'content' => $isLearnMoreCommand ? $learnMorePrompt : $promptCommand],
+            ['role' => 'user', 'content' => $request->input('prompt')],
         ],
     ]);
 
-    // Save the session ID for the next call if this is a continuing conversation
-    if ($sessionId) {
-        $request->session()->put('openai_session_id', $response['session_id']);
+
+    foreach ($response->choices as $result) {
+        $out->writeln($result->message->content);
+        $finaltext .= $result->message->content;
+       
     }
 
-    // Process the response and log it
-    $finaltext = collect($response->choices)->map(function ($choice) {
-        return $choice->message->content;
-    })->join('');
-
+    
     $out->writeln($finaltext);
 
-    // Return the response
+
+
     return response()->json([
         'text' => $finaltext,
         'id' => $response['id'],
-        'session_id' => $sessionId,
         'usage' => $response['usage']
     ]);
 });

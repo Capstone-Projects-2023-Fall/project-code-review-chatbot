@@ -48,10 +48,10 @@
                                     </svg>
                                 </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Getting Started</h2>
+                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Documentation Site</h2>
 
                                 <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                Dive into the comprehensive guide of the "Code Review Chatbot" project. Our documentation provides a detailed walkthrough of features, setup instructions, and usage examples to help you seamlessly integrate and maximize the potential of our chatbot. From getting started to advanced customization, our thorough documentation supports developers at every step, ensuring an efficient and streamlined code review process. Start enhancing your code quality today!
+                                    Click to checkout the official CRC Documentation Page!
                                 </p>
                             </div>
 
