@@ -6,7 +6,11 @@ environments:
         cli-memory: 512
         runtime: 'php-8.2:al2'
         timeout: 180
+        database: 'code-review'
         build:
             - 'composer install --no-dev'
             - 'php artisan event:cache'
-          # - 'npm ci && npm run build && rm -rf node_modules'
+            - 'npm ci && npm run build'
+            - 'touch database/database.sqlite'
+        deploy:        
+            - 'php artisan migrate --force'

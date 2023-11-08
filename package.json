@@ -76,26 +76,6 @@
         "title": "ChatGPT: Legibiliity Suggestions"
       },
       {
-        "command": "chatgpt.refactor",
-        "title": "ChatGPT: Refactor selection"
-      },
-      {
-        "command": "chatgpt.findProblems",
-        "title": "ChatGPT: Find problems"
-      },
-      {
-        "command": "chatgpt.findProblemsNormal",
-        "title": "ChatGPT: Find problems"
-      },
-      {
-        "command": "chatgpt.optimize",
-        "title": "ChatGPT: Optimize selection"
-      },
-      {
-        "command": "chatgpt.documentation",
-        "title": "ChatGPT: Write documentation"
-      },
-      {
         "command": "chatgpt.resetConversation",
         "title": "Reset ChatGPT conversation"
       },
@@ -119,26 +99,6 @@
           "command": "chatgpt.explain",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@2"
-        },
-        {
-          "command": "chatgpt.refactor",
-          "when": "editorHasSelection",
-          "group": "chatgpt-menu-group@3"
-        },
-        {
-          "command": "chatgpt.optimize",
-          "when": "editorHasSelection",
-          "group": "chatgpt-menu-group@4"
-        },
-        {
-          "command": "chatgpt.documentation",
-          "when": "editorHasSelection",
-          "group": "chatgpt-menu-group@5"
-        },
-        {
-          "command": "chatgpt.findProblemsNormal",
-          "when": "editorHasSelection",
-          "group": "chatgpt-menu-group@6"
         },
         {
           "command": "chatgpt.codeReview",
@@ -178,27 +138,7 @@
           "when": "editorHasSelection"
         },
         {
-          "command": "chatgpt.testSuggestions",
-          "when": "editorHasSelection"
-        },
-        {
           "command": "chatgpt.legibilitySuggestions",
-          "when": "editorHasSelection"
-        },
-        {
-          "command": "chatgpt.refactor",
-          "when": "editorHasSelection"
-        },
-        {
-          "command": "chatgpt.findProblemsNormal",
-          "when": "editorHasSelection"
-        },
-        {
-          "command": "chatgpt.optimize",
-          "when": "editorHasSelection"
-        },
-        {
-          "command": "chatgpt.documentation",
           "when": "editorHasSelection"
         },
         {
@@ -273,29 +213,11 @@
           "description": "The prompt prefix used for explaining the selected code",
           "order": 3
         },
-        "chatgpt.promptPrefix.refactor": {
-          "type": "string",
-          "default": "Refactor this code and explain what's changed: ",
-          "description": "The prompt prefix used for refactoring the selected code",
-          "order": 4
-        },
-        "chatgpt.promptPrefix.findProblems": {
-          "type": "string",
-          "default": "Find problems with the following code, fix them and explain what was wrong (Do not change anything else, if there are no problems say so): ",
-          "description": "The prompt prefix used for finding problems in the selected code",
-          "order": 5
-        },
         "chatgpt.promptPrefix.documentation": {
           "type": "string",
           "default": "Write documentation for the following code: ",
           "description": "The prompt prefix used for writing documentation for the selected code",
           "order": 7
-        },
-        "chatgpt.promptPrefix.optimize": {
-          "type": "string",
-          "default": "Optimize the following code if there is anything to improve, if not say so: ",
-          "description": "The prompt prefix used for optimizing the selected code",
-          "order": 6
         },
         "chatgpt.keepConversation": {
           "type": "boolean",
@@ -323,7 +245,7 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, and Legibility. Do not give me specific answers on how to fix the code, suggestions only based on the review.",
+          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, and Legibility. Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'.",
           "description": "Code Review of the whole file.",
           "order": 12
         },
@@ -335,7 +257,7 @@
         },
         "chatgpt.promptPrefix.testSuggestions": {
           "type": "string",
-          "default": "Suggest some tests I can write for the following code. Avoid atually wirting the tests out, but explain what some benenfical tests would be:",
+          "default": "Suggest some tests I can write for the following code. Avoid actually writing the tests out, but explain what some benefical tests would be:",
           "description": "The prompt prefix used for the bot to sugget ways to test code.",
           "order": 14
         },
