@@ -17,11 +17,10 @@ const BASE_URL = 'https://api.openai.com/v1';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	//start or focus the chatbot 
 	//current view can be instantiate or uninstantiated
 	let currentBotView: vscode.WebviewPanel | undefined = undefined;
 
-	context.subscriptions.push(
+	context.subscriptions.push(//webview bot start here
 		vscode.commands.registerCommand('chatbot.open', () => {
 			// Create and show a new webview
 			const columnToShowIn = vscode.window.activeTextEditor
@@ -30,11 +29,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 			//start or focus functionality
 			if (currentBotView){
-				// If we already have a panel, show it in the target column
+				// If we already have a view, show it in the target column AKA focus
 				currentBotView.reveal(columnToShowIn);
 			} 
 			else{
-				// Otherwise, create a new panel
+				// Otherwise, create a new panel AKA start
 				currentBotView = vscode.window.createWebviewPanel(
 				  'chatBot',
 				  'Chat Bot',
@@ -42,9 +41,20 @@ export function activate(context: vscode.ExtensionContext) {
 				  {}
 				);
 			}
-		
+
 			//set the HTML contents that the view is going to display
 			currentBotView.webview.html = getHtmlFortheBot();
+
+			//when the user type in the commands
+			currentBotView.webview.onDidReceiveMessage(
+				message => {
+					//TODO: need to update the message
+				  },
+				  undefined,
+				  context.subscriptions
+			);
+
+			//TODO: After the user sends in the message then we need to update the view
 
 			//when the view is close by the user the view is going to be destory
 			currentBotView.onDidDispose(
@@ -56,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 				context.subscriptions
 			  );
 		})
-	);//bot view ends
+	);//bot view ends here
 
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
@@ -226,6 +236,9 @@ function getHtmlFortheBot() {
 	  <title>Cat Coding</title>
   </head>
   <body>
+	
+
+	
   </body>
   </html>`;
 }
