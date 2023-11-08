@@ -1,0 +1,23 @@
+li {
+    padding: 1em;
+}
+
+ol li button {
+    border: none;
+    background: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #007BFF;
+    /* Change the color to your preference */
+}
+
+/* Style for the description element */
+ol li div {
+    margin-top: 0.5em;
+    padding-left: 1.5em;
+    /* Indent the description */
+    color: #555;
+    /* Text color */
+    display: none;
+    /* Hide by default */
+}

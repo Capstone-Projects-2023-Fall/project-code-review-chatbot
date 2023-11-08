@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="list_styling.css">
+    <style>
+        .code {
+            white-space: pre;
+        }
+
+        p {
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
+        }
+
+        /* overrides vscodes style reset, displays as if inside web browser */
+        ul,
+        ol {
+            list-style: initial !important;
+            margin-left: 10px !important;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: bold !important;
+        }
+
+        .center {
+            display: block;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 10%;
+        }
+
+        #spin-animation {
+            animation-name: spin-animation;
+            animation-duration: 1500ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+
+        }
+
+        @keyframes spin-animation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(0deg);
+            }
+
+            75% {
+                transform: rotate(360deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body style="display: flex; flex-direction: column; height: 100vh;">
+    <div style="flex: 1;">
+        <input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!"
+            id="prompt-input" />
+        <button id="testbutton">Call code review</button>
+
+        <div id="response" class="pt-4 text-sm">
+
+        </div>
+    </div>
+    <p id="test-p"></p>
+
+    <!-- Your button at the bottom -->
+    <button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous
+        Suggestion</button>
+
+    <script src="list_styling.js"></script>
+</body>
+
+</html>
