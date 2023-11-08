@@ -30,7 +30,7 @@
   "activationEvents": [
     "*",
     "onView:chatgpt.chatView",
-    "onCommand:chatbot",
+    "onCommand:chatbot.open",
     "onCommand:chatgpt.explain",
     "onCommand:chatgpt.codeReview",
     "onCommand:chatgpt.codeReviewAddComments",
@@ -52,7 +52,7 @@
     ],
     "commands": [
       {
-        "command": "chatbot",
+        "command": "chatbot.open",
         "title": "ChatBot: Start/Focus the Chatbot now",
         "category": "Chatbot"
       },

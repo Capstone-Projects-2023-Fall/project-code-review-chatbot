@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let currentBotView: vscode.WebviewPanel | undefined = undefined;
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('chatbot', () => {
+		vscode.commands.registerCommand('chatbot.open', () => {
 			// Create and show a new webview
 			const columnToShowIn = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
@@ -50,8 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 			currentBotView.onDidDispose(
 				() => {
 				  // When the panel is closed, cancel any future updates to the webview content
-				  
-				  //TODO: action needed here!
+				  // TODO: action needed here!
 				},
 				null,
 				context.subscriptions
@@ -77,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
                 const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
-                if (!fs.existsSync(gitHooksPath)) {
+                if (!fs.existsSync(gitHooksPath)){
                     vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
                     return;
                 }
@@ -120,8 +119,6 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}
 	
-	
-
 	// Register the provider with the extension's context
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ChatGPTViewProvider.viewType, provider,  {
@@ -229,7 +226,6 @@ function getHtmlFortheBot() {
 	  <title>Cat Coding</title>
   </head>
   <body>
-	  <h1>TODO: web view start here!
   </body>
   </html>`;
 }
