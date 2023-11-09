@@ -19,18 +19,23 @@
 
 		<div class="chatbox_message_area">
 			<div>
-				<div class="messages_item-chatGPT">
-					This came from the bot
+				<div class="chatGPT-messages_item">
+					<div class="Message">Hi! How Can I help you today?</div>
+					<div class="Message_time">11:00AM</div>
 				</div>
-				<div class="messages_item-user">
-					user input : hello world!
+				<div class="user-messages_item">
+					<div class="Message">Userse: 123122312</div>
+					<div class="Message_time">11:00AM</div>
 				</div>
 		</div>
 
 		<div class="chatbox_footer">
-			<input type="text" placeholder="Write a message">
-			<button>Enter</button>
+			<input class ="user_input" type="text" placeholder="Write a message">
+			<button class="enter_button">Enter</button>
+			<button class="clear_chat_button">Clear</button>
 		</div>
 	</div>
+
+	<script> src="chat.js"</script>
 </body>
 </html>
