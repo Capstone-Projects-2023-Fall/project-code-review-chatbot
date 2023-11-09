@@ -2,21 +2,15 @@
 # Script for commit intervention.
 
 # Change this to true to enable commit intervention
-
-
-
-
-
 export RUN_CODE_REVIEW=true
 
 if [ "$RUN_CODE_REVIEW" = "true" ]; then
     
-    # Sending the keystrokes for both GUI and command-line environments
     if [[ "$(uname)" == "Darwin" ]]; then
         osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
 
         if [ -t 1 ]; then
-            echo "Running Code Reivew...."
+            echo "Running Code Review...."
             # Redirect output to stderr.
             exec 1>&2
             # enable user input
@@ -41,40 +35,44 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
                 exit 1
             fi
         fi
-
-    elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-        powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
-        
-        if [ -t 1 ]; then
-            echo "Running Code Reivew...."
-            # Redirect output to stderr.
-            exec 1>&2
-            # enable user input
-            exec < /dev/tty
-            read -p "Do you want to proceed with the commit? Check the code review before selecting. (y/n): " user_choice
-            if [[ "$user_choice" == "y" || "$user_choice" == "yes" ]]; then
-                echo "Proceeding with the commit."
-                exit 0
-            else
-                echo "Commit aborted by the user."
-                exit 1
-            fi
-        else
-            # GUI popup
-            user_choice=$(powershell.exe -command "$a = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if ($a -eq 'Yes') {'Yes'} else {'No'}")
-
-            if [ "$user_choice" == "Yes" ]; then
-                exit 0
-            else
-                exit 1
-            fi
-        fi
-
-    else
-        echo "Unsupported OS."
-        exit 1
     fi
+
+    if [[ "$(uname)" == CYGWIN* || "$(uname)" == MINGW* || "$(uname)" == MSYS* ]]; then
+        powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
+            if [[ -t 1 ]] || [[ $- == *i* ]] || [[ -n "$PSModulePath" ]]; then
+                echo "Running Code Review...."
+                # Redirect output to stderr.
+                exec 1>&2
+                # enable user input
+                exec < /dev/tty
+                read -p "Do you want to proceed with the commit? Check the code review before selecting. (y/n): " user_choice
+                if [[ "$user_choice" == "y" || "$user_choice" == "yes" ]]; then
+                    echo "Proceeding with the commit."
+                    exit 0
+                else
+                    echo "Commit aborted by the user."
+                    exit 1
+                fi
+            else
+                    # GUI popup
+                user_choice=$(powershell.exe -Command "Add-Type -AssemblyName System.Windows.Forms; \$result = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if (\$result -eq 'Yes') { 'Yes' } else { 'No' }")
+
+                if [ "$user_choice" == "Yes" ]; then
+                    echo "Proceeding with the commit."
+                    exit 0
+                else
+                    echo "Commit aborted by the user."
+                    exit 1
+                fi
+            fi
+    fi
+
+else
+    echo "Unsupported OS."
+    exit 1
+fi
 else
     echo "Skipping code review."
     exit 0
+
 fi
