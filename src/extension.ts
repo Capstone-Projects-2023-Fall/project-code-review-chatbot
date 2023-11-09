@@ -16,7 +16,6 @@ type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: fa
 const BASE_URL = 'https://api.openai.com/v1';
 
 export function activate(context: vscode.ExtensionContext) {
-
 	//current view can be instantiate or uninstantiated
 	let currentBotView: vscode.WebviewPanel | undefined = undefined;
 
@@ -53,7 +52,6 @@ export function activate(context: vscode.ExtensionContext) {
 				  undefined,
 				  context.subscriptions
 			);
-
 			//TODO: After the user sends in the message then we need to update the view
 
 			//when the view is close by the user the view is going to be destory
@@ -229,18 +227,87 @@ async function setupPreCommitHookIfNecessary() {
 
 function getHtmlFortheBot() {
 	return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-	  <meta charset="UTF-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	  <title>Cat Coding</title>
-  </head>
-  <body>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Chat Bot</title>
+		<style>
+		
+			/* chatbox*/
+			.chatbox {
+				position: absolute;
+				top: 50%;
+				right: 50%;
+			}
+			
+			/* HEADER */
+			.chatbox_header {
+				position: sticky;
+			}
 	
-
+			/* MESSAGES */
+			.chatbox_messages {
+				margin-top: auto;
+				display: flex;
+				flex-direction: column;
+				overflow-y: scroll;
+				flex-direction: column-reverse;
+			}
+			.messages_item{
+				max-width: 60.6%;
+				width: fit-content;
+			}
+			.messages_item--operator {
+				margin-left: auto;
+			}
 	
-  </body>
-  </html>`;
+			.messages_item--visitor {
+				margin-right: auto;
+			}
+	
+			/* FOOTER */
+			.chatbox_footer {
+				position:fixed;
+				bottom: 20%;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="chatbox">
+			<div class="chat_support">
+				<div class="chatbox_header">
+					Chat Bot icon!
+				</div>
+			</div>
+	
+			<div class="chatbox_messages">
+				<div>
+					<div class="messages_item messages_item--visitor">
+						This came from the bot
+					</div>
+					<div class="messages_item messages_item--operator">
+						user input : hello world!
+					</div>
+			</div>
+	
+			<div class="chatbox_footer">
+				<input type="text" placeholder="Enter Here">
+	
+				<div class="buttons">
+					<div class="chatbox_enter">
+						<button>Enter</button>
+					</div>
+					<div class="chatbox_rest">
+						<button>Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+	
+	</body>
+	</html>`;
 }
 
 
