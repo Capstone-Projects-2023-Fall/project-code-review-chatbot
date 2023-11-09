@@ -1,7 +1,7 @@
 *{
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 *, html {
@@ -12,11 +12,80 @@
     --primary: #3f6ecc;
 }
 
-body {
-    font-family: 'Source Code Pro';
-    background: white;
+/*--------chatbox section--------*/
+.chatbox_title {
+    background: var(--secondaryColor);
+    height: 500px;
+    width: 350px;
+    box-shadow: 0px 0px 15px rgba(5, 2, 2, 0.1);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
 }
 
-.chat_title {
-    background: var(--secondaryColor);
+.chatbox_icon{
+    margin-right: 10px;
 }
+
+.chatbox_header {
+    background: var(--primaryColor);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 25px 30px;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    box-shadow: var(--primaryBoxColor);
+}
+
+/*------------message area-----------*/
+.chatbox_message_area{
+    padding: 0 20px;
+}
+
+.message_item {
+    max-width: 85%;
+    padding: 8px 12px;
+    margin-top: 10px;
+    background: #fffefe;    
+}
+
+.messages_item-chatGPT{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.messages_item-user{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background: var(--primary);
+}
+
+/*--------footer-----------*/
+.chatbox_footer {
+    display: flex;
+    margin-top: 20px;
+    padding: 20px 20px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.chatbox_footer input {
+    border: none;
+    text-align: center;
+}
+
+.chatbox__button button{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.chatbox__send--footer {
+    color: rgb(255, 254, 254);
+}
+
