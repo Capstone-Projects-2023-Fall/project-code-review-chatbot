@@ -39,7 +39,7 @@
 }
 
 /*------------message area-----------*/
-.chatbox_message_area{
+.chatbox_message{
     padding: 0 20px;
 }
 
@@ -50,16 +50,16 @@
     background: #fffefe;    
 }
 
-.messages_item-chatGPT{
+.Message_chatGPT{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
-.messages_item-user{
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+.messages_user{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     background: var(--primary);
 }
 
@@ -71,8 +71,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 .chatbox_footer input {

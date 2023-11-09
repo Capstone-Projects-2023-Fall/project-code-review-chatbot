@@ -17,25 +17,21 @@
 			</div>
 		</div>
 
-		<div class="chatbox_message_area">
+		<div class="chatbox_message">
 			<div>
-				<div class="chatGPT-messages_item">
-					<div class="Message">Hi! How Can I help you today?</div>
-					<div class="Message_time">11:00AM</div>
-				</div>
-				<div class="user-messages_item">
-					<div class="Message">Userse: 123122312</div>
-					<div class="Message_time">11:00AM</div>
-				</div>
-		</div>
+				<div class="Message_chatGPT">Hi! How Can I help you today?</div>
 
-		<div class="chatbox_footer">
-			<input class ="user_input" type="text" placeholder="Write a message">
-			<button class="enter_button">Enter</button>
-			<button class="clear_chat_button">Clear</button>
+				<div class="Message_user">Userse: 123122312</div>
 		</div>
 	</div>
+	
+	<div class="chatbox_footer">
+		<form class="chat_input_form">
+			<input class ="user_input" type="text" placeholder="Write a message">
+			<button type='submit' class="enter_button">Send</button>
+		</form>
+	</div>
 
-	<script> src="chat.js"</script>
-</body>
+	<script src="chat.js"></script>
+	</body>
 </html>
