@@ -39,18 +39,18 @@
 }
 
 /*------------message area-----------*/
-.chatbox_message{
+.chatbox{
     padding: 0 20px;
 }
 
-.message_item {
+.chatbox_message {
     max-width: 85%;
     padding: 8px 12px;
     margin-top: 10px;
     background: #fffefe;    
 }
 
-.Message_chatGPT{
+.message_chatGPT{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -80,7 +80,7 @@
     text-align: center;
 }
 
-.clear_chat_button {
+.enter_button {
     box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
