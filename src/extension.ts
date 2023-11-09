@@ -230,54 +230,63 @@ function getHtmlFortheBot() {
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.5">
 		<title>Chat Bot</title>
-		<style>
-		
-			/* chatbox*/
+		<style>	
 			.chatbox {
-				position: absolute;
-				top: 50%;
-				right: 50%;
-			}
-			
+		position: absolute;
+		bottom: 50%;
+		right: 50%;
+	}
+	
 			/* HEADER */
-			.chatbox_header {
+			.chat_title {
 				position: sticky;
+				top: 0;
 			}
 	
 			/* MESSAGES */
-			.chatbox_messages {
-				margin-top: auto;
+			.chatbox_messages{
 				display: flex;
 				flex-direction: column;
 				overflow-y: scroll;
 				flex-direction: column-reverse;
 			}
+			
 			.messages_item{
 				max-width: 60.6%;
 				width: fit-content;
 			}
 			.messages_item--operator {
 				margin-left: auto;
+				background-color: lightblue;
 			}
-	
 			.messages_item--visitor {
 				margin-right: auto;
+				background-color: lightgray;
 			}
 	
 			/* FOOTER */
 			.chatbox_footer {
-				position:fixed;
-				bottom: 20%;
+				position: sticky;
+				bottom: 0;
 			}
+	
+			/* BUTTON */
+			.chatbox_enter {
+				text-align: right;
+			}
+			
 		</style>
 	</head>
 	<body>
 		<div class="chatbox">
-			<div class="chat_support">
+			<div class="chat_title">
 				<div class="chatbox_header">
-					Chat Bot icon!
+					<div class="chatbox_icon">"icon"</div>
+					<div class="chatbox_content">
+						<h4>Chat Bot</h4>
+					</div>
 				</div>
 			</div>
 	
@@ -292,20 +301,14 @@ function getHtmlFortheBot() {
 			</div>
 	
 			<div class="chatbox_footer">
-				<input type="text" placeholder="Enter Here">
+				<input type="text" placeholder="Write a message">
 	
 				<div class="buttons">
 					<div class="chatbox_enter">
 						<button>Enter</button>
-					</div>
-					<div class="chatbox_rest">
-						<button>Cancel</button>
-					</div>
 				</div>
 			</div>
 		</div>
-	
-	
 	</body>
 	</html>`;
 }

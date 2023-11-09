@@ -2,55 +2,18 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.5">
+	<link rel="stylesheet" href="style.css">
 	<title>Chat Bot</title>
-	<style>
-	
-		/* chatbox*/
-		.chatbox {
-			position: absolute;
-			top: 50%;
-			right: 50%;
-		}
-		
-		/* HEADER */
-		.chatbox_header_icon {
-			position: absolute;
-
-		}
-
-		/* MESSAGES */
-		.chatbox_messages {
-			margin-top: auto;
-			display: flex;
-			flex-direction: column;
-			overflow-y: scroll;
-			flex-direction: column-reverse;
-		}
-		.messages_item{
-			max-width: 60.6%;
-			width: fit-content;
-		}
-		.messages_item--operator {
-			margin-left: auto;
-		}
-
-		.messages_item--visitor {
-			margin-right: auto;
-		}
-
-		/* FOOTER */
-		.chatbox_footer {
-			position:fixed;
-			bottom: 20%;
-		}
-	</style>
 </head>
 <body>
 	<div class="chatbox">
-		<div class="chat_support">
+		<div class="chat_title">
 			<div class="chatbox_header">
-				Chat Bot icon!
+				<div class="chatbox_icon">"icon"</div>
+				<div class="chatbox_content">
+					<h4>Chat Bot</h4>
+				</div>
 			</div>
 		</div>
 
@@ -65,19 +28,13 @@
 		</div>
 
 		<div class="chatbox_footer">
-			<input type="text" placeholder="Enter Here">
+			<input type="text" placeholder="Write a message">
 
 			<div class="buttons">
 				<div class="chatbox_enter">
 					<button>Enter</button>
-				</div>
-				<div class="chatbox_rest">
-					<button>Cancel</button>
-				</div>
 			</div>
 		</div>
 	</div>
-
-
 </body>
 </html>
