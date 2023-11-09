@@ -10,6 +10,13 @@
     });
   });
 
+  document.getElementById('askButton').addEventListener('click', () => {
+    vscode.postMessage({
+      type: 'askGPT'
+    });
+  });
+
+
   window.addEventListener("message", (event) => {
     const message = event.data;
     switch (message.type) {

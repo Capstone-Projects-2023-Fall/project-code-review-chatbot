@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 		selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false,
 		codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false,
 		pasteOnClick: config.get('pasteOnClick') || false,
-		keepConversation: config.get('keepConversation') || false,
+		keepConversation: config.get('keepConversation') || true,
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
 		model: config.get('model') || 'gpt-4',
@@ -333,6 +333,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						vscode.commands.executeCommand("chatgpt.learnMore");
 						break;
 					}
+				case 'askGPT':
+					{
+						vscode.commands.executeCommand('chatgpt.ask');
+						break;
+
+					}
 			}
 		});
 	}
@@ -544,7 +550,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 
-
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
@@ -623,8 +628,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				<!-- Your button at the bottom -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 
 				<script src="${scriptUri}"></script>
+
+
 			</body>
 			</html>`;
 	}
