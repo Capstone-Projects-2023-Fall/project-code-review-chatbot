@@ -170,7 +170,7 @@
       "properties": {
         "chatgpt.useServerApi": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Use Server API instead of your own",
           "order": -1
         },

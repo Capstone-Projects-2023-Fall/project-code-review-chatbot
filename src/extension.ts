@@ -431,7 +431,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-				await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
+				await axios.post("http://localhost/api/review",
 				{prompt: this._fullPrompt, model: this._settings.model}
 				
 				);
