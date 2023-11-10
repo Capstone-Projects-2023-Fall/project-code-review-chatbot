@@ -169,8 +169,6 @@
       return;
     }
 
-    const header = document.createElement('h3');
-    header.innerHTML = `Before you commit your code, here are some suggestions on how your code can be improved:`;
 
     const list = document.createElement('ol');
 

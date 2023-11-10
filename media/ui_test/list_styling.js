@@ -3,13 +3,15 @@
 (function () {
     let response = `
 ~~~Suggestion 1 Title~~~
-Suggestion 1 description.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. 
 **********
 ~~~Suggestion 2 Title~~~
-Suggestion 2 description.
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
 **********
 ~~~Suggestion 3 Title~~~
-Suggestion 3 description.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 **********
 `;
 
@@ -176,29 +178,61 @@ Suggestion 3 description.
 
         const list = document.createElement('ol');
 
-        suggestions.forEach((suggestion) => {
+        suggestions.forEach((suggestion, index) => {
             const listItem = document.createElement("li");
-            const titleElement = document.createElement("strong");
+            const titleContainer = document.createElement("div");
+            const titleElement = document.createElement("h3");
             const caretButton = document.createElement("button");
             const descriptionElement = document.createElement("div");
+            const checkbox = document.createElement("input");
+            const checkboxContainer = document.createElement("div");
 
             listItem.classList.add("my-3");
+            titleContainer.classList.add("title");
 
             titleElement.textContent = suggestion.title;
-            caretButton.textContent = "▼";
-            descriptionElement.classList.add("hidden");
+            titleElement.classList.add("title-element", "title-left");
+            checkboxContainer.classList.add("checkboxContainer", "title-element", "title-left");
+
+            checkbox.type = "checkbox";
+            checkbox.id = `checkbox-${index}`;
+            checkbox.name = "checkbox-group";
+            checkboxContainer.appendChild(checkbox);
+            //const label = document.createElement("label");
+            //label.setAttribute("for", `checkbox-${index}`);
+            //checkboxContainer.appendChild(label);
+
+            caretButton.type = "button";
+            caretButton.textContent = "﹀";
+            descriptionElement.classList.add("hidden", "description");
+            caretButton.classList.add("title-element", "title-right");
+
+            function setMaxHeight() {
+                descriptionElement.style.maxHeight = descriptionElement.scrollHeight + 'px';
+            }
+
+            setMaxHeight();
 
             caretButton.addEventListener("click", () => {
                 descriptionElement.classList.toggle("hidden");
-                caretButton.textContent = descriptionElement.classList.contains("hidden") ? "▼" : "▲";
+                caretButton.textContent = descriptionElement.classList.contains("hidden") ? "﹀" : "︿";
                 descriptionElement.style.display = descriptionElement.classList.contains("hidden") ? "none" : "block";
+                descriptionElement.classList.toggle('visible');
+                if (descriptionElement.classList.contains('visible')) {
+                    setMaxHeight();
+                } else {
+                    descriptionElement.style.maxHeight = '0';
+                }
+
             });
 
             descriptionElement.textContent = suggestion.description;
 
-
-            listItem.appendChild(titleElement);
-            listItem.appendChild(caretButton);
+            checkboxContainer.appendChild(checkbox);
+            titleContainer.appendChild(checkboxContainer);
+            titleContainer.appendChild(titleElement);
+            titleContainer.appendChild(caretButton);
+            listItem.appendChild(titleContainer);
             listItem.appendChild(descriptionElement);
             list.appendChild(listItem);
         });
