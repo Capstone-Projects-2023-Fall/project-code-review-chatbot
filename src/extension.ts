@@ -45,14 +45,14 @@ export function activate(context: vscode.ExtensionContext) {
 				fs.writeFileSync(scriptPath, scriptContent);
 				fs.chmodSync(scriptPath, '755');
 
-                vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
+				vscode.window.showInformationMessage('Pre-commit hook has been set up successfully.');
 				await config.update('enablePreCommitHook', true, vscode.ConfigurationTarget.Global);
-            } catch (error) {
-                vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
-                console.error(error);
-            }
-        }
-    });
+			} catch (error) {
+				vscode.window.showErrorMessage('Failed to set up the pre-commit hook.');
+				console.error(error);
+			}
+		}
+	});
 	context.subscriptions.push(disposable);
 
 	console.log('activating extension "chatgpt"');
@@ -148,16 +148,16 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
-            const config = vscode.workspace.getConfiguration('chatgpt');
-            const enableHook = config.get('enablePreCommitHook', false);
-            if (enableHook) {
-                setupPreCommitHookIfNecessary();
-            } else{
+		if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const enableHook = config.get('enablePreCommitHook', false);
+			if (enableHook) {
+				setupPreCommitHookIfNecessary();
+			} else {
 				deletePreCommitHookIfNecessary();
 			}
-        }
-    });
+		}
+	});
 
 	setupPreCommitHookIfNecessary();
 }
@@ -168,34 +168,34 @@ async function setupPreCommitHookIfNecessary() {
 		const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
 		const scriptPath = path.join(gitHooksPath, 'pre-commit');
 
-        if (!fs.existsSync(scriptPath)) {
-            await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
-        }
-    }
+		if (!fs.existsSync(scriptPath)) {
+			await vscode.commands.executeCommand('chatgpt.enablePreCommitHook');
+		}
+	}
 }
 
 
 async function deletePreCommitHookIfNecessary(): Promise<void> {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
-	  const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
-	  const scriptPath = path.join(gitHooksPath, 'pre-commit');
-  
-	  try {
-		await fsPromises.stat(scriptPath); 
-      	await fsPromises.unlink(scriptPath); 
-		  vscode.window.showInformationMessage('The pre-commit hook was successfully disabled.');
-	  } catch (error: any) { 
-		if (error.code === 'ENOENT') {
-		  // The pre-commit hook does not exist, no need to delete
-		  vscode.window.showInformationMessage('No pre-commit hook to delete.');
-		} else {
-		  // An error occurred while trying to delete the pre-commit hook
-		  vscode.window.showErrorMessage('An error occurred while trying to delete the pre-commit hook: ' + error.message);
+		const gitHooksPath = path.join(workspaceFolders[0].uri.fsPath, '.git', 'hooks');
+		const scriptPath = path.join(gitHooksPath, 'pre-commit');
+
+		try {
+			await fsPromises.stat(scriptPath);
+			await fsPromises.unlink(scriptPath);
+			vscode.window.showInformationMessage('The pre-commit hook was successfully disabled.');
+		} catch (error: any) {
+			if (error.code === 'ENOENT') {
+				// The pre-commit hook does not exist, no need to delete
+				vscode.window.showInformationMessage('No pre-commit hook to delete.');
+			} else {
+				// An error occurred while trying to delete the pre-commit hook
+				vscode.window.showErrorMessage('An error occurred while trying to delete the pre-commit hook: ' + error.message);
+			}
 		}
-	  }
 	}
-  }
+}
 
 
   function getScriptContent(): string {
@@ -253,9 +253,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 	public sendWebviewMessage(type: string, data?: any) {
-		this._view?.webview.postMessage({type, data});
+		this._view?.webview.postMessage({ type, data });
 	}
-	
+
 
 	public setSettings(settings: Settings) {
 		let changeModel = false;
@@ -409,8 +409,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Increment the message number
 		this._currentMessageNumber++;
 		let currentMessageNumber = this._currentMessageNumber;
-		
-		
+
+
 
 		this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 		if (isCodeReview) {
@@ -419,22 +419,22 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		else {
 			this._view?.webview.postMessage({ type: 'addResponse', value: '' });
 		}
-		
+
 
 		if (this._view) {
 			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
-			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString()});
+			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
-		
+
 
 		if (this._settings.useServerApi) {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-				await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
-				{prompt: this._fullPrompt, model: this._settings.model}
-				
-				);
+					await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
+						{ prompt: this._fullPrompt, model: this._settings.model }
+
+					);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
@@ -488,13 +488,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 							if (this._view && this._view.visible) {
 								response = partialResponse.text;
 								this._response = response;
-								if(isCodeReview) {
+								if (isCodeReview) {
 									this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
 								}
 								else {
 									this._view.webview.postMessage({ type: 'addResponse', value: response });
 								}
-								
+
 							}
 						},
 						timeoutMs: (this._settings.timeoutLength || 60) * 1000,
@@ -545,7 +545,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			else {
 				this._view.webview.postMessage({ type: 'addResponse', value: response });
 			}
-		
+
 		}
 	}
 
@@ -553,6 +553,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+		const scriptStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
 		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
 		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
 		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
@@ -565,6 +566,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				<script src="${tailwindUri}"></script>
 				<script src="${showdownUri}"></script>
 				<script src="${microlightUri}"></script>
+				<link rel="stylesheet" href="${scriptStyleUri}">
+			
 				<style>
 				.code {
 					white-space: pre;
@@ -613,6 +616,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					100%{
 						transform: rotate(360deg);
 					}
+
+					
 				}
 				</style>
 			</head>
@@ -624,15 +629,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 					</div>
 				</div>
-				<p id="test-p"></p>
 
 				<!-- Your button at the bottom -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 
 				<script src="${scriptUri}"></script>
-
-
+		
 			</body>
 			</html>`;
 	}
