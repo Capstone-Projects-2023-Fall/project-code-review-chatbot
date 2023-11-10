@@ -39,6 +39,14 @@ package:
         - '!resources/assets/**'
         - '!storage/**'
         - '!tests/**'
+constructs:
+    website:
+        type: server-side-website
+        assets:
+            'public/build/assets/*': public/build/assets
+            #'/css/*': public/css
+            'public/favicon.ico': public/favicon.ico
+            'public/robots.txt': public/robots.txt
 
 functions:
 
@@ -72,6 +80,6 @@ functions:
         #          input: '"schedule:run"'
 
 plugins:
-    # We need to include the Bref plugin
-    - ./vendor/bref/bref
-    - serverless-plugin-scripts
+  - ./vendor/bref/bref
+  - serverless-plugin-scripts
+  - serverless-lift
