@@ -27,7 +27,6 @@ custom:
         npm ci
         npm run build
 
-      'deploy:finalize': php artisan migrate --force
 
 
 
