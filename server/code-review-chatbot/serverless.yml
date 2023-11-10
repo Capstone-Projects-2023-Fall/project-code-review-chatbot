@@ -13,6 +13,14 @@ provider:
         DB_CONNECTION: mysql
         DATABASE_URL: ${param:DatabaseURL}
 
+	
+custom:
+  scripts:
+    hooks:
+      'before:deploy:deploy': |
+        npm install
+        npm run build
+
 
 package:
     # Files and directories to exclude from deployment
@@ -57,3 +65,4 @@ functions:
 plugins:
     # We need to include the Bref plugin
     - ./vendor/bref/bref
+     - serverless-plugin-scripts
