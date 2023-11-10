@@ -5,6 +5,8 @@ import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -64,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 		selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false,
 		codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false,
 		pasteOnClick: config.get('pasteOnClick') || false,
-		keepConversation: config.get('keepConversation') || false,
+		keepConversation: config.get('keepConversation') || true,
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
 		model: config.get('model') || 'gpt-4',
@@ -103,15 +105,10 @@ export function activate(context: vscode.ExtensionContext) {
 				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
-		vscode.commands.registerCommand('chatgpt.refactor', () => commandHandler('promptPrefix.refactor')),
-		vscode.commands.registerCommand('chatgpt.optimize', () => commandHandler('promptPrefix.optimize')),
 		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
-		vscode.commands.registerCommand('chatgpt.findProblemsNormal', () => commandHandler('promptPrefix.findProblems')),
-		vscode.commands.registerCommand('chatgpt.findProblems', () => commandHandler('promptPrefix.findProblems')),
-		vscode.commands.registerCommand('chatgpt.documentation', () => commandHandler('promptPrefix.documentation')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
 	);
@@ -200,45 +197,22 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 	}
 }
 
-function getScriptContent(): string {
-	return `
-#!/bin/bash
-# Script for commit intervention.
 
-# Change this to true to enable commit intervention
-export RUN_CODE_REVIEW=true
-
-if [ "$RUN_CODE_REVIEW" = "true" ]; then
-
-	echo "Running code review..."
-	
-	if [[ "$(uname)" == "Darwin" ]]; then
-		osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
-		user_choice=$(osascript -e 'display dialog "Do you want to proceed with the commit?" buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
-	elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-		echo "detected windows device"
-		powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
-		user_choice=$(powershell.exe -command "$a = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if ($a -eq 'Yes') {'Yes'} else {'No'}")
-	else
-		echo "Unsupported OS."
-		exit 1
-	fi
-	
-	if [ "$user_choice" == "Yes" ]; then
-		echo "Proceeding with the commit."
-		exit 0
-	else
-		echo "Commit aborted by the user."
-		exit 1
-	fi
-
-else
-	echo "Skipping code review."
-	exit 0
-fi
-	
-    `;
-}
+  function getScriptContent(): string {
+	try {
+	  // Resolve the path to the file relative to the current directory
+	  const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
+	  
+	  // Read the content of the file
+	  const content = readFileSync(filePath, { encoding: 'utf-8' });
+	  
+	  return content;
+	} catch (error) {
+	  // If there's an error reading the file, log the error and return a default string
+	  console.error("Error reading the pre-commit file: ", error);
+	  return '';
+	}
+  }
 
 
 
@@ -358,6 +332,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					{
 						vscode.commands.executeCommand("chatgpt.learnMore");
 						break;
+					}
+				case 'askGPT':
+					{
+						vscode.commands.executeCommand('chatgpt.ask');
+						break;
+
 					}
 			}
 		});
@@ -570,7 +550,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	}
 
 
-
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
@@ -653,9 +632,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				<!-- Your button at the bottom -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 
 				<script src="${scriptUri}"></script>
-				
+		
 			</body>
 			</html>`;
 	}
