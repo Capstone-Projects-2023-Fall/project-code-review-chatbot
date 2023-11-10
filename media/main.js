@@ -170,34 +170,70 @@
     }
 
 
+    const form = document.createElement('form');
     const list = document.createElement('ol');
 
-    suggestions.forEach((suggestion) => {
+    suggestions.forEach((suggestion, index) => {
       const listItem = document.createElement("li");
-      const titleElement = document.createElement("strong");
+      const titleContainer = document.createElement("div");
+      const titleElement = document.createElement("h3");
       const caretButton = document.createElement("button");
       const descriptionElement = document.createElement("div");
+      const checkbox = document.createElement("input");
+      const checkboxContainer = document.createElement("div");
 
       listItem.classList.add("my-3");
+      titleContainer.classList.add("title");
 
       titleElement.textContent = suggestion.title;
-      caretButton.textContent = "▼";
+      titleElement.classList.add("title-element", "title-left");
+      checkboxContainer.classList.add("checkboxContainer", "title-element", "title-left");
+
+      checkbox.type = "checkbox";
+      checkbox.id = `checkbox-${index}`;
+      checkbox.name = "checkbox-group";
+      checkboxContainer.appendChild(checkbox);
+      //const label = document.createElement("label");
+      //label.setAttribute("for", `checkbox-${index}`);
+      //checkboxContainer.appendChild(label);
+
+      caretButton.type = "button";
+      caretButton.textContent = "﹀";
+      descriptionElement.classList.add("hidden", "description");
+      caretButton.classList.add("title-element", "title-right");
+
+      function setMaxHeight() {
+        descriptionElement.style.maxHeight = descriptionElement.scrollHeight + 'px';
+      }
+
+      setMaxHeight();
 
       caretButton.addEventListener("click", () => {
         descriptionElement.classList.toggle("hidden");
-        caretButton.textContent = descriptionElement.classList.contains("hidden") ? "▼" : "▲";
+        caretButton.textContent = descriptionElement.classList.contains("hidden") ? "﹀" : "︿";
+        descriptionElement.style.display = descriptionElement.classList.contains("hidden") ? "none" : "block";
+        descriptionElement.classList.toggle('visible');
+        if (descriptionElement.classList.contains('visible')) {
+          setMaxHeight();
+        } else {
+          descriptionElement.style.maxHeight = '0';
+        }
       });
 
       descriptionElement.textContent = suggestion.description;
       descriptionElement.classList.add("hidden");
 
-      listItem.appendChild(titleElement);
-      listItem.appendChild(caretButton);
+      checkboxContainer.appendChild(checkbox);
+      titleContainer.appendChild(checkboxContainer);
+      titleContainer.appendChild(titleElement);
+      titleContainer.appendChild(caretButton);
+      listItem.appendChild(titleContainer);
       listItem.appendChild(descriptionElement);
       list.appendChild(listItem);
     });
 
-    suggestionsContainer.appendChild(list);
+    form.appendChild(list);
+    suggestionsContainer.appendChild(form);
     console.log("done rendering suggestions");
   }
 
