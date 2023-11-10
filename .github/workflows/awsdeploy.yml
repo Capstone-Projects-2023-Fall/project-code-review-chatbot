@@ -27,6 +27,7 @@ jobs:
         working-directory: ./server/code-review-chatbot
       - name: Deploy Environment
         run: |
+          npm install -g serverless
           serverless login
           serverless deploy
         working-directory: ./server/code-review-chatbot
