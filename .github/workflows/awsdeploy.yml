@@ -28,6 +28,7 @@ jobs:
       - name: Deploy Environment
         run: |
           npm install -g serverless
+          serverless plugin install -n serverless-plugin-scripts
           serverless deploy
         working-directory: ./server/code-review-chatbot
         env:
