@@ -12,14 +12,23 @@ provider:
         OPENAI_API_KEY: ${param:OpenAIKey}
         DB_CONNECTION: mysql
         DATABASE_URL: ${param:DatabaseURL}
+        SCRIPT_FILENAME: 'laravel/public/index.php'
+        SCRIPT_NAME: '/index.php'
+        FILESYSTEM_DISK: s3
+        ASSET_URL: public/ 
 
 	
 custom:
   scripts:
     hooks:
       'before:deploy:deploy': |
-        npm install
+        composer install --no-dev
+        php artisan event:cache
+        npm ci
         npm run build
+
+      'deploy:finalize': php artisan migrate --force
+
 
 
 package:
@@ -65,4 +74,4 @@ functions:
 plugins:
     # We need to include the Bref plugin
     - ./vendor/bref/bref
-     - serverless-plugin-scripts
+    - serverless-plugin-scripts
