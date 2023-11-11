@@ -13,6 +13,7 @@ provider:
         DB_CONNECTION: mysql
         DATABASE_URL: ${param:DatabaseURL}
         SCRIPT_FILENAME: 'laravel/public/index.php'
+        APP_KEY: ${param:AppKey}
         SCRIPT_NAME: '/index.php'
         FILESYSTEM_DISK: s3
         ASSET_URL: public/ 

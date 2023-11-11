@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b190f5804490e8dfa2374b067e6203e",
+    "content-hash": "3a0da1666f9594eb4e064398deb8da17",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2035,6 +2035,87 @@
             "time": "2023-11-07T13:13:54+00:00"
         },
         {
+            "name": "laravel/octane",
+            "version": "v1.5.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/octane.git",
+                "reference": "065310f5baec40c61b68eeb8058b041079c3453e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/octane/zipball/065310f5baec40c61b68eeb8058b041079c3453e",
+                "reference": "065310f5baec40c61b68eeb8058b041079c3453e",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-diactoros": "^2.5",
+                "laravel/framework": "^8.83.26|^9.38.0|^10.0",
+                "laravel/serializable-closure": "^1.0",
+                "nesbot/carbon": "^2.60",
+                "php": "^8.0",
+                "symfony/psr-http-message-bridge": "^2.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.2",
+                "inertiajs/inertia-laravel": "^0.6.9",
+                "laravel/scout": "^9.8",
+                "laravel/socialite": "^5.6",
+                "livewire/livewire": "^2.12",
+                "mockery/mockery": "^1.4",
+                "nunomaduro/collision": "^5.10|^6.0|^7.0",
+                "orchestra/testbench": "^6.16|^7.0|^8.0",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.3",
+                "spiral/roadrunner": "^2.8.2"
+            },
+            "bin": [
+                "bin/roadrunner-worker",
+                "bin/swoole-server"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Octane\\OctaneServiceProvider"
+                    ],
+                    "aliases": {
+                        "Octane": "Laravel\\Octane\\Facades\\Octane"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Octane\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "Supercharge your Laravel application's performance.",
+            "keywords": [
+                "laravel",
+                "octane",
+                "roadrunner",
+                "swoole"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/octane/issues",
+                "source": "https://github.com/laravel/octane"
+            },
+            "time": "2023-05-16T06:47:34+00:00"
+        },
+        {
             "name": "laravel/passport",
             "version": "v11.10.0",
             "source": {
@@ -2087,8 +2168,7 @@
             "autoload": {
                 "psr-4": {
                     "Laravel\\Passport\\": "src/",
-                    "Laravel\\Passport\\Database\\Factories\\": "database/factories/",
-                    "Laravel\\Octane\\": "src"
+                    "Laravel\\Passport\\Database\\Factories\\": "database/factories/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
