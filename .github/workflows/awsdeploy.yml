@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Server to AWS
 
 on:
   push:
@@ -19,16 +19,18 @@ jobs:
           php-version: 8.1
           tools: composer:v2
           coverage: none
-      - name: Require Vapor CLI
-        run: composer global require laravel/vapor-cli
-        working-directory: ./server/code-review-chatbot
+      #- name: Require Vapor CLI
+      #  run: composer global require laravel/vapor-cli
+   #     working-directory: ./server/code-review-chatbot
       - name: Install Project Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./server/code-review-chatbot
       - name: Deploy Environment
         run: |
-          vapor team:switch --id 62804
-          vapor deploy production
+          npm install -g serverless
+          serverless plugin install -n serverless-plugin-scripts
+          serverless deploy
+          #serverless bref:cli --args="migrate --force"
         working-directory: ./server/code-review-chatbot
         env:
-          VAPOR_API_TOKEN: ${{ secrets.VAPOR_API_TOKEN }}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
