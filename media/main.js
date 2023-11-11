@@ -238,10 +238,14 @@
       //stores what boxes are checked by user to be sent to server
       
       checkbox.addEventListener("change ", () => {
+        var ucIndex = 0;
+        //grabs checkbox element from its id, then grabs the index of that element 
+        ucIndex = suggestions.findIndex(x => getElementById(checkbox.id));
+
         if (checkbox.checked) {
-          userChanges[index] = "" + checkbox.name + "with checkboxID of: " + checkbox.id + " was checked";
+          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was checked";
         } else {
-          userChanges[index] = "" + checkbox.name + "with checkboxID of: " + checkbox.id + " was NOT checked";
+          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was NOT checked";
         }
       });
 
