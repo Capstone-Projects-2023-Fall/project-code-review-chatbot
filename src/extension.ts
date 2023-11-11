@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -79,6 +80,21 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}
 
+	//auth0 setup
+	
+	context.subscriptions.push(
+		vscode.commands.registerCommand('vscode-auth0-authprovider.signIn', async () => {
+			const session = await vscode.authentication.getSession("auth0", [], { createIfNone: true });
+			console.log(session);
+		})
+	)
+
+	context.subscriptions.push(
+		new Auth0AuthenticationProvider(context)
+	);
+
+	getAuth0Session();
+
 
 
 	// Register the provider with the extension's context
@@ -87,6 +103,17 @@ export function activate(context: vscode.ExtensionContext) {
 			webviewOptions: { retainContextWhenHidden: true }
 		})
 	);
+
+	context.subscriptions.push(
+		vscode.authentication.onDidChangeSessions(async e => {
+			console.log(e);
+			if (e.provider.id === "auth0") {
+				getAuth0Session();
+			}
+		})
+	);
+
+	
 
 
 	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
@@ -162,6 +189,16 @@ export function activate(context: vscode.ExtensionContext) {
 	setupPreCommitHookIfNecessary();
 }
 
+
+const getAuth0Session = async () => {
+	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: false });
+	if (session) {
+		vscode.window.showInformationMessage(`Welcome back ${session.account.label}`);
+	}
+};
+
+
+
 async function setupPreCommitHookIfNecessary() {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
@@ -173,6 +210,8 @@ async function setupPreCommitHookIfNecessary() {
         }
     }
 }
+
+
 
 
 async function deletePreCommitHookIfNecessary(): Promise<void> {
