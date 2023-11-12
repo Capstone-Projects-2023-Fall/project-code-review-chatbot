@@ -75,3 +75,18 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
         'usage' => $response['usage']
     ]);
 });
+
+Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
+    if (Auth::user()) {
+        $user = Auth::user(); 
+
+        return response()->json([
+            'name' => [$user->name],
+            'email' => [$user->email],
+        ]);
+    } else {
+        return response(0);
+    }
+
+});
+

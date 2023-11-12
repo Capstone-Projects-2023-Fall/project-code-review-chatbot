@@ -8,8 +8,10 @@ import fetch from 'node-fetch';
 export const AUTH_TYPE = `auth0`;
 const AUTH_NAME = `Auth0`;
 const CLIENT_ID = `3GUryQ7ldAeKEuD2obYnppsnmj58eP5u`;
-const AUTH0_DOMAIN = `dev-txghew0y.us.auth0.com`;
+const AUTH0_DOMAIN = `localhost`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
+
+type AuthUserInfo =  { name: string, email: string };
 
 
 
@@ -70,7 +72,9 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
         throw new Error(`Auth0 login failure`);
       }
 
-      const userinfo: { name: string, email: string } = await this.getUserInfo(token);
+      const userinfo : AuthUserInfo = await this.getUserInfo(token);
+
+
 
       const session: AuthenticationSession = {
         id: uuid(),
@@ -121,7 +125,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
 	}
 
   /**
-   * Log in to Auth0
+   * Log in to Auth
    */
   private async login(scopes: string[] = []) {
     return await window.withProgress<string>({
@@ -153,7 +157,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
         ['scope', scopes.join(' ')],
         ['prompt', "login"]
       ]);
-      const uri = Uri.parse(`https://${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
+      const uri = Uri.parse(`http://${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
       await env.openExternal(uri);
 
       let codeExchangePromise = this._codeExchangePromises.get(scopeString);
@@ -187,8 +191,9 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
     const access_token = query.get('access_token');
     const state = query.get('state');
 
+
     if (!access_token) {
-      reject(new Error('No token'));
+      reject(new Error('No token.'));
       return;
     }
     if (!state) {
@@ -211,11 +216,12 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
    * @returns 
    */
   private async getUserInfo(token: string) {
-    const response = await fetch(`https://${AUTH0_DOMAIN}/userinfo`, {
+    const response : any = await fetch(`http://${AUTH0_DOMAIN}/api/userinfo`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+
     return await response.json();
   }
 }
