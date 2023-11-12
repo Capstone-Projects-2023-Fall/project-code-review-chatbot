@@ -1,4 +1,4 @@
-//credit: https://github.com/estruyf/vscode-auth-sample/tree/main
+//based on: https://github.com/estruyf/vscode-auth-sample/tree/main
 
 import { authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession, Disposable, env, EventEmitter, ExtensionContext, ProgressLocation, Uri, UriHandler, window } from "vscode";
 import { v4 as uuid } from 'uuid';
@@ -6,7 +6,7 @@ import { PromiseAdapter, promiseFromEvent } from "./util";
 import fetch from 'node-fetch';
 
 export const AUTH_TYPE = `auth0`;
-const AUTH_NAME = `Auth0`;
+const AUTH_NAME = `Code Review Chatbot Auth`;
 const CLIENT_ID = `3GUryQ7ldAeKEuD2obYnppsnmj58eP5u`;
 const AUTH0_DOMAIN = `localhost`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
@@ -53,11 +53,21 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
   public async getSessions(scopes?: string[]): Promise<readonly AuthenticationSession[]> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
 
+    var finalSessions : AuthenticationSession[] = new Array();
+
     if (allSessions) {
-      return JSON.parse(allSessions) as AuthenticationSession[];
+      let sessions = JSON.parse(allSessions) as AuthenticationSession[];
+      for (let i=0; i < sessions.length; i++) {
+        const userinfo : AuthUserInfo = await this.getUserInfo(sessions[i].accessToken);
+        if (!userinfo) {
+          this.removeSession(sessions[i].id);
+        } else {
+          finalSessions.push(sessions[i]);
+        }
+      }
     }
 
-    return [];
+    return finalSessions;
   }
 
   /**
@@ -222,6 +232,11 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
       }
     });
 
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return await response.json();
+    } else {
+      return undefined;
+    }
   }
 }

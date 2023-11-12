@@ -51,12 +51,11 @@ Route::get('/authorize', function(Request $request) {
             'state' => $state,
         );
 
-        $out->writeln($redirect_uri . '#' . http_build_query($returnquery));
 
 
         return redirect()->away($redirect_uri .'#' . http_build_query($returnquery));
     } else {
-        return view('auth/login', 'auth');
+        return view('auth/login', ['auth' => $request->fullUrl()]);
     }
 
     

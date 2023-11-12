@@ -17,8 +17,8 @@ type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
 
 const BASE_URL = 'https://api.openai.com/v1';
+var currentServerToken: string;
 
-export function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -82,18 +82,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 	//auth0 setup
 	
-	context.subscriptions.push(
+	/*context.subscriptions.push(
 		vscode.commands.registerCommand('vscode-auth0-authprovider.signIn', async () => {
 			const session = await vscode.authentication.getSession("auth0", [], { createIfNone: true });
 			console.log(session);
 		})
-	)
+	)*/
 
 	context.subscriptions.push(
 		new Auth0AuthenticationProvider(context)
 	);
 
-	getAuth0Session();
+	currentServerToken = await getAuthSession(false);
+
+	if (config.get('useServerApi') && !currentServerToken) {
+		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
+	} 
 
 
 
@@ -108,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.authentication.onDidChangeSessions(async e => {
 			console.log(e);
 			if (e.provider.id === "auth0") {
-				getAuth0Session();
+				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
 			}
 		})
 	);
@@ -190,11 +194,14 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 
-const getAuth0Session = async () => {
-	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: false });
+const getAuthSession = async (useServerApi: boolean) => {
+	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
 	if (session) {
-		vscode.window.showInformationMessage(`Welcome back ${session.account.label}`);
+		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
+		return session.accessToken;
+
 	}
+	return '';
 };
 
 
@@ -465,14 +472,22 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
 
-
+		// Send the search prompt to the ChatGPTAPI instance and store the response
 		if (this._settings.useServerApi) {
 			try {
-				// Send the search prompt to the ChatGPTAPI instance and store the response
+				
+				if (!currentServerToken) {
+					currentServerToken = await getAuthSession(true);
+				}
+
+				const config = {
+					headers: { Authorization: `Bearer ${currentServerToken}` }
+				};
+
 				const res =
 				await axios.post("http://localhost/api/review",
-				{prompt: this._fullPrompt, model: this._settings.model}
-				
+				{prompt: this._fullPrompt, model: this._settings.model},
+				config
 				);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {

@@ -85,7 +85,9 @@ Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
             'email' => [$user->email],
         ]);
     } else {
-        return response(0);
+        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+        $out->writeln('not authenticated');
+        return response();
     }
 
 });
