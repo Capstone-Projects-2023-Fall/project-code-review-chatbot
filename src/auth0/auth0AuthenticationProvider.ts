@@ -8,7 +8,7 @@ import fetch from 'node-fetch';
 export const AUTH_TYPE = `auth0`;
 const AUTH_NAME = `Code Review Chatbot Auth`;
 const CLIENT_ID = `3GUryQ7ldAeKEuD2obYnppsnmj58eP5u`;
-const AUTH0_DOMAIN = `localhost`;
+const AUTH0_DOMAIN = `d3a3f6u8pmaxns.cloudfront.net`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
 type AuthUserInfo =  { name: string, email: string };
@@ -167,7 +167,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
         ['scope', scopes.join(' ')],
         ['prompt', "login"]
       ]);
-      const uri = Uri.parse(`http://${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
+      const uri = Uri.parse(`https://${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
       await env.openExternal(uri);
 
       let codeExchangePromise = this._codeExchangePromises.get(scopeString);
@@ -226,7 +226,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
    * @returns 
    */
   private async getUserInfo(token: string) {
-    const response : any = await fetch(`http://${AUTH0_DOMAIN}/api/userinfo`, {
+    const response : any = await fetch(`https://${AUTH0_DOMAIN}/api/userinfo`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

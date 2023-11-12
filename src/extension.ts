@@ -19,6 +19,7 @@ type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: f
 const BASE_URL = 'https://api.openai.com/v1';
 var currentServerToken: string;
 
+export async function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -485,7 +486,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				};
 
 				const res =
-				await axios.post("http://localhost/api/review",
+				await axios.post("https://d3a3f6u8pmaxns.cloudfront.net/api/review",
 				{prompt: this._fullPrompt, model: this._settings.model},
 				config
 				);
