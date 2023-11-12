@@ -23,7 +23,11 @@ jobs:
       #  run: composer global require laravel/vapor-cli
    #     working-directory: ./server/code-review-chatbot
       - name: Install Project Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          php artisan event:cache
+          npm ci
+          npm run build
         working-directory: ./server/code-review-chatbot
       - name: Deploy Environment
         run: |
