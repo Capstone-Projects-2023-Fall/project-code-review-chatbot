@@ -180,6 +180,14 @@
     const form = document.createElement('form');
     const list = document.createElement('ol');
 
+    const userChanges = [ //array to store if user marked a suggestion as done
+      "VariableNamingConventions",
+      "Redundancy",
+      "Bug/Broken",
+      "Complexity",
+      "Legibility"
+    ];
+
     suggestions.forEach((suggestion, index) => {
       const listItem = document.createElement("li");
       const titleContainer = document.createElement("div");
@@ -224,6 +232,20 @@
           setMaxHeight();
         } else {
           descriptionElement.style.maxHeight = '0';
+        }
+      });
+
+      //stores what boxes are checked by user to be sent to server
+      
+      checkbox.addEventListener("change ", () => {
+        var ucIndex = 0;
+        //grabs checkbox element from its id, then grabs the index of that element 
+        ucIndex = suggestions.findIndex(x => getElementById(checkbox.id));
+
+        if (checkbox.checked) {
+          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was checked";
+        } else {
+          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was NOT checked";
         }
       });
 
