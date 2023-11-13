@@ -685,9 +685,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					</div>
 				</div>
 
-				<!-- Your button at the bottom -->
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
+				<div class="button-container">
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="askButton">Talk to GPT</button>
+				</div>
 
 				<script src="${scriptUri}"></script>
 		
