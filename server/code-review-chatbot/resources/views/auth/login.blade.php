@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login')  }}">
             @csrf
 
             <div>
@@ -32,6 +32,8 @@
                 </label>
             </div>
 
+            
+
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
                     <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
@@ -43,8 +45,24 @@
                     {{ __('Log in') }}
                 </x-button>
             </div>
+            
         </form>
+
+        <div class="flex items-center justify-center mt-5">
+            @if (Route::has('register'))
+                <div> 
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Don\'t have an account?') }}</span>
+                </div>
+                <div>
+                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('register') }}">
+                        {{ __('Sign up') }}
+                    </a>
+                </div>
+            @endif
+        </div>
     </x-authentication-card>
+    
+
 </x-guest-layout>
 
 
