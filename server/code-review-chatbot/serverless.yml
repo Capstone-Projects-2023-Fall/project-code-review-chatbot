@@ -2,6 +2,15 @@ org: trau3
 app: laravel
 service: laravel
 
+constructs:
+    website:
+        type: server-side-website
+        assets:
+            'public/build/assets/*': public/build/assets
+            #'/css/*': public/css
+            'public/favicon.ico': public/favicon.ico
+            'public/robots.txt': public/robots.txt
+
 provider:
     name: aws
     # The AWS region in which to deploy (us-east-1 is the default)
@@ -16,19 +25,37 @@ provider:
         SCRIPT_FILENAME: 'laravel/public/index.php'
         APP_KEY: ${param:AppKey}
         SCRIPT_NAME: '/index.php'
-        FILESYSTEM_DISK: s3
-        ASSET_URL: public/ 
+        FILESYSTEM_DRIVER: s3
+        ASSET_URL: public/
+        SESSION_DRIVER: cookie
+        LOG_CHANNEL: stderr
+        WEBSITE_URL: ${construct:website.url}
+        AWS_BUCKET: !Ref Storage
+    iam:
+        role:
+            statements:
+                # Allow Lambda to read and write files in the S3 buckets
+                - Effect: Allow
+                  Action: s3:*
+                  Resource:
+                    - !Sub '${Storage.Arn}' # the storage bucket
+                    - !Sub '${Storage.Arn}/*' # and everything inside
 
 
 	
 custom:
   scripts:
     hooks:
-      'before:deploy:deploy': |
+      'before:package:initialize': |
         composer install --no-dev
         php artisan event:cache
         npm ci
         npm run build
+        php artisan config:clear
+  lift:
+    assets:
+      path: public
+      url: /
 
 
 
@@ -41,14 +68,7 @@ package:
         - '!resources/assets/**'
         - '!storage/**'
         - '!tests/**'
-constructs:
-    website:
-        type: server-side-website
-        assets:
-            'public/build/**': public/build
-            #'/css/*': public/css
-            'public/favicon.ico': public/favicon.ico
-            'public/robots.txt': public/robots.txt
+
 
 functions:
 
@@ -85,3 +105,11 @@ plugins:
   - ./vendor/bref/bref
   - serverless-plugin-scripts
   - serverless-lift
+  - serverless-offline
+
+
+resources:
+  Resources:
+    # Create our S3 storage bucket using CloudFormation
+    Storage:
+      Type: AWS::S3::Bucket
