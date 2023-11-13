@@ -41,7 +41,7 @@ class SuggestionParser extends React.Component {
     }
 
     render() {
-        return null; // SuggestionParser doesn't render any visible content
+        return null;
     }
 }
 

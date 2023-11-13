@@ -89,19 +89,12 @@ li {
 /* Define the checkmark pseudo-element */
 .checkboxContainer input[type="checkbox"]::before {
     content: "✔";
-    /* Use a checkmark character */
     display: inline-block;
     font-size: 1em;
-    /* Adjust the size of the checkmark */
     position: absolute;
     top: 48%;
-    /* Vertically center the checkmark */
     left: 50%;
-    /* Horizontally center the checkmark */
     transform: translate(-50%, -50%);
-    /* Center it precisely */
     color: white;
-    /* Color of the checkmark */
     pointer-events: none;
-    /* Ensure the checkmark is not interactive */
 }
