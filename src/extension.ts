@@ -7,7 +7,6 @@ import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -17,9 +16,8 @@ type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
 
 const BASE_URL = 'https://api.openai.com/v1';
-var currentServerToken: string;
 
-export async function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -81,25 +79,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
 	}
 
-	//auth0 setup
-	
-	/*context.subscriptions.push(
-		vscode.commands.registerCommand('vscode-auth0-authprovider.signIn', async () => {
-			const session = await vscode.authentication.getSession("auth0", [], { createIfNone: true });
-			console.log(session);
-		})
-	)*/
-
-	context.subscriptions.push(
-		new Auth0AuthenticationProvider(context)
-	);
-
-	currentServerToken = await getAuthSession(false);
-
-	if (config.get('useServerApi') && !currentServerToken) {
-		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
-	} 
-
 
 
 	// Register the provider with the extension's context
@@ -108,17 +87,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			webviewOptions: { retainContextWhenHidden: true }
 		})
 	);
-
-	context.subscriptions.push(
-		vscode.authentication.onDidChangeSessions(async e => {
-			console.log(e);
-			if (e.provider.id === "auth0") {
-				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
-			}
-		})
-	);
-
-	
 
 
 	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
@@ -194,19 +162,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	setupPreCommitHookIfNecessary();
 }
 
-
-const getAuthSession = async (useServerApi: boolean) => {
-	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
-	if (session) {
-		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
-		return session.accessToken;
-
-	}
-	return '';
-};
-
-
-
 async function setupPreCommitHookIfNecessary() {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
@@ -218,8 +173,6 @@ async function setupPreCommitHookIfNecessary() {
 		}
 	}
 }
-
-
 
 
 async function deletePreCommitHookIfNecessary(): Promise<void> {
@@ -473,23 +426,15 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
 
-		// Send the search prompt to the ChatGPTAPI instance and store the response
+
 		if (this._settings.useServerApi) {
 			try {
-				
-				if (!currentServerToken) {
-					currentServerToken = await getAuthSession(true);
-				}
-
-				const config = {
-					headers: { Authorization: `Bearer ${currentServerToken}` }
-				};
-
+				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-				await axios.post("https://d3a3f6u8pmaxns.cloudfront.net/api/review",
-				{prompt: this._fullPrompt, model: this._settings.model},
-				config
-				);
+					await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
+						{ prompt: this._fullPrompt, model: this._settings.model }
+
+					);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
@@ -685,10 +630,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					</div>
 				</div>
 
-				<div class="button-container">
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="learn-more-button">Learn More About The Previous Suggestion</button>
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="askButton">Talk to GPT</button>
-				</div>
+				<!-- Your button at the bottom -->
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 
 				<script src="${scriptUri}"></script>
 		
