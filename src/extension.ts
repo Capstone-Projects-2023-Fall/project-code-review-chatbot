@@ -486,7 +486,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				};
 
 				const res =
-				await axios.post("https://d3a3f6u8pmaxns.cloudfront.net/api/review",
+				await axios.post("http://localhost/api/review",
 				{prompt: this._fullPrompt, model: this._settings.model},
 				config
 				);

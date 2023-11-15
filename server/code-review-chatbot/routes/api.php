@@ -49,7 +49,7 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     }*/
 
 
-
+    /*
     $response = OpenAI::chat()->create([
         'model' => $request->input('model'),
         'messages' => [
@@ -62,8 +62,36 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
         $out->writeln($result->message->content);
         $finaltext .= $result->message->content;
        
+    }*/
+    $user = Auth::user();
+    
+    if (!$user->thread_id) {
+        $threadres = OpenAI::threads()->create([]);
+        DB::table('users')
+              ->where('id', $user->id)
+              ->update(['thread_id' => $threadres->id]);
     }
 
+    $usermsg = OpenAI::threads()->messages()->create($user->thread_id, [
+        'role' => 'user',
+        'content' => $request->input('prompt')
+    ]); 
+
+    $msglist = OpenAI::threads()->messages()->list('thread_tKFLqzRN9n7MnyKKvc1Q7868', [
+        'limit' => 1,
+    ]);
+
+
+    $response = OpenAI::threads()->messages()->retrieve(
+        threadId: $user->thread_id,
+        messageId: $msglist->lastId,
+    );
+
+    foreach ($response->content as $result) {
+        $out->writeln($result->text->value);
+        $finaltext .= $result->text->value;
+       
+    }
     
     $out->writeln($finaltext);
 
@@ -71,8 +99,8 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
 
     return response()->json([
         'text' => $finaltext,
-        'id' => $response['id'],
-        'usage' => $response['usage']
+        'id' => $response->id,
+        'usage' => ''//$response['usage']
     ]);
 });
 
