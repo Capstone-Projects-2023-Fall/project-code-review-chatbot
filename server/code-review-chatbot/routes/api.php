@@ -74,10 +74,10 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
 
     $usermsg = OpenAI::threads()->messages()->create($user->thread_id, [
         'role' => 'user',
-        'content' => $request->input('prompt')
+        'content' => ($request->input('prompt')),
     ]); 
 
-    $msglist = OpenAI::threads()->messages()->list('thread_tKFLqzRN9n7MnyKKvc1Q7868', [
+    $msglist = OpenAI::threads()->messages()->list($user->thread_id, [
         'limit' => 1,
     ]);
 
