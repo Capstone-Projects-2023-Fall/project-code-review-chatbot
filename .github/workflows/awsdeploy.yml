@@ -32,7 +32,7 @@ jobs:
       - name: Deploy Environment
         run: |
           vapor team:switch --id 62804
-          vapor deploy production
+          vapor deploy prod
         working-directory: ./server/code-review-chatbot
         env:
           VAPOR_API_TOKEN: ${{ secrets.VAPOR_API_TOKEN }}
