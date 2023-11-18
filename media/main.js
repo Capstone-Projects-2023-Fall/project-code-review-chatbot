@@ -167,27 +167,21 @@
       </div>`;
   }
 
+  
   function renderSuggestions(response) {
     console.log("start renderSuggestions");
     const suggestions = parseSuggestions(response);
     const suggestionsContainer = document.getElementById("response");
-
+  
     if (!suggestionsContainer || suggestions.length === 0) {
       return;
     }
-
-
+  
     const form = document.createElement('form');
     const list = document.createElement('ol');
-
-    const userChanges = [ //array to store if user marked a suggestion as done
-      "VariableNamingConventions",
-      "Redundancy",
-      "Bug/Broken",
-      "Complexity",
-      "Legibility"
-    ];
-
+  
+    const userChanges = new Array(suggestions.length).fill(""); // Initialize with empty strings for each suggestion
+  
     suggestions.forEach((suggestion, index) => {
       const listItem = document.createElement("li");
       const titleContainer = document.createElement("div");
@@ -196,33 +190,30 @@
       const descriptionElement = document.createElement("div");
       const checkbox = document.createElement("input");
       const checkboxContainer = document.createElement("div");
-
+  
       listItem.classList.add("my-3");
       titleContainer.classList.add("title");
-
+  
       titleElement.textContent = suggestion.title;
       titleElement.classList.add("title-element", "title-left");
       checkboxContainer.classList.add("checkboxContainer", "title-element", "title-left");
-
+  
       checkbox.type = "checkbox";
       checkbox.id = `checkbox-${index}`;
       checkbox.name = "checkbox-group";
       checkboxContainer.appendChild(checkbox);
-      //const label = document.createElement("label");
-      //label.setAttribute("for", `checkbox-${index}`);
-      //checkboxContainer.appendChild(label);
-
+  
       caretButton.type = "button";
       caretButton.textContent = "﹀";
       descriptionElement.classList.add("hidden", "description");
       caretButton.classList.add("title-element", "title-right");
-
+  
       function setMaxHeight() {
         descriptionElement.style.maxHeight = descriptionElement.scrollHeight + 'px';
       }
-
+  
       setMaxHeight();
-
+  
       caretButton.addEventListener("click", () => {
         descriptionElement.classList.toggle("hidden");
         caretButton.textContent = descriptionElement.classList.contains("hidden") ? "﹀" : "︿";
@@ -234,24 +225,22 @@
           descriptionElement.style.maxHeight = '0';
         }
       });
-
-      //stores what boxes are checked by user to be sent to server
-      
-      checkbox.addEventListener("change ", () => {
-        var ucIndex = 0;
-        //grabs checkbox element from its id, then grabs the index of that element 
-        ucIndex = suggestions.findIndex(x => getElementById(checkbox.id));
-
-        if (checkbox.checked) {
-          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was checked";
-        } else {
-          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was NOT checked";
-        }
+  
+      // Handle checkbox change
+      checkbox.addEventListener("change", () => {
+        const checkboxState = checkbox.checked ? "was checked" : "was NOT checked";
+        userChanges[index] = `The box for ${suggestion.title} with checkboxID of: ${checkbox.id} ${checkboxState}`;
+  
+        // Optionally, post this data back to your extension
+        vscode.postMessage({
+          type: 'checkboxChange',
+          userChanges: userChanges
+        });
       });
-
+  
       descriptionElement.textContent = suggestion.description;
       descriptionElement.classList.add("hidden");
-
+  
       checkboxContainer.appendChild(checkbox);
       titleContainer.appendChild(checkboxContainer);
       titleContainer.appendChild(titleElement);
@@ -260,11 +249,12 @@
       listItem.appendChild(descriptionElement);
       list.appendChild(listItem);
     });
-
+  
     form.appendChild(list);
     suggestionsContainer.appendChild(form);
     console.log("done rendering suggestions");
   }
+  
 
   function parseSuggestions(response) {
     console.log("start parsing suggestions");
