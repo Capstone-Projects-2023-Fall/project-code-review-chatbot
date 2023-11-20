@@ -15,21 +15,12 @@ use OpenAI\Laravel\Facades\OpenAI;
 |
 */
 
-
-Route::post('login', 'API\UserController@login');
-Route::post('register', 'API\UserController@register');
-
-Route::group(['middleware' => 'auth:api'], function(){
-    Route::post('details', 'API\UserController@details');
-});
-
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 
-Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
+Route::post('/review', function (Request $request) {
     
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
 
@@ -75,20 +66,3 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
         'usage' => $response['usage']
     ]);
 });
-
-Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
-    if (Auth::user()) {
-        $user = Auth::user(); 
-
-        return response()->json([
-            'name' => [$user->name],
-            'email' => [$user->email],
-        ]);
-    } else {
-        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
-        $out->writeln('not authenticated');
-        return response();
-    }
-
-});
-

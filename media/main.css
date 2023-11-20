@@ -89,49 +89,19 @@ li {
 /* Define the checkmark pseudo-element */
 .checkboxContainer input[type="checkbox"]::before {
     content: "✔";
+    /* Use a checkmark character */
     display: inline-block;
     font-size: 1em;
+    /* Adjust the size of the checkmark */
     position: absolute;
     top: 48%;
+    /* Vertically center the checkmark */
     left: 50%;
+    /* Horizontally center the checkmark */
     transform: translate(-50%, -50%);
+    /* Center it precisely */
     color: white;
+    /* Color of the checkmark */
     pointer-events: none;
+    /* Ensure the checkmark is not interactive */
 }
-
-
-.prompt-text-button {
-    height: 2.5rem; 
-    width: 100%;
-    background-color: #333;
-    color: #fff; 
-    padding: 10px;
-    text-align: center;
-    font-size: 14px; 
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    
-  }
-  
-  .prompt-text-button:hover {
-    background-color: #555;
-  }
-  
-
-  #learn-more-button {
-    white-space: normal; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; 
-    -webkit-box-orient: vertical;
-  }
-
-  .button-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; 
-    margin-top: 10px; 
-  }
-  
