@@ -7,10 +7,25 @@ import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import * as mysql from 'mysql2';
+import { connect } from 'http2';
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+const DB_HOST = process.env.DB_HOST!;
+const DB_USER = process.env.DB_USER!;
+const DB_PASSWORD = process.env.DB_PASSWORD!;
+const DB_DATABASE = process.env.DB_DATABASE!;
+
+const dbConfig = {
+	host:DB_HOST,
+	user: DB_USER ,
+	password: DB_PASSWORD,
+	database: DB_DATABASE
+};
+
+const pool = mysql.createPool(dbConfig);
 
 type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
@@ -338,6 +353,37 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						vscode.commands.executeCommand('chatgpt.ask');
 						break;
 
+					}
+				case 'checkboxChange':
+					{
+						console.log("Checkbox states have changed:", data.userChanges);
+					
+						// Combine the array of userChanges into a single string
+						const userChangesString = data.userChanges.join('\n'); // You can use a different separator if needed
+					
+						const checkboxData = {
+						userChanges: userChangesString, // Use the formatted string
+						};
+					
+						const query = 'INSERT INTO test SET ?';
+					
+						pool.getConnection((err, connection) => {
+						if (err) {
+							console.error("Error connecting to the database", err);
+							return;
+						}
+					
+						connection.query(query, checkboxData, (error, results) => {
+							connection.release();
+					
+							if (error) {
+							console.error("Error inserting data", error);
+							} else {
+							console.log('Successfully inserted data:', results);
+							}
+						});
+						});
+						break;
 					}
 			}
 		});
