@@ -357,12 +357,15 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				case 'checkboxChange':
 					{
 						console.log("Checkbox states have changed:", data.userChanges);
+
+						const currentTime = new Date();
+						const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
 					
-						// Combine the array of userChanges into a single string
-						const userChangesString = data.userChanges.join('\n'); // You can use a different separator if needed
+						const userChangesString = data.userChanges.join('\n');
 					
 						const checkboxData = {
-						userChanges: userChangesString, // Use the formatted string
+						timestamp: formattedTimestamp,
+						logs: userChangesString,
 						};
 					
 						const query = 'INSERT INTO test SET ?';
