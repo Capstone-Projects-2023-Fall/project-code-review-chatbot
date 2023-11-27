@@ -387,7 +387,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 									return;
 								}
 	
-								let parsedDiff = stdout;
+								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
 	
 								const checkboxData = {
 									timestamp: formattedTimestamp,
