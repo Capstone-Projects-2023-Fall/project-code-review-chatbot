@@ -110,7 +110,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
+		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const promptPrefix = config.get('promptPrefix.findIssue') as string;
+			console.log('Received issueTitle:', issueTitle);
+
+			// Modify the prompt to include the issueTitle received from the webview
+			const prompt = `${promptPrefix} ${issueTitle}`;
+
+			// Pass the modified prompt to the search function
+			provider.search(prompt, true, false);
+		})
+
+
 	);
 
 
@@ -198,21 +211,21 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 }
 
 
-  function getScriptContent(): string {
+function getScriptContent(): string {
 	try {
-	  // Resolve the path to the file relative to the current directory
-	  const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
-	  
-	  // Read the content of the file
-	  const content = readFileSync(filePath, { encoding: 'utf-8' });
-	  
-	  return content;
+		// Resolve the path to the file relative to the current directory
+		const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
+
+		// Read the content of the file
+		const content = readFileSync(filePath, { encoding: 'utf-8' });
+
+		return content;
 	} catch (error) {
-	  // If there's an error reading the file, log the error and return a default string
-	  console.error("Error reading the pre-commit file: ", error);
-	  return '';
+		// If there's an error reading the file, log the error and return a default string
+		console.error("Error reading the pre-commit file: ", error);
+		return '';
 	}
-  }
+}
 
 
 
@@ -339,6 +352,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						break;
 
 					}
+				case 'findIssue': {
+					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
+					break;
+				}
+
 			}
 		});
 	}
@@ -630,9 +648,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					</div>
 				</div>
 
-				<!-- Your button at the bottom -->
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
+				<div class="button-container">
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="askButton">Talk to GPT</button>
+				</div>
 
 				<script src="${scriptUri}"></script>
 		

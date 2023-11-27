@@ -1,5 +1,7 @@
 // @ts-ignore
 
+//const { title } = require("process");
+
 (function () {
   const vscode = acquireVsCodeApi();
   let response = '';
@@ -15,6 +17,59 @@
       type: 'askGPT'
     });
   });
+
+  /* for each listItem {
+    createButton('findIssueButton').addEventListener('click', () = > {
+        vscode.postMessage
+      type: 'locateIssue'
+    } 
+    })
+  
+
+    // Data flow: button is clicked next to suggestion 
+                  -> event listener posts message to extension.ts
+                  -> extension.ts receives message in onDidReceiveMessage
+                  -> (registered) findissue command is executed
+                  -> commandHandler executes search(prompt) where prompt is the command
+                  -> search appends document text
+                  !!! in search add a boolean for isFindIssues, which will bypass appending document text
+                  -> instead, the title and description of the listItem needs to be appended
+                  !!! either send this through the message sent to extension.ts, or ???
+    
+    in package.json: 
+
+       {
+        "command": "chatgpt.locateIssue",
+        "title": "Locate Issue"
+      }
+
+
+      "chatgpt.promptPrefix.locateIssue": {
+          "type": "string",
+          "default": "Please provide the sections of my code where this issue is present: ",
+          "description": "locate the particular code review issue",
+          "order": 17
+        }
+    
+     in extension.ts:
+
+        -- This is when the extension receives the findIssue message from main.js postMessage
+        webviewView.webview.onDidReceiveMessage(data => {
+          case 'findIssue':
+          {
+            vscode.commands.executeCommand('chatgpt.findIssue');
+            break;
+
+          }
+
+        context.subscriptions.push {
+    vscode.commands.registerCommand('chatgpt.findIssue', () => commandHandler('promptPrefix.findIssue')),
+        }
+    
+
+    */
+
+
 
 
   window.addEventListener("message", (event) => {
@@ -167,21 +222,22 @@
       </div>`;
   }
 
-  
+
   function renderSuggestions(response) {
     console.log("start renderSuggestions");
     const suggestions = parseSuggestions(response);
     const suggestionsContainer = document.getElementById("response");
-  
+
     if (!suggestionsContainer || suggestions.length === 0) {
       return;
     }
-  
+
     const form = document.createElement('form');
     const list = document.createElement('ol');
-  
+
     const userChanges = new Array(suggestions.length).fill(""); // Initialize with empty strings for each suggestion
-  
+
+    // For each suggestion, create the suggestion UI
     suggestions.forEach((suggestion, index) => {
       const listItem = document.createElement("li");
       const titleContainer = document.createElement("div");
@@ -190,30 +246,31 @@
       const descriptionElement = document.createElement("div");
       const checkbox = document.createElement("input");
       const checkboxContainer = document.createElement("div");
-  
+      const findIssueButton = document.createElement("button");
+
       listItem.classList.add("my-3");
       titleContainer.classList.add("title");
-  
+
       titleElement.textContent = suggestion.title;
       titleElement.classList.add("title-element", "title-left");
       checkboxContainer.classList.add("checkboxContainer", "title-element", "title-left");
-  
+
       checkbox.type = "checkbox";
       checkbox.id = `checkbox-${index}`;
       checkbox.name = "checkbox-group";
       checkboxContainer.appendChild(checkbox);
-  
+
       caretButton.type = "button";
       caretButton.textContent = "﹀";
       descriptionElement.classList.add("hidden", "description");
       caretButton.classList.add("title-element", "title-right");
-  
+
       function setMaxHeight() {
         descriptionElement.style.maxHeight = descriptionElement.scrollHeight + 'px';
       }
-  
+
       setMaxHeight();
-  
+
       caretButton.addEventListener("click", () => {
         descriptionElement.classList.toggle("hidden");
         caretButton.textContent = descriptionElement.classList.contains("hidden") ? "﹀" : "︿";
@@ -225,36 +282,54 @@
           descriptionElement.style.maxHeight = '0';
         }
       });
-  
+
       // Handle checkbox change
       checkbox.addEventListener("change", () => {
         const checkboxState = checkbox.checked ? "was checked" : "was NOT checked";
         userChanges[index] = `The box for ${suggestion.title} with checkboxID of: ${checkbox.id} ${checkboxState}`;
-  
+
         // Optionally, post this data back to your extension
         vscode.postMessage({
           type: 'checkboxChange',
           userChanges: userChanges
         });
       });
-  
+
+      findIssueButton.type = "button";
+      findIssueButton.textContent = "⌕";
+      findIssueButton.classList.add("title-element", "title-right");
+
+      findIssueButton.addEventListener('click', (function (title) {
+        return function () {
+          const issueTitle = title.textContent;
+          console.log("issueTitle:", issueTitle);
+
+          vscode.postMessage({
+            type: 'findIssue',
+            issueTitle: issueTitle
+          });
+        };
+      })(titleElement)); // Pass titleElement to the closure
+
+
       descriptionElement.textContent = suggestion.description;
       descriptionElement.classList.add("hidden");
-  
+
       checkboxContainer.appendChild(checkbox);
       titleContainer.appendChild(checkboxContainer);
       titleContainer.appendChild(titleElement);
       titleContainer.appendChild(caretButton);
+      titleContainer.appendChild(findIssueButton);
       listItem.appendChild(titleContainer);
       listItem.appendChild(descriptionElement);
       list.appendChild(listItem);
     });
-  
+
     form.appendChild(list);
     suggestionsContainer.appendChild(form);
     console.log("done rendering suggestions");
   }
-  
+
 
   function parseSuggestions(response) {
     console.log("start parsing suggestions");
