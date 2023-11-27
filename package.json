@@ -86,6 +86,10 @@
       {
         "command": "chatgpt.learnMore",
         "title": "Learn More"
+      },
+      {
+        "command": "chatgpt.findIssue",
+        "title": "Find Issue"
       }
     ],
     "menus": {
@@ -258,7 +262,7 @@
         "chatgpt.promptPrefix.testSuggestions": {
           "type": "string",
           "default": "Suggest some tests I can write for the following code. Avoid actually writing the tests out, but explain what some benefical tests would be:",
-          "description": "The prompt prefix used for the bot to sugget ways to test code.",
+          "description": "The prompt prefix used for the bot to suggest ways to test code.",
           "order": 14
         },
         "chatgpt.promptPrefix.legibilitySuggestions": {
@@ -272,6 +276,12 @@
           "default": "Would like to learn More about the previous suggestion.",
           "description": "LearnMore function for the responses",
           "order": 16
+        },
+        "chatgpt.promptPrefix.findIssue": {
+          "type": "string",
+          "default": "Show me all of the code snippets where you identified this issue within your code review:",
+          "description": "The prompt prefix used for the bot to show the user where code improvments can be made.",
+          "order": 17
         }
       }
     }

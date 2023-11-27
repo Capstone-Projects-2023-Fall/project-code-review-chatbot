@@ -25,4 +25,11 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', 'AdminController@dashboard')->name('admin_dashboard');
+        
+    });
 });
+
+
