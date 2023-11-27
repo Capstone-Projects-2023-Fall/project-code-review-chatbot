@@ -16,6 +16,10 @@
     });
   });
 
+  document.getElementById('quickFixButton').addEventListener('click', () => {
+    applyQuickFixes();
+  });
+
 
   window.addEventListener("message", (event) => {
     const message = event.data;
