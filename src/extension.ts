@@ -90,10 +90,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
+		console.log("command handler");
 		const config = vscode.workspace.getConfiguration('chatgpt');
 		const prompt = config.get(command) as string;
-		provider.search(prompt, useEntireFile, isCodeReview);
+	
+		// Check if the command is promptPrefix.quickFix
+		if (command === 'promptPrefix.quickFix') {
+			provider.applyQuickFixes();
+		} else {
+			provider.search(prompt, useEntireFile, isCodeReview);
+		}
 	};
+	
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () =>
@@ -253,6 +261,28 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
+	public applyQuickFixes() {
+		const response = this._response;
+		
+		if (response != null) 
+		{
+			const quickFixStart = response.indexOf('~~~Quick Fix~~~');
+			const quickFixEnd = response.indexOf('---', quickFixStart);
+
+			if (quickFixStart !== -1 && quickFixEnd !== -1) {
+			const quickFixSection = response.substring(quickFixStart, quickFixEnd);
+			console.log('Quick Fix Section:', quickFixSection);
+			} else {
+			console.log('Quick Fix section not found in the response.');
+			}
+		}
+		else 
+		{
+			console.log('Must run code review command before fixing code.')
+		}
+
+	}
+
 	public sendWebviewMessage(type: string, data?: any) {
 		this._view?.webview.postMessage({ type, data });
 	}
@@ -339,6 +369,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						vscode.commands.executeCommand('chatgpt.ask');
 						break;
 
+					}
+				case 'quickFix':
+					{
+						this.applyQuickFixes();
+						break;
 					}
 			}
 		});

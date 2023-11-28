@@ -17,7 +17,10 @@
   });
 
   document.getElementById('quickFixButton').addEventListener('click', () => {
-    applyQuickFixes();
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'quickFix'
+    });
   });
 
 
