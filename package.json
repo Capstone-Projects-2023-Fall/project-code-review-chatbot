@@ -91,6 +91,10 @@
       {
         "command": "chatgpt.learnMore",
         "title": "Learn More"
+      },
+      {
+        "command": "chatgpt.findIssue",
+        "title": "Find Issue"
       }
     ],
     "menus": {
@@ -263,7 +267,7 @@
         "chatgpt.promptPrefix.testSuggestions": {
           "type": "string",
           "default": "Suggest some tests I can write for the following code. Avoid actually writing the tests out, but explain what some benefical tests would be:",
-          "description": "The prompt prefix used for the bot to sugget ways to test code.",
+          "description": "The prompt prefix used for the bot to suggest ways to test code.",
           "order": 14
         },
         "chatgpt.promptPrefix.legibilitySuggestions": {
@@ -282,7 +286,13 @@
           "type": "string",
           "default": "Look for basic errors in the code such as missing semicolons and misspelled variables. Explain where these errors are in the code and how you would fix them.",
           "description": "Search for simple areas in the code that can be easily modified.",
-          "order": 16
+          "order": 17
+
+        "chatgpt.promptPrefix.findIssue": {
+          "type": "string",
+          "default": "Show me all of the code snippets where you identified this issue within your code review:",
+          "description": "The prompt prefix used for the bot to show the user where code improvments can be made.",
+          "order": 18
         }
       }
     }
@@ -326,6 +336,7 @@
     "composer": "^4.1.0",
     "dotenv": "^16.3.1",
     "gpt3-tokenizer": "^1.1.5",
+    "mysql2": "^3.6.3",
     "node-fetch": "^3.3.0",
     "yarn": "^1.22.19"
   }

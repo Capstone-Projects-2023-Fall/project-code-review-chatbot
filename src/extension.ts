@@ -7,10 +7,26 @@ import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import * as mysql from 'mysql2';
+import { exec } from 'child_process';
+
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+const DB_HOST = process.env.DB_HOST!;
+const DB_USER = process.env.DB_USER!;
+const DB_PASSWORD = process.env.DB_PASSWORD!;
+const DB_DATABASE = process.env.DB_DATABASE!;
+
+const dbConfig = {
+	host:DB_HOST,
+	user: DB_USER ,
+	password: DB_PASSWORD,
+	database: DB_DATABASE
+};
+
+const pool = mysql.createPool(dbConfig);
 
 type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
@@ -119,7 +135,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
+		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const promptPrefix = config.get('promptPrefix.findIssue') as string;
+			console.log('Received issueTitle:', issueTitle);
+
+			// Modify the prompt to include the issueTitle received from the webview
+			const prompt = `${promptPrefix} ${issueTitle}`;
+
+			// Pass the modified prompt to the search function
+			provider.search(prompt, true, false);
+		})
+
+
 	);
 
 
@@ -207,21 +236,21 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 }
 
 
-  function getScriptContent(): string {
+function getScriptContent(): string {
 	try {
-	  // Resolve the path to the file relative to the current directory
-	  const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
-	  
-	  // Read the content of the file
-	  const content = readFileSync(filePath, { encoding: 'utf-8' });
-	  
-	  return content;
+		// Resolve the path to the file relative to the current directory
+		const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
+
+		// Read the content of the file
+		const content = readFileSync(filePath, { encoding: 'utf-8' });
+
+		return content;
 	} catch (error) {
-	  // If there's an error reading the file, log the error and return a default string
-	  console.error("Error reading the pre-commit file: ", error);
-	  return '';
+		// If there's an error reading the file, log the error and return a default string
+		console.error("Error reading the pre-commit file: ", error);
+		return '';
 	}
-  }
+}
 
   function getActiveEditor() {
     return vscode.window.activeTextEditor;
@@ -448,11 +477,67 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						break;
 
 					}
+
 				case 'quickFix':
 					{
 						this.applyQuickFixes();
 						break;
 					}
+				case 'checkboxChange':
+					{
+						let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
+						? vscode.workspace.workspaceFolders[0].uri.fsPath
+						: null;
+
+						console.log("Checkbox states have changed:", data.userChanges);
+
+						const currentTime = new Date();
+						const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
+						const userChangesString = data.userChanges.join('\n');
+
+						if(workspacePath){
+							exec('git diff', { cwd: workspacePath }, (error, stdout, stderr) => {
+								if (error){
+									console.error('error',error);
+									return;
+								}
+	
+								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
+	
+								const checkboxData = {
+									timestamp: formattedTimestamp,
+									logs: userChangesString,
+									gitDiff: parsedDiff
+									};
+								
+									const query = 'INSERT INTO test SET ?';
+						
+									pool.getConnection((err, connection) => {
+									if (err) {
+										console.error("Error connecting to the database", err);
+										return;
+									}
+								
+									connection.query(query, checkboxData, (error, results) => {
+										connection.release();
+								
+										if (error) {
+										console.error("Error inserting data", error);
+										} else {
+										console.log('Successfully inserted data:', results);
+										}
+	
+									});
+								});
+							});
+
+						}
+						break;
+					}
+				case 'findIssue': {
+					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
+					break;
+				}
 			}
 		});
 	}
@@ -748,7 +833,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>
-
 
 				<script src="${scriptUri}"></script>
 		
