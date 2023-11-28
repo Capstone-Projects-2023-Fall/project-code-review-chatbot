@@ -18,6 +18,7 @@ const DB_HOST = process.env.DB_HOST!;
 const DB_USER = process.env.DB_USER!;
 const DB_PASSWORD = process.env.DB_PASSWORD!;
 const DB_DATABASE = process.env.DB_DATABASE!;
+const DB_TABLE = process.env.DB_TABLE;
 
 const dbConfig = {
 	host:DB_HOST,
@@ -356,6 +357,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				case 'prompt':
 					{
 						this.search(data.value);
+						let log = 'Search Command: ' + data.value;
+
+						this.dbQuery(log);
+
 					}
 				case 'learnMore':
 					{
@@ -388,32 +393,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								}
 	
 								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
-	
-								const checkboxData = {
-									timestamp: formattedTimestamp,
-									logs: userChangesString,
-									gitDiff: parsedDiff
-									};
-								
-									const query = 'INSERT INTO test SET ?';
-						
-									pool.getConnection((err, connection) => {
-									if (err) {
-										console.error("Error connecting to the database", err);
-										return;
-									}
-								
-									connection.query(query, checkboxData, (error, results) => {
-										connection.release();
-								
-										if (error) {
-										console.error("Error inserting data", error);
-										} else {
-										console.log('Successfully inserted data:', results);
-										}
-	
-									});
-								});
+								let log = 'Checkbox Change: ' + userChangesString;
+
+								this.dbQuery(log,parsedDiff);
 							});
 
 						}
@@ -425,6 +407,38 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 			}
+		});
+	}
+
+	public dbQuery(log: string, gitdiff?: string){
+
+		const currentTime = new Date();
+		const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
+
+		const checkboxData = {
+			timestamp: formattedTimestamp,
+			logs: log,
+			gitdiff: gitdiff
+			};
+		
+			const query = `INSERT INTO ${DB_TABLE} SET ?`;
+		
+		pool.getConnection((err, connection) => {
+			if (err) {
+				console.error("Error connecting to the database", err);
+				return;
+			}
+		
+			connection.query(query, checkboxData, (error, results) => {
+				connection.release();
+		
+				if (error) {
+				console.error("Error inserting data", error);
+				} else {
+				console.log('Successfully inserted data:', results);
+				}
+
+			});
 		});
 	}
 
