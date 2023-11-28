@@ -261,19 +261,21 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
+	// Fires when quick fix button is clicked. Grabs quick fix section of response.
 	public applyQuickFixes() {
 		const response = this._response;
 		
 		if (response != null) 
 		{
-			const quickFixStart = response.indexOf('~~~Quick Fix~~~');
+			const quickFixStart = response.indexOf('[Fix 1]');
 			const quickFixEnd = response.indexOf('---', quickFixStart);
 
 			if (quickFixStart !== -1 && quickFixEnd !== -1) {
-			const quickFixSection = response.substring(quickFixStart, quickFixEnd);
-			console.log('Quick Fix Section:', quickFixSection);
+				const quickFixSection = response.substring(quickFixStart, quickFixEnd);
+				console.log('Quick Fix Section:', quickFixSection);
+				this.applyFixes(quickFixSection);
 			} else {
-			console.log('Quick Fix section not found in the response.');
+				console.log('Quick Fix section not found in the response.');
 			}
 		}
 		else 
@@ -282,6 +284,37 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 	}
+
+	public applyFixes(quickFixSection: string) {
+		const fixes = quickFixSection.split('[Fix ');
+	
+		for (const fix of fixes) {
+			if (fix.trim() !== '') {
+				const description = this.extractValue(fix, 'Description:');
+				const location = this.extractValue(fix, 'Location:');
+				const suggestedFix = this.extractValue(fix, 'Suggested Fix:');
+	
+				// Apply each fix to the user's file
+				this.applyFixToUserFile(description, location, suggestedFix);
+			}
+		}
+	}
+
+	extractValue(fix: string, label: string) {
+		const startIndex = fix.indexOf(label);
+		if (startIndex !== -1) {
+			const valueStartIndex = startIndex + label.length;
+			const valueEndIndex = fix.indexOf('\n', valueStartIndex);
+			console.log(fix.substring(valueStartIndex, valueEndIndex).trim());
+			// return fix.substring(valueStartIndex, valueEndIndex).trim();
+		}
+		return null;
+	}
+	
+	applyFixToUserFile(description: any, location: any, suggestedFix: any) {
+
+	}
+	
 
 	public sendWebviewMessage(type: string, data?: any) {
 		this._view?.webview.postMessage({ type, data });
