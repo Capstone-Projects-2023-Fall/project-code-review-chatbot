@@ -18,59 +18,13 @@
     });
   });
 
-  /* for each listItem {
-    createButton('findIssueButton').addEventListener('click', () = > {
-        vscode.postMessage
-      type: 'locateIssue'
-    } 
-    })
-  
 
-    // Data flow: button is clicked next to suggestion 
-                  -> event listener posts message to extension.ts
-                  -> extension.ts receives message in onDidReceiveMessage
-                  -> (registered) findissue command is executed
-                  -> commandHandler executes search(prompt) where prompt is the command
-                  -> search appends document text
-                  !!! in search add a boolean for isFindIssues, which will bypass appending document text
-                  -> instead, the title and description of the listItem needs to be appended
-                  !!! either send this through the message sent to extension.ts, or ???
-    
-    in package.json: 
-
-       {
-        "command": "chatgpt.locateIssue",
-        "title": "Locate Issue"
-      }
-
-
-      "chatgpt.promptPrefix.locateIssue": {
-          "type": "string",
-          "default": "Please provide the sections of my code where this issue is present: ",
-          "description": "locate the particular code review issue",
-          "order": 17
-        }
-    
-     in extension.ts:
-
-        -- This is when the extension receives the findIssue message from main.js postMessage
-        webviewView.webview.onDidReceiveMessage(data => {
-          case 'findIssue':
-          {
-            vscode.commands.executeCommand('chatgpt.findIssue');
-            break;
-
-          }
-
-        context.subscriptions.push {
-    vscode.commands.registerCommand('chatgpt.findIssue', () => commandHandler('promptPrefix.findIssue')),
-        }
-    
-
-    */
-
-
-
+  document.getElementById('quickFixButton').addEventListener('click', () => {
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'quickFix'
+    });
+  });
 
   window.addEventListener("message", (event) => {
     const message = event.data;

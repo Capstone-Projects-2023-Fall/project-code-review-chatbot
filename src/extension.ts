@@ -106,10 +106,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
+		console.log("command handler");
 		const config = vscode.workspace.getConfiguration('chatgpt');
 		const prompt = config.get(command) as string;
-		provider.search(prompt, useEntireFile, isCodeReview);
+	
+		// Check if the command is promptPrefix.quickFix
+		if (command === 'promptPrefix.quickFix') {
+			provider.applyQuickFixes();
+		} else {
+			provider.search(prompt, useEntireFile, isCodeReview);
+		}
 	};
+	
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () =>
@@ -125,6 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
 		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
+		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
 		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
@@ -243,7 +252,22 @@ function getScriptContent(): string {
 	}
 }
 
+  function getActiveEditor() {
+    return vscode.window.activeTextEditor;
+}
 
+function getActiveFileUri() {
+    const editor = getActiveEditor();
+    if (editor) {
+        return editor.document.uri;
+    }
+    return null;
+}
+
+function getActiveFilePath() {
+    const fileUri = getActiveFileUri();
+    return fileUri ? fileUri.fsPath : null;
+}
 
 export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'chatgpt.chatView';
@@ -280,6 +304,91 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._newAPI();
 
 	}
+
+	// Fires when quick fix button is clicked. Grabs quick fix section of response.
+	public applyQuickFixes() {
+		const response = this._response;
+		
+		if (response != null) 
+		{
+			const quickFixStart = response.indexOf('[Fix 1]');
+			const quickFixEnd = response.indexOf('---', quickFixStart);
+
+			if (quickFixStart !== -1 && quickFixEnd !== -1) {
+				const quickFixSection = response.substring(quickFixStart, quickFixEnd);
+				console.log('Quick Fix Section:', quickFixSection);
+				this.applyFixes(quickFixSection);
+			} else {
+				console.log('Quick Fix section not found in the response.');
+			}
+		}
+		else 
+		{
+			console.log('Must run code review command before fixing code.');
+			vscode.window.showErrorMessage('Must run code review command before fixing code.');
+		}
+
+	}
+
+	public applyFixes(quickFixSection: string) {
+		const fixes = quickFixSection.split('[Fix ');
+	
+		for (const fix of fixes) {
+			if (fix.trim() !== '') {
+				const description = this.extractValue(fix, 'Description:');
+				const location = this.extractValue(fix, 'To Be Replaced:');
+				const suggestedFix = this.extractValue(fix, 'Suggested Fix:');
+	
+				// Make each fix to the users file
+				this.applyFixToUserFile(description ? description.value : null, location ? location.value : null, suggestedFix ? suggestedFix.value : null);
+			}
+		}
+	}
+	
+	extractValue(fix: string, label: string) {
+		const startIndex = fix.indexOf(label);
+		if (startIndex !== -1) {
+			const valueStartIndex = startIndex + label.length;
+			const valueEndIndex = fix.indexOf('\n', valueStartIndex);
+			const value = fix.substring(valueStartIndex, valueEndIndex).trim();
+			return { value };
+		}
+		return null;
+	}
+	
+	applyFixToUserFile(description: string | null, location: string | null, suggestedFix: string | null) {
+		if (description && location && suggestedFix) {
+			try {
+				const filePath = getActiveFilePath();
+				if (filePath) {
+					let fileContent = fs.readFileSync(filePath, 'utf-8');
+					console.log(`To Be Replaced: ${location}`);
+	
+					// find the specified text in the file
+					const textToReplace = location.trim();
+					const startIndex = fileContent.indexOf(textToReplace);
+	
+					if (startIndex !== -1) {
+						// Replace the text with the suggested fix
+						fileContent = fileContent.slice(0, startIndex) + suggestedFix + fileContent.slice(startIndex + textToReplace.length);
+	
+						// Write the changes back to the file
+						fs.writeFileSync(filePath, fileContent, 'utf-8');
+	
+						console.log(`Fix applied successfully to the file.`);
+					} else {
+						console.log(`Specified text not found in the file.`);
+					}
+				} else {
+					console.error('File path is null');
+				}
+			} catch (error) {
+				console.error('Error applying fix:', error);
+			}
+		} else {
+			console.error('Invalid fix data.');
+		}
+	}	
 
 	public sendWebviewMessage(type: string, data?: any) {
 		this._view?.webview.postMessage({ type, data });
@@ -368,6 +477,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						break;
 
 					}
+
+				case 'quickFix':
+					{
+						this.applyQuickFixes();
+						break;
+					}
 				case 'checkboxChange':
 					{
 						let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -423,7 +538,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 					break;
 				}
-
 			}
 		});
 	}
@@ -715,10 +829,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					</div>
 				</div>
 
-				<div class="button-container">
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="learn-more-button">Learn More About The Previous Suggestion</button>
-				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm prompt-text-button" id="askButton">Talk to GPT</button>
-				</div>
+				<!-- Your button at the bottom -->
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>
 
 				<script src="${scriptUri}"></script>
 		
