@@ -306,7 +306,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		for (const fix of fixes) {
 			if (fix.trim() !== '') {
 				const description = this.extractValue(fix, 'Description:');
-				const location = this.extractValue(fix, 'Location:');
+				const location = this.extractValue(fix, 'To Be Replaced:');
 				const suggestedFix = this.extractValue(fix, 'Suggested Fix:');
 	
 				// Make each fix to the users file
@@ -332,35 +332,33 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				const filePath = getActiveFilePath();
 				if (filePath) {
 					let fileContent = fs.readFileSync(filePath, 'utf-8');
-					console.log(`File content: ${fileContent}`);
+					console.log(`To Be Replaced: ${location}`);
 	
-					// get line number from the location
-					const lineNumberMatch = location.match(/Line (\d+)/);
-					const lineNumber = lineNumberMatch ? parseInt(lineNumberMatch[1], 10) : NaN;
+					// find the specified text in the file
+					const textToReplace = location.trim();
+					const startIndex = fileContent.indexOf(textToReplace);
 	
-					if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= fileContent.split('\n').length) {
-						// Apply the suggested fix to the located line
-						const lines = fileContent.split('\n');
-						lines[lineNumber - 1] = suggestedFix;
-						fileContent = lines.join('\n');
+					if (startIndex !== -1) {
+						// Replace the text with the suggested fix
+						fileContent = fileContent.slice(0, startIndex) + suggestedFix + fileContent.slice(startIndex + textToReplace.length);
 	
 						// Write the changes back to the file
 						fs.writeFileSync(filePath, fileContent, 'utf-8');
 	
-						console.log(`Fix applied successfully to line ${lineNumber}`);
+						console.log(`Fix applied successfully to the file.`);
 					} else {
-						console.log(`Invalid line number ${lineNumber}.`);
+						console.log(`Specified text not found in the file.`);
 					}
 				} else {
-					console.error('File path is null. Unable to read file content.');
+					console.error('File path is null');
 				}
 			} catch (error) {
-				console.error('Error applying fix');
+				console.error('Error applying fix:', error);
 			}
 		} else {
 			console.error('Invalid fix data.');
 		}
-	}
+	}	
 
 	public sendWebviewMessage(type: string, data?: any) {
 		this._view?.webview.postMessage({ type, data });
