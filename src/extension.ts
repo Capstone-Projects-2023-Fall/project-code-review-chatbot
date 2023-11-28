@@ -295,7 +295,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 		else 
 		{
-			console.log('Must run code review command before fixing code.')
+			console.log('Must run code review command before fixing code.');
+			vscode.window.showErrorMessage('Must run code review command before fixing code.');
 		}
 
 	}
