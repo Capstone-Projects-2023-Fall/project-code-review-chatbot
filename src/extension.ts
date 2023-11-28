@@ -8,10 +8,23 @@ import { promises as fsPromises } from 'fs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+ 
+
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+ 
+var echo = new Echo({
+    broadcaster: 'pusher',
+    key: process.env.VITE_PUSHER_APP_KEY,
+    cluster: process.env.VITE_PUSHER_APP_CLUSTER,
+    forceTLS: true
+});
+
+
 
 type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
@@ -485,11 +498,44 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					headers: { Authorization: `Bearer ${currentServerToken}` }
 				};
 
-				const res =
+				/*const res =
 				await axios.post("http://localhost/api/review",
 				{prompt: this._fullPrompt, model: this._settings.model},
 				config
+				);*/
+
+				//const socket = new WebSocket("ws://localhost:8080", ["Authorization", `Bearer ${currentServerToken}`]);
+				const socketdata = {prompt: this._fullPrompt, model: this._settings.model}
+				const thisBot = this;
+
+				
+				/*socket.on('open', function open() {
+					socket.send(socketdata);
+				});*/
+
+				echo.channel(`review.${currentServerToken}`)
+				.listen('message', (res: any) => {
+					response = res.data.text;
+					if (res.data.detail?.usage?.total_tokens) {
+						response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
+					}
+
+					if (thisBot._settings.keepConversation) {
+						thisBot._conversation = {
+							parentMessageId: res.data.id
+						};
+					}
+				});
+
+				echo.join(`review.${currentServerToken}`).whisper(
+					'review',
+					socketdata
 				);
+
+
+				//socket.on('message', function message(res: { data: { text: string; detail: { usage: { total_tokens: any; prompt_tokens: any; completion_tokens: any; }; }; id: any; }; }) {
+					
+			//	});
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
@@ -497,16 +543,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 
-				response = res.data.text;
-				if (res.data.detail?.usage?.total_tokens) {
-					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
-				}
-
-				if (this._settings.keepConversation) {
-					this._conversation = {
-						parentMessageId: res.data.id
-					};
-				}
+				
 
 			} catch (e: any) {
 				console.error(e);
