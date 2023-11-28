@@ -223,7 +223,22 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 	}
   }
 
+  function getActiveEditor() {
+    return vscode.window.activeTextEditor;
+}
 
+function getActiveFileUri() {
+    const editor = getActiveEditor();
+    if (editor) {
+        return editor.document.uri;
+    }
+    return null;
+}
+
+function getActiveFilePath() {
+    const fileUri = getActiveFileUri();
+    return fileUri ? fileUri.fsPath : null;
+}
 
 export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'chatgpt.chatView';
@@ -294,27 +309,58 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				const location = this.extractValue(fix, 'Location:');
 				const suggestedFix = this.extractValue(fix, 'Suggested Fix:');
 	
-				// Apply each fix to the user's file
-				this.applyFixToUserFile(description, location, suggestedFix);
+				// Make each fix to the users file
+				this.applyFixToUserFile(description ? description.value : null, location ? location.value : null, suggestedFix ? suggestedFix.value : null);
 			}
 		}
 	}
-
+	
 	extractValue(fix: string, label: string) {
 		const startIndex = fix.indexOf(label);
 		if (startIndex !== -1) {
 			const valueStartIndex = startIndex + label.length;
 			const valueEndIndex = fix.indexOf('\n', valueStartIndex);
-			console.log(fix.substring(valueStartIndex, valueEndIndex).trim());
-			// return fix.substring(valueStartIndex, valueEndIndex).trim();
+			const value = fix.substring(valueStartIndex, valueEndIndex).trim();
+			return { value };
 		}
 		return null;
 	}
 	
-	applyFixToUserFile(description: any, location: any, suggestedFix: any) {
-
-	}
+	applyFixToUserFile(description: string | null, location: string | null, suggestedFix: string | null) {
+		if (description && location && suggestedFix) {
+			try {
+				const filePath = getActiveFilePath();
+				if (filePath) {
+					let fileContent = fs.readFileSync(filePath, 'utf-8');
+					console.log(`File content: ${fileContent}`);
 	
+					// get line number from the location
+					const lineNumberMatch = location.match(/Line (\d+)/);
+					const lineNumber = lineNumberMatch ? parseInt(lineNumberMatch[1], 10) : NaN;
+	
+					if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= fileContent.split('\n').length) {
+						// Apply the suggested fix to the located line
+						const lines = fileContent.split('\n');
+						lines[lineNumber - 1] = suggestedFix;
+						fileContent = lines.join('\n');
+	
+						// Write the changes back to the file
+						fs.writeFileSync(filePath, fileContent, 'utf-8');
+	
+						console.log(`Fix applied successfully to line ${lineNumber}`);
+					} else {
+						console.log(`Invalid line number ${lineNumber}.`);
+					}
+				} else {
+					console.error('File path is null. Unable to read file content.');
+				}
+			} catch (error) {
+				console.error('Error applying fix');
+			}
+		} else {
+			console.error('Invalid fix data.');
+		}
+	}
 
 	public sendWebviewMessage(type: string, data?: any) {
 		this._view?.webview.postMessage({ type, data });
