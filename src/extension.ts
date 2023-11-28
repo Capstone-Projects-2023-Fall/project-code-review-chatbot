@@ -241,6 +241,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	private _fullPrompt?: string;
 	private _currentMessageNumber = 0;
 
+	private _conversationHistory: string[] = [];
+
+
 	private _settings: Settings = {
 		selectedInsideCodeblock: false,
 		codeblockWithLanguageId: false,
@@ -350,13 +353,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					{
 						vscode.commands.executeCommand('chatgpt.ask');
 						break;
-
 					}
 				case 'findIssue': {
 					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 					break;
 				}
-
 			}
 		});
 	}
@@ -396,6 +397,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 		let response = '';
 		this._response = '';
+
+
 
 		let documentText: string | undefined;
 		// Get the selected text of the active editor
@@ -459,7 +462,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 
-
 				response = res.data.text;
 				if (res.data.detail?.usage?.total_tokens) {
 					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
@@ -469,6 +471,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					this._conversation = {
 						parentMessageId: res.data.id
 					};
+					this._conversationHistory.push(response);
 				}
 
 			} catch (e: any) {
@@ -523,7 +526,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						return;
 					}
 
-
 					response = res.text;
 					if (res.detail?.usage?.total_tokens) {
 						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
@@ -533,6 +535,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						this._conversation = {
 							parentMessageId: res.id
 						};
+						response = this._response;
+						this._conversationHistory.push(response);
 					}
 
 				} catch (e: any) {
@@ -557,6 +561,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Show the view and send a message to the webview with the response
 		if (this._view) {
 			this._view.show?.(true);
+			this._view.webview.postMessage({ type: 'updateConversation', value: this._conversationHistory });
 			if (isCodeReview) {
 				this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
 			}

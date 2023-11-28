@@ -92,6 +92,20 @@
       case "loadResponse":
         renderImageResponse(message.value);
         break;
+      case 'updateConversation':
+        const conversationHistory = message.value || [];
+        const responseDiv = document.getElementById('response');
+
+        // Clear existing content
+        //responseDiv.innerHTML = '';
+
+        // Append conversation history to the response div
+        conversationHistory.forEach((conversation) => {
+          const p = document.createElement('p');
+          p.textContent = conversation;
+          responseDiv.appendChild(p);
+        });
+        break;
     }
   });
 
@@ -175,7 +189,18 @@
     });
     //response = fixCodeBlocks(response);
     const html = converter.makeHtml(response);
-    document.getElementById("response").innerHTML = html;
+    const responseDiv = document.getElementById("response");
+
+    if (responseDiv.innerHTML.trim() !== '') {
+      // If content exists, append the new content
+      const newContent = document.createElement('div');
+      newContent.innerHTML = html;
+      responseDiv.appendChild(newContent);
+    } else {
+      // If no content exists, set the HTML content directly
+      responseDiv.innerHTML = html;
+    }
+    //document.getElementById("response").innerHTML = html;
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
