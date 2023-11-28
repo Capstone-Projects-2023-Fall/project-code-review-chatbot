@@ -287,7 +287,7 @@
           "default": "Look for basic errors in the code such as missing semicolons and misspelled variables. Explain where these errors are in the code and how you would fix them.",
           "description": "Search for simple areas in the code that can be easily modified.",
           "order": 17
-
+        },
         "chatgpt.promptPrefix.findIssue": {
           "type": "string",
           "default": "Show me all of the code snippets where you identified this issue within your code review:",
@@ -336,7 +336,7 @@
     "composer": "^4.1.0",
     "dotenv": "^16.3.1",
     "gpt3-tokenizer": "^1.1.5",
-    "mysql2": "^3.6.3",
+    "mysql2": "^3.6.5",
     "node-fetch": "^3.3.0",
     "yarn": "^1.22.19"
   }
