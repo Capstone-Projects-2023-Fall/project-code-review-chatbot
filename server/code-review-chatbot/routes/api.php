@@ -77,31 +77,7 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
         'content' => ($request->input('prompt')),
     ]); 
 
-    $msglist = OpenAI::threads()->messages()->list($user->thread_id, [
-        'limit' => 1,
-    ]);
-
-
-    $response = OpenAI::threads()->messages()->retrieve(
-        threadId: $user->thread_id,
-        messageId: $msglist->lastId,
-    );
-
-    foreach ($response->content as $result) {
-        $out->writeln($result->text->value);
-        $finaltext .= $result->text->value;
-       
-    }
-    
-    $out->writeln($finaltext);
-
-
-
-    return response()->json([
-        'text' => $finaltext,
-        'id' => $response->id,
-        'usage' => ''//$response['usage']
-    ]);
+    return 0;
 });
 
 Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
