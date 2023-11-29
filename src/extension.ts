@@ -266,7 +266,16 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 async function dbQuery(log: string, gitdiff?: string, token?: number, hash?: string){
 
 	const currentTime = new Date();
-	const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
+	const formattedTimestamp = currentTime.toLocaleString('en-US', {
+		timeZone: 'America/New_York',
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		hour12: false
+	}).replace(/(\d+)\/(\d+)\/(\d+), (\d+:\d+:\d+)/, '$3-$1-$2 $4');
 
 	const checkboxData = {
 		timestamp: formattedTimestamp,
