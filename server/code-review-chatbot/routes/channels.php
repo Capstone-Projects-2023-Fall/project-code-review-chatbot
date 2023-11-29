@@ -15,5 +15,10 @@ use Illuminate\Broadcasting\PrivateChannel;
 */
 
 Broadcast::channel('review.{id}', function ($user, $id) {
+    $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+
+
+    $out->writeln($request->input('prompt123'));
+
     return (int) $user->id === (int) $id;
 });

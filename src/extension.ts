@@ -16,6 +16,8 @@ import Pusher from 'pusher-js';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+
+var pusher = Pusher
  
 var echo = new Echo({
     broadcaster: 'pusher',
@@ -515,6 +517,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				echo.channel(`review.${currentServerToken}`)
 				.listen('message', (res: any) => {
+					console.log(res)
+
 					response = res.data.text;
 					if (res.data.detail?.usage?.total_tokens) {
 						response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
