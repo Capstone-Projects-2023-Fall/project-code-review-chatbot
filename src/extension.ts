@@ -133,7 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
 						provider.search(value);
 					}
 					let log = "Ask Command: " + value ;
-					dbQuery(log);
+					query(log);
 				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
@@ -148,7 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			const promptPrefix = config.get('promptPrefix.findIssue') as string;
 			console.log('Received issueTitle:', issueTitle);
-			dbQuery('findIssue :'+ issueTitle);
+			query('findIssue :'+ issueTitle);
 
 			// Modify the prompt to include the issueTitle received from the webview
 			const prompt = `${promptPrefix} ${issueTitle}`;
@@ -234,7 +234,7 @@ async function pollForNewCommits() {
     const hash = await getLatestCommitHash();
     if (hash && hash !== lastHash) {
         lastHash = hash;
-        dbQuery('Commit Detected', undefined, undefined, hash);
+        query('Commit Detected', undefined, undefined, hash);
     }
 }
 
@@ -272,49 +272,20 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 		}
 	}
 }
-async function dbQuery(log: string, gitdiff?: string, token?: number, hash?: string){
 
-	const currentTime = new Date();
-	const formattedTimestamp = currentTime.toLocaleString('en-US', {
-		timeZone: 'America/New_York',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-		hour12: false
-	}).replace(/(\d+)\/(\d+)\/(\d+), (\d+:\d+:\d+)/, '$3-$1-$2 $4');
-
-	const checkboxData = {
-		timestamp: formattedTimestamp,
-		logs: log,
-		hash:hash,
-		gitdiff: gitdiff,
-		num_tokens: token
-		};
-	
-		const query = `INSERT INTO ${DB_TABLE} SET ?`;
-	
-	pool.getConnection((err, connection) => {
-		if (err) {
-			console.error("Error connecting to the database", err);
-			return;
-		}
-	
-		connection.query(query, checkboxData, (error, results) => {
-			connection.release();
-	
-			if (error) {
-			console.error("Error inserting data", error);
-			} else {
-			console.log('Successfully inserted data:', results);
-			}
-
+async function query(log: string, gitdiff?: string, token?: number, hash?: string){
+	try {
+		const response = await axios.post('http://127.0.0.1:8000/api/log', {
+			log: log,
+			gitdiff: gitdiff,
+			token: token,
+			hash: hash
 		});
-	});
+		console.log('Log data sent successfully:', response.data);
+	} catch (err) {
+		console.error('Error sending log data:', err);
+	}
 }
-
 
 function getScriptContent(): string {
 	try {
@@ -525,7 +496,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
 		// add an event listener for messages received by the webview
-		webviewView.webview.onDidReceiveMessage(data => {
+		webviewView.webview.onDidReceiveMessage(async data => {
 			console.log("Received message:", data);
 			console.log(data.type);
 			switch (data.type) {
@@ -547,15 +518,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						this.search(data.value);
 						let log = 'Search Command: ' + data.value;
 
-						dbQuery(log);
-
+						query(log);
 					}
 				case 'learnMore':
 					{
 						vscode.commands.executeCommand("chatgpt.learnMore");
 						let log = 'Learn More Command Triggered';
-
-						dbQuery(log);
+						query(log);
 						break;
 					}
 				case 'askGPT':
@@ -590,15 +559,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
 								let log = 'Checkbox Change: ' + userChangesString;
 
-								try {
-									const response = await axios.post('https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/log', {
-										log: log,
-										gitdiff: parsedDiff,
-									});
-									console.log('Log data sent successfully:', response.data);
-								} catch (err) {
-									console.error('Error sending log data:', err);
-								}
+								query(log,parsedDiff);
 
 							});
 
@@ -695,8 +656,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
 
-
 		if (this._settings.useServerApi) {
+			let numToken;
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
@@ -705,13 +666,16 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 					);
 
+					query('Received Prompt: ' + this._fullPrompt );
+
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
-
-
 				response = res.data.text;
+
+				console.log(res.data.detail?.usage?.total_tokens);
+				
 				if (res.data.detail?.usage?.total_tokens) {
 					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
 				}
@@ -721,7 +685,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						parentMessageId: res.data.id
 					};
 				}
-
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
@@ -729,6 +692,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
+			query('Response Sent: ' + response,undefined, numToken);
 		}
 		else {
 			if (!this._chatGPTAPI) {
@@ -741,7 +705,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 				
-				dbQuery('Received Prompt: ' + this._prompt );
+				query('Received Prompt: ' + this._prompt );
 
 				const agent = this._chatGPTAPI;
 				let numToken;
@@ -795,7 +759,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						response += `\n\n---\n[ERROR] ${e}`;
 					}
 				}
-				dbQuery("Response Sent: "+ this._response, undefined, numToken);
+				query("Response Sent: "+ this._response, undefined, numToken);
 			}
 		}
 
