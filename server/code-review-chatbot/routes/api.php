@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Middleware\AfterResponseMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
+Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/review', function (Request $request) {
     
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
 
