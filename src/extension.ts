@@ -578,12 +578,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 						console.log("Checkbox states have changed:", data.userChanges);
 
-						const currentTime = new Date();
-						const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
 						const userChangesString = data.userChanges.join('\n');
 
 						if(workspacePath){
-							exec('git diff', { cwd: workspacePath }, (error, stdout, stderr) => {
+							exec('git diff', { cwd: workspacePath }, async (error, stdout, stderr) => {
 								if (error){
 									console.error('error',error);
 									return;
@@ -592,7 +590,16 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
 								let log = 'Checkbox Change: ' + userChangesString;
 
-								dbQuery(log,parsedDiff);
+								try {
+									const response = await axios.post('https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/log', {
+										log: log,
+										gitdiff: parsedDiff,
+									});
+									console.log('Log data sent successfully:', response.data);
+								} catch (err) {
+									console.error('Error sending log data:', err);
+								}
+
 							});
 
 						}
@@ -693,7 +700,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
-					await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
+					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
 						{ prompt: this._fullPrompt, model: this._settings.model }
 
 					);
