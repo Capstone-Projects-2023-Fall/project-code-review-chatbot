@@ -12,7 +12,9 @@ class YourController extends Controller
     {
         $request->validate([
             'log' => 'required|string',
-            // other validation rules for gitdiff, token, hash
+            'gitdiff' => 'nullable|string',
+            'token' => 'nullable|numeric',
+            'hash' => 'nullable|string'
         ]);
 
         $formattedTimestamp = Carbon::now('America/New_York')->format('Y-m-d H:i:s');
