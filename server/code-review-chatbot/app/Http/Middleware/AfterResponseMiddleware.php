@@ -16,6 +16,6 @@ class AfterResponseMiddleware
         $out = new \Symfony\Component\Console\Output\ConsoleOutput();
 
 
-        $out->writeln($request->input($request));
+        $out->writeln(print_r($request));
     }
 }
