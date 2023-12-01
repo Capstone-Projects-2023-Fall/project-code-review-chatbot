@@ -12,15 +12,53 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\LoginViewResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
+
+    
+
+
     public function register(): void
     {
-        //
+    
+        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
+            public function toResponse($request)
+            {
+                $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+                $out->writeln($request);
+
+                if (str_starts_with(request()->headers->get('referer'), request()->headers->get('origin') . '/authorize')) {
+                    $out->writeln('redirect');
+                    return redirect()->intended(request()->headers->get('referer'));
+                } else {
+                    return redirect(RouteServiceProvider::HOME);
+                }
+               
+            }
+        });
+
+    
+        $this->app->instance(RegisterResponse::class, new class implements RegisterResponse {
+            //not working yet
+            public function toResponse($request)
+            {
+                $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+                $out->writeln($request);
+
+                if ($request->alias) {
+                    return redirect()->intended($request->alias);
+                } else {
+                    return redirect(RouteServiceProvider::HOME);
+                }
+            }
+        });
     }
 
     /**

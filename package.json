@@ -332,6 +332,7 @@
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
+    "@types/uuid": "^9.0.7",
     "axios": "^1.6.0",
     "chatgpt": "^5.2.5",
     "composer": "^4.1.0",
@@ -339,6 +340,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "mysql2": "^3.6.5",
     "node-fetch": "^3.3.0",
+    "uuid": "^9.0.1",
     "yarn": "^1.22.19"
   }
 }

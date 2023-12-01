@@ -27,8 +27,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-
-
 Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
@@ -76,8 +74,6 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     ]);
 });
 
-
-
 Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
     if (Auth::user()) {
         $user = Auth::user(); 
@@ -93,3 +89,4 @@ Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
     }
 
 });
+

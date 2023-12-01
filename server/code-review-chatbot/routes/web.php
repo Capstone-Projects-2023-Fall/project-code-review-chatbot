@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,3 +66,6 @@ Route::get('/authorize', function(Request $request) {
 
     
 });
+
+
+
