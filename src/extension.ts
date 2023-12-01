@@ -382,7 +382,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
-	// Fires when quick fix button is clicked. Grabs quick fix section of response.
 	public applyQuickFixes() {
 		const response = this._response;
 		
