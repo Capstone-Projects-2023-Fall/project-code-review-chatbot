@@ -8,7 +8,7 @@ import fetch from 'node-fetch';
 export const AUTH_TYPE = `auth0`;
 const AUTH_NAME = `Code Review Chatbot Auth`;
 const CLIENT_ID = `3GUryQ7ldAeKEuD2obYnppsnmj58eP5u`;
-const AUTH0_DOMAIN = `http://localhost`;
+const AUTH0_DOMAIN = `http://127.0.0.1:8000`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
 type AuthUserInfo =  { name: string, email: string };
