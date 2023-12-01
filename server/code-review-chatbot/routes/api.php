@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Controllers\DBLogging;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 |
 */
 
+Route::post('/log', [DBLogging::class, 'logData']);
 Route::post('login', 'API\UserController@login');
 Route::post('register', 'API\UserController@register');
 

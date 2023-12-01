@@ -16,24 +16,12 @@ import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-const DB_HOST = process.env.DB_HOST!;
-const DB_USER = process.env.DB_USER!;
-const DB_PASSWORD = process.env.DB_PASSWORD!;
-const DB_DATABASE = process.env.DB_DATABASE!;
-const DB_TABLE = process.env.DB_TABLE;
-
-const dbConfig = {
-	host:DB_HOST,
-	user: DB_USER ,
-	password: DB_PASSWORD,
-	database: DB_DATABASE
-};
 
 const execAsync = promisify(exec);
 
-const pool = mysql.createPool(dbConfig);
 
 let lastHash = '';
+let platform = '';
 
 type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
@@ -154,7 +142,7 @@ export async function activate(context: vscode.ExtensionContext) {
 						provider.search(value);
 					}
 					let log = "Ask Command: " + value ;
-					dbQuery(log);
+					query(log, platform);
 				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
@@ -169,7 +157,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			const promptPrefix = config.get('promptPrefix.findIssue') as string;
 			console.log('Received issueTitle:', issueTitle);
-			dbQuery('findIssue :'+ issueTitle);
+			query('findIssue :'+ issueTitle, platform);
 
 			// Modify the prompt to include the issueTitle received from the webview
 			const prompt = `${promptPrefix} ${issueTitle}`;
@@ -256,7 +244,7 @@ async function pollForNewCommits() {
     const hash = await getLatestCommitHash();
     if (hash && hash !== lastHash) {
         lastHash = hash;
-        dbQuery('Commit Detected', undefined, undefined, hash);
+        query('Newest Commit: ', platform, undefined, hash);
     }
 }
 
@@ -304,49 +292,20 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 		}
 	}
 }
-async function dbQuery(log: string, gitdiff?: string, token?: number, hash?: string){
 
-	const currentTime = new Date();
-	const formattedTimestamp = currentTime.toLocaleString('en-US', {
-		timeZone: 'America/New_York',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-		hour12: false
-	}).replace(/(\d+)\/(\d+)\/(\d+), (\d+:\d+:\d+)/, '$3-$1-$2 $4');
-
-	const checkboxData = {
-		timestamp: formattedTimestamp,
-		logs: log,
-		hash:hash,
-		gitdiff: gitdiff,
-		num_tokens: token
-		};
-	
-		const query = `INSERT INTO ${DB_TABLE} SET ?`;
-	
-	pool.getConnection((err, connection) => {
-		if (err) {
-			console.error("Error connecting to the database", err);
-			return;
-		}
-	
-		connection.query(query, checkboxData, (error, results) => {
-			connection.release();
-	
-			if (error) {
-			console.error("Error inserting data", error);
-			} else {
-			console.log('Successfully inserted data:', results);
-			}
-
+async function query(log: string, platform: string, gitdiff?: string, hash?: string){
+	try {
+		const response = await axios.post('http://127.0.0.1:8000/api/log', {
+			log: log,
+			platform: platform,
+			gitdiff: gitdiff,
+			hash: hash
 		});
-	});
+		console.log('Log data sent successfully:', response.data);
+	} catch (err) {
+		console.error('Error sending log data:', err);
+	}
 }
-
 
 function getScriptContent(): string {
 	try {
@@ -557,7 +516,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
 		// add an event listener for messages received by the webview
-		webviewView.webview.onDidReceiveMessage(data => {
+		webviewView.webview.onDidReceiveMessage(async data => {
 			console.log("Received message:", data);
 			console.log(data.type);
 			switch (data.type) {
@@ -579,15 +538,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						this.search(data.value);
 						let log = 'Search Command: ' + data.value;
 
-						dbQuery(log);
-
+						query(log,platform);
 					}
 				case 'learnMore':
 					{
 						vscode.commands.executeCommand("chatgpt.learnMore");
 						let log = 'Learn More Command Triggered';
-
-						dbQuery(log);
+						query(log,platform);
 						break;
 					}
 				case 'askGPT':
@@ -610,12 +567,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 						console.log("Checkbox states have changed:", data.userChanges);
 
-						const currentTime = new Date();
-						const formattedTimestamp = currentTime.toISOString().slice(0, 19).replace('T', ' ');
 						const userChangesString = data.userChanges.join('\n');
 
 						if(workspacePath){
-							exec('git diff', { cwd: workspacePath }, (error, stdout, stderr) => {
+							exec('git diff', { cwd: workspacePath }, async (error, stdout, stderr) => {
 								if (error){
 									console.error('error',error);
 									return;
@@ -624,7 +579,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
 								let log = 'Checkbox Change: ' + userChangesString;
 
-								dbQuery(log,parsedDiff);
+								query(log, platform, parsedDiff);
+
 							});
 
 						}
@@ -721,11 +677,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 		// Send the search prompt to the ChatGPTAPI instance and store the response
-
-		if (this._settings.useServerApi) {
+		if (useServerApithis._settings.) {
+			platform = 'Server API';
 			try {
-				
-
+				// Send the search prompt to the ChatGPTAPI instance and store the response
+				const res =
+					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
+						{ prompt: this._fullPrompt, model: this._settings.model }
 
 				if (!currentServerToken) {
 					currentServerToken = await getAuthSession(true);
@@ -741,13 +699,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					config
 				);
 
+					query('Received Prompt: ' + this._fullPrompt, platform);
+
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
-
-
 				response = res.data.text;
+				
 				if (res.data.detail?.usage?.total_tokens) {
 					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
 				}
@@ -757,7 +716,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						parentMessageId: res.data.id
 					};
 				}
-
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
@@ -765,6 +723,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
+			query('Response Sent: ' + response, platform);
 		}
 		else {
 			if (!this._chatGPTAPI) {
@@ -772,12 +731,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} else {
 				// If successfully signed in
 				console.log("sendMessage");
+				platform = "local";
 
 				// Make sure the prompt is shown
 				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 				
-				dbQuery('Received Prompt: ' + this._prompt );
+				query('Received Prompt: ' + this._prompt, platform);
 
 				const agent = this._chatGPTAPI;
 				let numToken;
@@ -831,7 +791,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						response += `\n\n---\n[ERROR] ${e}`;
 					}
 				}
-				dbQuery("Response Sent: "+ this._response, undefined, numToken);
+				query("Response Sent: "+ this._response, platform);
 			}
 		}
 
