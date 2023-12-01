@@ -15,24 +15,12 @@ import { promisify } from 'util';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-const DB_HOST = process.env.DB_HOST!;
-const DB_USER = process.env.DB_USER!;
-const DB_PASSWORD = process.env.DB_PASSWORD!;
-const DB_DATABASE = process.env.DB_DATABASE!;
-const DB_TABLE = process.env.DB_TABLE;
-
-const dbConfig = {
-	host:DB_HOST,
-	user: DB_USER ,
-	password: DB_PASSWORD,
-	database: DB_DATABASE
-};
 
 const execAsync = promisify(exec);
 
-const pool = mysql.createPool(dbConfig);
 
 let lastHash = '';
+let platform = '';
 
 type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
@@ -133,7 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 						provider.search(value);
 					}
 					let log = "Ask Command: " + value ;
-					query(log);
+					query(log, platform);
 				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
@@ -148,7 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			const promptPrefix = config.get('promptPrefix.findIssue') as string;
 			console.log('Received issueTitle:', issueTitle);
-			query('findIssue :'+ issueTitle);
+			query('findIssue :'+ issueTitle, platform);
 
 			// Modify the prompt to include the issueTitle received from the webview
 			const prompt = `${promptPrefix} ${issueTitle}`;
@@ -234,7 +222,7 @@ async function pollForNewCommits() {
     const hash = await getLatestCommitHash();
     if (hash && hash !== lastHash) {
         lastHash = hash;
-        query('Commit Detected', undefined, undefined, hash);
+        query('Newest Commit: ', platform, undefined, hash);
     }
 }
 
@@ -273,12 +261,12 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 	}
 }
 
-async function query(log: string, gitdiff?: string, token?: number, hash?: string){
+async function query(log: string, platform: string, gitdiff?: string, hash?: string){
 	try {
 		const response = await axios.post('http://127.0.0.1:8000/api/log', {
 			log: log,
+			platform: platform,
 			gitdiff: gitdiff,
-			token: token,
 			hash: hash
 		});
 		console.log('Log data sent successfully:', response.data);
@@ -518,13 +506,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						this.search(data.value);
 						let log = 'Search Command: ' + data.value;
 
-						query(log);
+						query(log,platform);
 					}
 				case 'learnMore':
 					{
 						vscode.commands.executeCommand("chatgpt.learnMore");
 						let log = 'Learn More Command Triggered';
-						query(log);
+						query(log,platform);
 						break;
 					}
 				case 'askGPT':
@@ -559,7 +547,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
 								let log = 'Checkbox Change: ' + userChangesString;
 
-								query(log,parsedDiff);
+								query(log, platform, parsedDiff);
 
 							});
 
@@ -657,6 +645,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 		if (this._settings.useServerApi) {
+			platform = 'Server API';
 			let numToken;
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
@@ -666,15 +655,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 					);
 
-					query('Received Prompt: ' + this._fullPrompt );
+					query('Received Prompt: ' + this._fullPrompt, platform);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
 				response = res.data.text;
-
-				console.log(res.data.detail?.usage?.total_tokens);
 				
 				if (res.data.detail?.usage?.total_tokens) {
 					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
@@ -692,7 +679,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
-			query('Response Sent: ' + response,undefined, numToken);
+			query('Response Sent: ' + response, platform);
 		}
 		else {
 			if (!this._chatGPTAPI) {
@@ -700,12 +687,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} else {
 				// If successfully signed in
 				console.log("sendMessage");
+				platform = "local";
 
 				// Make sure the prompt is shown
 				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
 				
-				query('Received Prompt: ' + this._prompt );
+				query('Received Prompt: ' + this._prompt, platform);
 
 				const agent = this._chatGPTAPI;
 				let numToken;
@@ -759,7 +747,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						response += `\n\n---\n[ERROR] ${e}`;
 					}
 				}
-				query("Response Sent: "+ this._response, undefined, numToken);
+				query("Response Sent: "+ this._response, platform);
 			}
 		}
 

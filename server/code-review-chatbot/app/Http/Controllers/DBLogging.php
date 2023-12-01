@@ -12,8 +12,8 @@ class DBLogging extends Controller
     {
         $request->validate([
             'log' => 'required|string',
+            'platform' => 'required|string',
             'gitdiff' => 'nullable|string',
-            'token' => 'nullable|numeric',
             'hash' => 'nullable|string'
         ]);
 
@@ -21,10 +21,10 @@ class DBLogging extends Controller
 
         $checkboxData = [
             'timestamp' => $formattedTimestamp,
+            'platform' =>$request->platform,
             'logs' => $request->log,
             'hash' => $request->hash,
             'gitdiff' => $request->gitdiff,
-            'num_token' => $request->token
         ];
 
         try {
