@@ -677,13 +677,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 		// Send the search prompt to the ChatGPTAPI instance and store the response
-		if (useServerApithis._settings.) {
+		if (this._settings.useServerApi){
 			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
-				const res =
-					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
-						{ prompt: this._fullPrompt, model: this._settings.model }
 
 				if (!currentServerToken) {
 					currentServerToken = await getAuthSession(true);
@@ -694,7 +691,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				};
 
 				const res =
-					await axios.post("http://localhost/api/review",
+					await axios.post("http://127.0.0.1:8000/api/review",
 					{prompt: this._fullPrompt, model: this._settings.model},
 					config
 				);
