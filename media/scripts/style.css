@@ -103,18 +103,3 @@ body {
     border-radius: 30px;
     text-align: center;
 }
-
-.enter_button ,
-.enter_button :focus,
-.enter_button :visited {
-    padding: 10px;
-    background: rgb(18, 124, 132);
-    color: white;
-    border: none;
-    outline: none;
-    border-top-left-radius: 50px;
-    border-top-right-radius: 50px;
-    border-bottom-left-radius: 50px;
-    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
