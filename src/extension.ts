@@ -10,6 +10,7 @@ import { resolve } from 'path';
 import * as mysql from 'mysql2';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
 
 
 
@@ -26,8 +27,9 @@ type AuthInfo = { apiKey?: string };
 type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
 
 const BASE_URL = 'https://api.openai.com/v1';
+var currentServerToken: string;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -90,11 +92,30 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 
+	//auth0 setup
+	context.subscriptions.push(
+		new Auth0AuthenticationProvider(context)
+	);
+
+	currentServerToken = await getAuthSession(false);
+
+	if (config.get('useServerApi') && !currentServerToken) {
+		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
+	} 
 
 	// Register the provider with the extension's context
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ChatGPTViewProvider.viewType, provider, {
 			webviewOptions: { retainContextWhenHidden: true }
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.authentication.onDidChangeSessions(async e => {
+			console.log(e);
+			if (e.provider.id === "auth0") {
+				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
+			}
 		})
 	);
 
@@ -203,6 +224,7 @@ export function activate(context: vscode.ExtensionContext) {
 	setupPreCommitHookIfNecessary();
 }
 
+
 async function getLatestCommitHash(): Promise<string> {
     let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
         ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -225,6 +247,16 @@ async function pollForNewCommits() {
         query('Newest Commit: ', platform, undefined, hash);
     }
 }
+
+const getAuthSession = async (useServerApi: boolean) => {
+	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
+	if (session) {
+		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
+		return session.accessToken;
+
+	}
+	return '';
+};
 
 async function setupPreCommitHookIfNecessary() {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -644,16 +676,28 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
 
-		if (this._settings.useServerApi) {
+		// Send the search prompt to the ChatGPTAPI instance and store the response
+		if (useServerApithis._settings.) {
 			platform = 'Server API';
-			let numToken;
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 				const res =
 					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
 						{ prompt: this._fullPrompt, model: this._settings.model }
 
-					);
+				if (!currentServerToken) {
+					currentServerToken = await getAuthSession(true);
+				}
+
+				const config = {
+					headers: { Authorization: `Bearer ${currentServerToken}` }
+				};
+
+				const res =
+					await axios.post("http://localhost/api/review",
+					{prompt: this._fullPrompt, model: this._settings.model},
+					config
+				);
 
 					query('Received Prompt: ' + this._fullPrompt, platform);
 
