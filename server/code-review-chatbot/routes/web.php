@@ -33,3 +33,35 @@ Route::middleware([
 });
 
 
+Route::get('/authorize', function(Request $request) {
+    $redirect_uri = $request->query('redirect_uri') ?? '';
+    $response_type = $request->query('response_type') ?? '';
+    $prompt = $request->query('prompt') ?? '';
+    $state = $request->query('state') ?? '';
+
+
+    $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+    $out->writeln('new request');
+    $out->writeln($redirect_uri);
+    $out->writeln($response_type);
+    $out->writeln($prompt);
+
+    if (Auth::user()) {
+        $user = Auth::user(); 
+        $token = $user->createToken('MyApp')-> plainTextToken;
+        
+
+        $returnquery = array(
+            'access_token' => $token,
+            'state' => $state,
+        );
+
+
+
+        return redirect()->away($redirect_uri .'#' . http_build_query($returnquery));
+    } else {
+        return view('auth/login', ['auth' => $request->fullUrl()]);
+    }
+
+    
+});
