@@ -537,6 +537,19 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						};
 						response = this._response;
 						this._conversationHistory.push(response);
+
+						if (this._view) {
+							this._view.show?.(true);
+							this._view.webview.postMessage({ type: 'updateConversation', value: this._conversationHistory });
+							console.log("updateconversation message has been posted to webview");
+							/*if (isCodeReview) {
+								this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
+							}
+							else {
+								this._view.webview.postMessage({ type: 'addResponse', value: response });
+							}*/
+				
+						}
 					}
 
 				} catch (e: any) {
@@ -559,7 +572,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._response = response;
 
 		// Show the view and send a message to the webview with the response
-		if (this._view) {
+	/* 	if (this._view) {
 			this._view.show?.(true);
 			this._view.webview.postMessage({ type: 'updateConversation', value: this._conversationHistory });
 			if (isCodeReview) {
@@ -569,7 +582,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				this._view.webview.postMessage({ type: 'addResponse', value: response });
 			}
 
-		}
+		} */
 	}
 
 

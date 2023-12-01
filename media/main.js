@@ -93,11 +93,13 @@
         renderImageResponse(message.value);
         break;
       case 'updateConversation':
+        console.log("updateconversion message received by webview");
         const conversationHistory = message.value || [];
+        console.log("message.value after received by webview" , message.value);
         const responseDiv = document.getElementById('response');
 
         // Clear existing content
-        //responseDiv.innerHTML = '';
+        responseDiv.innerHTML = '';
 
         // Append conversation history to the response div
         conversationHistory.forEach((conversation) => {
@@ -191,7 +193,7 @@
     const html = converter.makeHtml(response);
     const responseDiv = document.getElementById("response");
 
-    if (responseDiv.innerHTML.trim() !== '') {
+    /*if (responseDiv.innerHTML.trim() !== '') {
       // If content exists, append the new content
       const newContent = document.createElement('div');
       newContent.innerHTML = html;
@@ -199,8 +201,8 @@
     } else {
       // If no content exists, set the HTML content directly
       responseDiv.innerHTML = html;
-    }
-    //document.getElementById("response").innerHTML = html;
+    }*/
+    document.getElementById("response").innerHTML = html;
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
