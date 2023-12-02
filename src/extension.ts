@@ -916,6 +916,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				<head>
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.5">
+					<script src="${tailwindUri}"></script>
+					<script src="${showdownUri}"></script>
+					<script src="${microlightUri}"></script>
 					<link rel="stylesheet" href="${scriptStyleUri}">
 					<title>Chat Bot</title>
 				</head>
