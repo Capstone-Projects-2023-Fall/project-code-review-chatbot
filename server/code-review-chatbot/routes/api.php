@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Http\Middleware\AfterResponseMiddleware;
+use App\Http\Controllers\AssistantController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,7 @@ use App\Http\Middleware\AfterResponseMiddleware;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 
 
 Route::post('login', 'API\UserController@login');
@@ -65,20 +67,65 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
        
     }*/
     $user = Auth::user();
+
+    $userthread = $user->thread_id;
     
-    if (!$user->thread_id) {
+    if (!$userthread) {
         $threadres = OpenAI::threads()->create([]);
+
         DB::table('users')
               ->where('id', $user->id)
               ->update(['thread_id' => $threadres->id]);
+
+        $userthread = $threadres->id;
     }
+
+    
 
     $usermsg = OpenAI::threads()->messages()->create($user->thread_id, [
         'role' => 'user',
         'content' => ($request->input('prompt')),
     ]); 
 
-    return 0;
+    $assistid = AssistantController::get_assist_id();
+
+    $response = OpenAI::threads()->runs()->create(
+        threadId: $userthread, 
+        parameters: [
+            'assistant_id' => $assistid,
+        ],
+    );
+
+   
+
+    sleep(20);
+
+    $msglist = OpenAI::threads()->messages()->list($user->thread_id, [
+        'limit' => 1,
+    ]);
+
+
+    $response = OpenAI::threads()->messages()->retrieve(
+        threadId: $user->thread_id,
+        messageId: $msglist->lastId,
+    );
+
+    foreach ($response->content as $result) {
+        $out->writeln($result->text->value);
+        $finaltext .= $result->text->value;
+       
+    }
+    
+    $out->writeln($finaltext);
+
+
+
+    return response()->json([
+        'text' => $finaltext,
+        'id' => $response->id,
+        'usage' => ''//$response['usage']
+    ]);
+
 });
 
 Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
