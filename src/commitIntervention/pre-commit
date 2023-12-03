@@ -15,7 +15,7 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
             exec 1>&2
             # enable user input
             exec < /dev/tty
-            read -p "Do you want to proceed with the commit? Check the code review before selecting. (y/n): " user_choice
+            read -p "Would you like to proceed with the commit? Ensuring that all checkboxes are completed beforehand can significantly enhance the process. (y/n): " user_choice
             if [[ "$user_choice" == "y" || "$user_choice" == "yes" ]]; then
                 echo "Proceeding with the commit."
                 exit 0
@@ -25,7 +25,7 @@ if [ "$RUN_CODE_REVIEW" = "true" ]; then
             fi
         else
             # GUI popup
-            user_choice=$(osascript -e 'display dialog "Do you want to proceed with the commit? Check the code review before selecting." buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
+            user_choice=$(osascript -e 'display dialog "Would you like to proceed with the commit? Ensuring that all checkboxes are completed beforehand can significantly enhance the process." buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
 
             if [ "$user_choice" == "Yes" ]; then
                 echo "Proceeding with the commit."
