@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\AdminController;
 
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
+    Route::get('/admin-dashboard/users', [AdminController::class, 'index'])->name('user-list');
+    Route::get('/admin-dashboard/live-sessions', [AdminController::class, 'liveSessions'])->name('live-sessions');
+});
+
+Route::delete('/users/{user}', [AdminController::class, 'destroy'])->name('users.destroy');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -31,10 +41,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-});
-
-Route::middleware(['auth', 'is_admin'])->group(function () {
-    Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
 });
 
 Route::get('/authorize', function(Request $request) {
