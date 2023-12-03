@@ -40,7 +40,7 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
     $out->writeln($request->input('prompt'));
     $out->writeln($request->input('model'));
 
-    $finaltext = "";
+    $finalText = "";
 
 
     /*$mods = OpenAI::models()->list();
@@ -68,60 +68,75 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
     }*/
     $user = Auth::user();
 
-    $userthread = $user->thread_id;
+    $userThread = $user->thread_id;
     
-    if (!$userthread) {
+    if (!$userThread) {
         $threadres = OpenAI::threads()->create([]);
 
         DB::table('users')
               ->where('id', $user->id)
               ->update(['thread_id' => $threadres->id]);
 
-        $userthread = $threadres->id;
+        $userThread = $threadres->id;
     }
 
     
 
-    $usermsg = OpenAI::threads()->messages()->create($user->thread_id, [
+    $userMsg = OpenAI::threads()->messages()->create($userThread, [
         'role' => 'user',
         'content' => ($request->input('prompt')),
     ]); 
 
-    $assistid = AssistantController::get_assist_id();
+    $assistId = AssistantController::get_assist_id();
 
-    $response = OpenAI::threads()->runs()->create(
-        threadId: $userthread, 
+    $threadRunResponse = OpenAI::threads()->runs()->create(
+        threadId: $userThread, 
         parameters: [
-            'assistant_id' => $assistid,
+            'assistant_id' => $assistId,
         ],
     );
 
-   
 
-    sleep(20);
 
-    $msglist = OpenAI::threads()->messages()->list($user->thread_id, [
-        'limit' => 1,
-    ]);
+    $lastMsg;
+    do {
+        sleep(1);
+
+        $msgList = OpenAI::threads()->messages()->list($userThread, [
+            'limit' => 1,
+        ]);
+
+        $lastMsg = $msgList->lastId;
+        $out->writeln('lastmsg ' . $lastMsg);
+        $out->writeln('usermsg ' . $userMsg->id);
+    }
+    while ($lastMsg == $userMsg->id);
+
+
+    $out->writeln('lets go ' . $lastMsg);
+    $out->writeln('lets go thread' . $userThread);
+    
+
+    
 
 
     $response = OpenAI::threads()->messages()->retrieve(
-        threadId: $user->thread_id,
-        messageId: $msglist->lastId,
+        threadId: $userThread,
+        messageId: $lastMsg,
     );
 
     foreach ($response->content as $result) {
         $out->writeln($result->text->value);
-        $finaltext .= $result->text->value;
+        $finalText .= $result->text->value;
        
     }
     
-    $out->writeln($finaltext);
+    $out->writeln($finalText);
 
 
 
     return response()->json([
-        'text' => $finaltext,
+        'text' => $finalText,
         'id' => $response->id,
         'usage' => ''//$response['usage']
     ]);
