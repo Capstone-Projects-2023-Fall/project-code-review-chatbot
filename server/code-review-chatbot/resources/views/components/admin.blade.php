@@ -13,9 +13,14 @@
             <!-- Option 1 -->
             <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    <a href="https://status.openai.com/" class="text-indigo-600 dark:text-indigo-400 hover:underline">OpenAI Status</a>
+                    <a href="https://laravel.com/docs" class="text-indigo-600 dark:text-indigo-400 hover:underline">OPTION1</a>
                 </h2>
-                <!-- No additional text -->
+                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Discover powerful features and functionalities.
+                </p>
+                <a href="https://capstone-projects-2023-fall.github.io/project-code-review-chatbot/docs/requirements/features-and-requirements" class="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline">
+                    Learn More
+                </a>
             </div>
 
             <!-- Option 2 -->
@@ -40,19 +45,6 @@
                     Explore the documentation and customize your experience.
                 </p>
                 <!-- Add additional content as needed for Option 3 -->
-            </div>
-
-            <!-- Verification Button -->
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    Verification
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Click the button below for verification.
-                </p>
-                <button class="mt-4 inline-block bg-indigo-600 dark:bg-indigo-400 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                    Verify Now <!-- Interactable Button So place any link for verifcation instead of "Verify Now" -->
-                </button>
             </div>
         </div>
     </div>
