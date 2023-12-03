@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use Illuminate\Http\Request;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,10 +29,13 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::prefix('admin')->group(function () {
-        Route::get('/dashboard', 'AdminController@dashboard')->name('admin_dashboard');
-        
-    });
+    Route::get('/admin-dashboard', function () {
+        return view('admin-dashboard');
+    })->name('admin-dashboard');
+
+    // Route::prefix('admin')->group(function () {
+    //     Route::get('/dashboard', 'AdminController@dashboard')->name('admin_dashboard');
+    // });
 });
 
 
