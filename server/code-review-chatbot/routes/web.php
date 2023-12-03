@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\AdminController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,15 +31,11 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/admin-dashboard', function () {
-        return view('admin-dashboard');
-    })->name('admin-dashboard');
-
-    // Route::prefix('admin')->group(function () {
-    //     Route::get('/dashboard', 'AdminController@dashboard')->name('admin_dashboard');
-    // });
 });
 
+Route::middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
+});
 
 Route::get('/authorize', function(Request $request) {
     $redirect_uri = $request->query('redirect_uri') ?? '';
