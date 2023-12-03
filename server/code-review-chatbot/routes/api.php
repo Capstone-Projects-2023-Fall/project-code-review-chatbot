@@ -28,53 +28,41 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
 Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
-    
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+    $userInput = $request->input('prompt');
+    $model = $request->input('model');
 
+    $conversationId = $request->input('conversation_id');
+    $history = Cache::get('conversation_' . $conversationId, []);
 
-    $out->writeln($request->input('prompt'));
-    $out->writeln($request->input('model'));
-
-    $finaltext = "";
-
-
-    /*$mods = OpenAI::models()->list();
-
-
-    foreach ($mods->data as $result) {
-        $out->writeln($result->id); // 'gpt-3.5-turbo-instruct'
-        // ...
-    }*/
-
-
+    $history[] = ['role' => 'user', 'content' => $userInput];
 
     $response = OpenAI::chat()->create([
-        'model' => $request->input('model'),
-        'messages' => [
-            ['role' => 'user', 'content' => $request->input('prompt')],
-        ],
+        'model' => $model,
+        'messages' => $history,
     ]);
 
+    $finaltext = "";
 
     foreach ($response->choices as $result) {
         $out->writeln($result->message->content);
         $finaltext .= $result->message->content;
-       
+        $history[] = ['role' => 'assistant', 'content' => $result->message->content]; 
     }
 
-    
+    Cache::put('conversation_' . $conversationId, $history);
+
     $out->writeln($finaltext);
-
-
 
     return response()->json([
         'text' => $finaltext,
         'id' => $response['id'],
-        'usage' => $response['usage']
+        'usage' => $response['usage'],
+        'conversation_id' => $conversationId 
     ]);
 });
+
 
 Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
     if (Auth::user()) {
