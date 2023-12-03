@@ -694,6 +694,50 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>`;
 	}
+
+	private _getHtmlForWebview2(webview: vscode.Webview) {
+		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'chat.js'));
+		const scriptStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'style.css'));
+		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
+		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
+		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
+
+		return `<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.5">
+					<link rel="stylesheet" href="${scriptStyleUri}">
+					<title>Chat Bot</title>
+				</head>
+				<body>
+
+					<div class="chatbox_1">
+						<div class="chatbox_header">
+							<div class="chatbox_icon">"icon"</div>
+							<div class="chatbox_content">
+								<h4>Chat Bot</h4>
+							</div>
+						</div>
+
+						<div class="chatbox_message">
+						
+							<div class="message message_chatGPT">Hi! How Can I help you today?</div>
+							<div class="message message_user"></div>
+							
+						</div>
+
+						<div class="chatbox_footer">
+							<form class="chat_input_form">
+								<input class ="user_input" type="text" placeholder="Write a message">
+								<button type='submit' class="enter_button">Send</button>
+							</form>
+						</div>
+					</div>
+					<script src="${scriptUri}"></script>
+					</body>
+				</html>`;
+	}
 }
 
 // This method is called when your extension is deactivated
