@@ -17,18 +17,7 @@
                 </h2>
                 <!-- No additional text -->
             </div>
-            <!-- Verification Button -->
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    Verification
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Click the button below for verification.
-                </p>
-                <button class="mt-4 inline-block bg-indigo-600 dark:bg-indigo-400 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                    Verify Now <!-- Interactable Button So place any link for verifcation instead of "Verify Now" -->
-                </button>
-            </div>
+            <!-- Removed Verification button as it is now automatic on registration -->
         </div>
     </div>
 </body>
