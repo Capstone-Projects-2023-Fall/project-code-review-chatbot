@@ -13,24 +13,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           tools: composer:v2
           coverage: none
-      #- name: Require Vapor CLI
-      #  run: composer global require laravel/vapor-cli
-   #     working-directory: ./server/code-review-chatbot
+      - name: Require Vapor CLI
+        run: composer global require laravel/vapor-cli
+        working-directory: ./server/code-review-chatbot
       - name: Install Project Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
         working-directory: ./server/code-review-chatbot
       - name: Deploy Environment
         run: |
-          npm install -g serverless
-          serverless plugin install -n serverless-plugin-scripts
-          serverless deploy
-          #serverless bref:cli --args="migrate --force"
+          vapor team:switch --id 62804
+          vapor deploy prod
         working-directory: ./server/code-review-chatbot
         env:
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          VAPOR_API_TOKEN: ${{ secrets.VAPOR_API_TOKEN }}

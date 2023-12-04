@@ -18,7 +18,13 @@
     });
   });
 
-  // put a tag on outputs that are code review and redirect them to main.js
+
+  document.getElementById('quickFixButton').addEventListener('click', () => {
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'quickFix'
+    });
+  });
 
   window.addEventListener("message", (event) => {
     const message = event.data;
