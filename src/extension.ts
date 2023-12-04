@@ -598,6 +598,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 					break;
 				}
+
+				case 'clearConversation': {
+					this._view?.webview.postMessage({ type: 'clearResponse' });
+					this._responseArray = [];
+				
+				}
 			}
 		});
 	}
@@ -908,6 +914,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				</div>
 
 				<!-- Your button at the bottom -->
+				<!-- <button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="clear-button">Clear Conversation</button> -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>

@@ -6,6 +6,13 @@
   const vscode = acquireVsCodeApi();
   let response = '';
 
+  /*
+  document.getElementById('clear-button').addEventListener('click', () => {
+    vscode.postMessage({
+      type: 'clearConversation'
+    });
+  });*/
+
   document.getElementById('learn-more-button').addEventListener('click', () => {
     vscode.postMessage({
       type: 'learnMore'
@@ -58,7 +65,17 @@
               handleResponse(item.userPrompt, item.gptResponse);
             }
           });
+
+          // Scroll to the bottom of the response div
+          const responseDiv = document.getElementById('response');
+          const lastResponseElement = responseDiv.lastElementChild;
+          if (lastResponseElement) {
+            lastResponseElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
         }
+        break;
+      case 'clearResponse':
+        document.getElementById('response').innerHTML = '';
         break;
     }
   });
