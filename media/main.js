@@ -44,13 +44,12 @@
         renderImageResponse(message.value);
         break;
       case 'responseDone':
-      case 'responseDone':
         if (Array.isArray(message.data)) {
           message.data.forEach(item => {
             if (item.isCodeReview) {
-              handleCodeReviewResponse(item.text);
+              handleCodeReviewResponse(item.userPrompt, item.gptResponse);
             } else {
-              handleResponse(item.text);
+              handleResponse(item.userPrompt, item.gptResponse);
             }
           });
         }
@@ -58,19 +57,19 @@
     }
   });
 
-  function handlePrompt(message) {
-    const prompt = message.value;
-    const input = document.getElementById("prompt-input");
-    input.value = prompt;
-    input.focus();
-  }
 
-  function handleResponse(message) {
+  function handleResponse(prompt, response) {
     console.log("message type received by handleResponse:");
-    console.log(message);
-    response = message;
+    console.log(response);
+
+    // Create elements for displaying the prompt and response
+    const promptElement = document.createElement("div");
+    promptElement.classList.add("chat-prompt");
+    promptElement.textContent = prompt;
+
 
     const output = document.createElement("div");
+    output.classList.add("chat-response");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -83,6 +82,7 @@
     output.innerHTML = html;
 
     // Append the new content to the response div without clearing existing content
+    document.getElementById("response").appendChild(promptElement);
     document.getElementById("response").appendChild(output);
     //document.getElementById("response").innerHTML = html;
 
@@ -119,9 +119,14 @@
     microlight.reset('code');
   }
 
-  function handleCodeReviewResponse(message) {
-    response = message;
+  function handleCodeReviewResponse(prompt, response) {
+
+    const promptElement = document.createElement("div");
+    promptElement.classList.add("chat-prompt");
+    promptElement.textContent = prompt;
+
     const output = document.createElement("div");
+    output.classList.add("chat-response");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -129,13 +134,15 @@
       literalMidWordUnderscores: true,
       simpleLineBreaks: true
     });
+
     //response = fixCodeBlocks(response);
+
     const html = converter.makeHtml(response);
     output.innerHTML = html;
 
-    // Append the new content to the response div without clearing existing content
+    // Append the prompt and response elements to the response div
+    document.getElementById("response").appendChild(promptElement);
     document.getElementById("response").appendChild(output);
-    //document.getElementById("response").innerHTML = html;
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {

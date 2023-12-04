@@ -241,7 +241,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	private _fullPrompt?: string;
 	private _currentMessageNumber = 0;
 
-	private _responseArray: { text: string; isCodeReview: boolean }[] = [];
+	private _responseArray: { userPrompt: string, gptResponse: string; isCodeReview: boolean }[] = [];
 
 
 	private _settings: Settings = {
@@ -527,7 +527,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response = res.text;
 					if (res.detail?.usage?.total_tokens) {
 						// Store the response and whether it is related to a code review in the response array
-						this._responseArray.push({ text: response, isCodeReview });
+						this._responseArray.push({ userPrompt: prompt, gptResponse: response, isCodeReview });
 
 						// Send the updated response array to the webview
 						this.sendWebviewMessage('responseDone', this._responseArray);
