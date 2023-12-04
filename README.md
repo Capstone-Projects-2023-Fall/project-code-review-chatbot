@@ -10,7 +10,23 @@
 
 # Installation Instructions
 
-## Backend Setup
+## Client Setup
+
+1. To Install this extension, you can install the extension from this link:
+
+    https://marketplace.visualstudio.com/items?itemName=CIS4398.CRC-CIS4398-Fall2023
+
+   You can also install this via VSCode. In Visual Studio Code, navigate to the extensions tab. Search for "CIS4398" and install the extension
+   ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/02205b36-b438-4494-b11f-65d38f5f3161)
+
+   
+2. After installation, you should be prompted to register on the website.
+3. To use your own API key or change the ChatGPT model, you can change these in the settings screen of the extension:
+   ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/83d8a75a-95ec-4d9d-9bbf-e349cf6199f3)
+
+
+
+## Backend Setup (dev only)
 
 1. In order to run the server client on Windows, the Windows Subsystem for Linux must be installed via PowerShell:
 
