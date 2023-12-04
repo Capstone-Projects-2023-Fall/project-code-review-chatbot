@@ -28,10 +28,10 @@ class AuthServiceProvider extends ServiceProvider
 
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             return (new MailMessage)
-                ->subject('Verify Email Address CRC Laravel')
-                ->line('Thanks for registering for the CodeReviewChatbot laravel page! Please use the button below to verify your email.')
-                ->action('Verify Email', $url);
-                ->line('If you have not requested verification no action is needed.')
+                ->subject(Lang::get('Verify Email CRC Laravel'))
+                ->line(Lang::get('Thank you for registering with CodeReviewChatbot on Laravel! To complete verification, please use the button below.'))
+                ->action(Lang::get('Verify Email'), $url)
+                ->line(Lang::get('If you did not register no further action is required.'));
         });
     }
 }
