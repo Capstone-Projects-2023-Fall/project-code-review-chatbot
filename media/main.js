@@ -1,5 +1,7 @@
 // @ts-ignore
 
+//const { title } = require("process");
+
 (function () {
   const vscode = acquireVsCodeApi();
   let response = '';
@@ -16,6 +18,13 @@
     });
   });
 
+
+  document.getElementById('quickFixButton').addEventListener('click', () => {
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'quickFix'
+    });
+  });
 
   window.addEventListener("message", (event) => {
     const message = event.data;
@@ -167,6 +176,7 @@
       </div>`;
   }
 
+
   function renderSuggestions(response) {
     console.log("start renderSuggestions");
     const suggestions = parseSuggestions(response);
@@ -176,18 +186,12 @@
       return;
     }
 
-
     const form = document.createElement('form');
     const list = document.createElement('ol');
 
-    const userChanges = [ //array to store if user marked a suggestion as done
-      "VariableNamingConventions",
-      "Redundancy",
-      "Bug/Broken",
-      "Complexity",
-      "Legibility"
-    ];
+    const userChanges = new Array(suggestions.length).fill(""); // Initialize with empty strings for each suggestion
 
+    // For each suggestion, create the suggestion UI
     suggestions.forEach((suggestion, index) => {
       const listItem = document.createElement("li");
       const titleContainer = document.createElement("div");
@@ -196,6 +200,7 @@
       const descriptionElement = document.createElement("div");
       const checkbox = document.createElement("input");
       const checkboxContainer = document.createElement("div");
+      const findIssueButton = document.createElement("button");
 
       listItem.classList.add("my-3");
       titleContainer.classList.add("title");
@@ -208,9 +213,6 @@
       checkbox.id = `checkbox-${index}`;
       checkbox.name = "checkbox-group";
       checkboxContainer.appendChild(checkbox);
-      //const label = document.createElement("label");
-      //label.setAttribute("for", `checkbox-${index}`);
-      //checkboxContainer.appendChild(label);
 
       caretButton.type = "button";
       caretButton.textContent = "﹀";
@@ -235,19 +237,34 @@
         }
       });
 
-      //stores what boxes are checked by user to be sent to server
-      
-      checkbox.addEventListener("change ", () => {
-        var ucIndex = 0;
-        //grabs checkbox element from its id, then grabs the index of that element 
-        ucIndex = suggestions.findIndex(x => getElementById(checkbox.id));
+      // Handle checkbox change
+      checkbox.addEventListener("change", () => {
+        const checkboxState = checkbox.checked ? "was checked" : "was NOT checked";
+        userChanges[index] = `The box for ${suggestion.title} with checkboxID of: ${checkbox.id} ${checkboxState}`;
 
-        if (checkbox.checked) {
-          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was checked";
-        } else {
-          userChanges[ucIndex] = "The box for " + suggestion.title + " with checkboxID of: " + checkbox.id + " was NOT checked";
-        }
+        // Optionally, post this data back to your extension
+        vscode.postMessage({
+          type: 'checkboxChange',
+          userChanges: userChanges
+        });
       });
+
+      findIssueButton.type = "button";
+      findIssueButton.textContent = "⌕";
+      findIssueButton.classList.add("title-element", "title-right");
+
+      findIssueButton.addEventListener('click', (function (title) {
+        return function () {
+          const issueTitle = title.textContent;
+          console.log("issueTitle:", issueTitle);
+
+          vscode.postMessage({
+            type: 'findIssue',
+            issueTitle: issueTitle
+          });
+        };
+      })(titleElement)); // Pass titleElement to the closure
+
 
       descriptionElement.textContent = suggestion.description;
       descriptionElement.classList.add("hidden");
@@ -256,6 +273,7 @@
       titleContainer.appendChild(checkboxContainer);
       titleContainer.appendChild(titleElement);
       titleContainer.appendChild(caretButton);
+      titleContainer.appendChild(findIssueButton);
       listItem.appendChild(titleContainer);
       listItem.appendChild(descriptionElement);
       list.appendChild(listItem);
@@ -265,6 +283,7 @@
     suggestionsContainer.appendChild(form);
     console.log("done rendering suggestions");
   }
+
 
   function parseSuggestions(response) {
     console.log("start parsing suggestions");

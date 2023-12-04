@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Controllers\DBLogging;
+use App\Http\Controllers\API\UserController;
 use App\Http\Middleware\AfterResponseMiddleware;
 use App\Http\Controllers\AssistantController;
 
@@ -17,56 +19,49 @@ use App\Http\Controllers\AssistantController;
 |
 */
 
-
-
-Route::post('login', 'API\UserController@login');
-Route::post('register', 'API\UserController@register');
+Route::post('/log', [DBLogging::class, 'logData']);
+Route::post('login', [UserController::class, 'login']);
+Route::post('register', [UserController::class, 'register']);
 
 Route::group(['middleware' => 'auth:api'], function(){
-    Route::post('details', 'API\UserController@details');
+    Route::post('details', [UserController::class, 'details']);
 });
-
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
 Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/review', function (Request $request) {
     
     $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+    $userInput = $request->input('prompt');
+    $model = $request->input('model');
 
+    $conversationId = $request->input('conversation_id');
+    //$history = Cache::get('conversation_' . $conversationId, []);
 
-    $out->writeln($request->input('prompt'));
-    $out->writeln($request->input('model'));
+    //$history[] = ['role' => 'user', 'content' => $userInput];
 
     $finalText = "";
 
 
-    /*$mods = OpenAI::models()->list();
-
-
-    foreach ($mods->data as $result) {
-        $out->writeln($result->id); // 'gpt-3.5-turbo-instruct'
-        // ...
-    }*/
-
 
     /*
     $response = OpenAI::chat()->create([
-        'model' => $request->input('model'),
-        'messages' => [
-            ['role' => 'user', 'content' => $request->input('prompt')],
-        ],
+        'model' => $model,
+        'messages' => $history,
     ]);
 
+    $finaltext = "";
 
     foreach ($response->choices as $result) {
         $out->writeln($result->message->content);
         $finaltext .= $result->message->content;
-       
+        $history[] = ['role' => 'assistant', 'content' => $result->message->content]; 
     }*/
     $user = Auth::user();
+
+    //Cache::put('conversation_' . $conversationId, $history);
 
     $userThread = $user->thread_id;
     
@@ -113,12 +108,6 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
     while ($lastMsg == $userMsg->id);
 
 
-    $out->writeln('lets go ' . $lastMsg);
-    $out->writeln('lets go thread' . $userThread);
-    
-
-    
-
 
     $response = OpenAI::threads()->messages()->retrieve(
         threadId: $userThread,
@@ -133,15 +122,15 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
     
     $out->writeln($finalText);
 
-
-
     return response()->json([
-        'text' => $finalText,
-        'id' => $response->id,
-        'usage' => ''//$response['usage']
+        'text' => $finaltext,
+        'id' => $response['id'],
+        'usage' => $response['usage']
+
     ]);
 
 });
+
 
 Route::middleware('auth:sanctum')->get('/userinfo', function(Request $request) {
     if (Auth::user()) {
