@@ -19,6 +19,12 @@
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Current Live Sessions</h5>
                         <p class="font-normal text-gray-700">{{ $livesessionsCount }}</p>
                     </a>
+
+                    <!-- Live Sessions Box -->
+                    <a href="{{ route('logs') }}" class="w-1/4 max-w-sm p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 text-center">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Log</h5>
+                        <p class="font-normal text-gray-700">Click to check logs</p>
+                    </a>
                 <x-admin />
             </div>
         </div>
