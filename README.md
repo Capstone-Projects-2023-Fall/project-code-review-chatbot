@@ -17,11 +17,24 @@
     https://marketplace.visualstudio.com/items?itemName=CIS4398.CRC-CIS4398-Fall2023
 
    You can also install this via VSCode. In Visual Studio Code, navigate to the extensions tab. Search for "CIS4398" and install the extension
+   
    ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/02205b36-b438-4494-b11f-65d38f5f3161)
 
    
-2. After installation, you should be prompted to register on the website.
-3. To use your own API key or change the ChatGPT model, you can change these in the settings screen of the extension:
+3. After installation, you should be prompted to register on the website. Create an account using a temple email before using the extension.
+   If you are not prompted, you can access the accounts button on VSCode and register by clicking the "Sign in with Code Review Chatbot Auth to use Code Review Chatbot" button
+   
+   ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/d19de7c5-e9f7-478b-a6c9-35719ea61af9)
+
+4. After logging in, you will be prompted to open Visual Studio Code again to authenticate. Please click confirm on each prompt.
+
+5. When launching a new folder connected with git, you will be prompted to enable pre-commit hooks. If you would like the extension to do a code review whenever you commit, click yes on the prompt.
+   
+   ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/ecf1af9b-d86a-49e4-a59c-8efceb82bf28)
+
+
+6. To use your own API key, change the ChatGPT model, or disable/enable your pre-commit hook, you can change these in the settings screen of the extension:
+   
    ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/83d8a75a-95ec-4d9d-9bbf-e349cf6199f3)
 
 
