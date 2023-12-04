@@ -4,13 +4,29 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import axios from "axios";
 import * as fs from 'fs';
+import { promises as fsPromises } from 'fs';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import * as mysql from 'mysql2';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
+
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 
-type AuthInfo = {apiKey?: string};
-type Settings = {selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean};
+const execAsync = promisify(exec);
+
+
+let lastHash = '';
+let platform = '';
+let user = '';
+let email = '';
+
+type AuthInfo = { apiKey?: string };
+type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
 
 const BASE_URL = 'https://api.openai.com/v1';
 var currentServerToken: string;
@@ -76,8 +92,18 @@ export async function activate(context: vscode.ExtensionContext) {
 			apiKey: config.get('apiKey')
 		});
 	}
-	
-	
+
+
+	//auth0 setup
+	context.subscriptions.push(
+		new Auth0AuthenticationProvider(context)
+	);
+
+	currentServerToken = await getAuthSession(false);
+
+	if (config.get('useServerApi') && !currentServerToken) {
+		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
+	} 
 
 	// Register the provider with the extension's context
 	context.subscriptions.push(
@@ -113,11 +139,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () =>
 			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-			.then((value) => {
-				if (value) {
-					provider.search(value);
-				}
-			})
+				.then((value) => {
+					if (value) {
+						provider.search(value);
+					}
+					let log = "Ask Command: " + value ;
+					query(log, platform,undefined,undefined,user,email);
+				})
 		),
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
@@ -126,7 +154,21 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation())
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
+		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const promptPrefix = config.get('promptPrefix.findIssue') as string;
+			console.log('Received issueTitle:', issueTitle);
+			query('findIssue :'+ issueTitle, platform,undefined,undefined,user,email);
+
+			// Modify the prompt to include the issueTitle received from the webview
+			const prompt = `${promptPrefix} ${issueTitle}`;
+
+			// Pass the modified prompt to the search function
+			provider.search(prompt, true, false);
+		})
+
+
 	);
 
 
@@ -184,6 +226,42 @@ export async function activate(context: vscode.ExtensionContext) {
 	setupPreCommitHookIfNecessary();
 }
 
+
+async function getLatestCommitHash(): Promise<string> {
+    let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
+        ? vscode.workspace.workspaceFolders[0].uri.fsPath
+        : null;
+
+    if (workspacePath) {
+        try {
+            const { stdout } = await execAsync('git rev-parse HEAD', { cwd: workspacePath });
+            return stdout.trim();
+        } catch (error) {
+            console.error('Error executing git command:', error);
+        }
+    }
+    return "";
+}
+async function pollForNewCommits() {
+    const hash = await getLatestCommitHash();
+    if (hash && hash !== lastHash) {
+        lastHash = hash;
+        query('Newest Commit: ', platform, undefined, hash, user, email);
+    }
+}
+
+const getAuthSession = async (useServerApi: boolean) => {
+	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
+	if (session) {
+		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
+		user = JSON.stringify(session.account.label).replace(/[^a-zA-Z ]/g, '');
+		email = JSON.stringify(session.account.id).replace(/[^a-zA-Z1-9 @ .]/g, '');
+		return session.accessToken;
+
+	}
+	return '';
+};
+
 async function setupPreCommitHookIfNecessary() {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
@@ -236,43 +314,36 @@ async function query(log: string, platform: string, gitdiff?: string, hash?: str
 }
 
 function getScriptContent(): string {
-    return `
-#!/bin/bash
-# Script for commit intervention.
+	try {
+		// Resolve the path to the file relative to the current directory
+		const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
 
-# Change this to true to enable commit intervention
-export RUN_CODE_REVIEW=true
+		// Read the content of the file
+		const content = readFileSync(filePath, { encoding: 'utf-8' });
 
-if [ "$RUN_CODE_REVIEW" = "true" ]; then
+		return content;
+	} catch (error) {
+		// If there's an error reading the file, log the error and return a default string
+		console.error("Error reading the pre-commit file: ", error);
+		return '';
+	}
+}
 
-	echo "Running code review..."
-	
-	if [[ "$(uname)" == "Darwin" ]]; then
-		osascript -e 'tell application "System Events" to keystroke "p" using {control down, option down}'
-		user_choice=$(osascript -e 'display dialog "Do you want to proceed with the commit?" buttons {"Yes", "No"} default button "No"' -e 'button returned of result')
-	elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-		echo "detected windows device"
-		powershell.exe -command "(New-Object -ComObject WScript.Shell).SendKeys('%^(p)')"
-		user_choice=$(powershell.exe -command "$a = [System.Windows.Forms.MessageBox]::Show('Do you want to proceed with the commit?', 'Confirm', [System.Windows.Forms.MessageBoxButtons]::YesNo); if ($a -eq 'Yes') {'Yes'} else {'No'}")
-	else
-		echo "Unsupported OS."
-		exit 1
-	fi
-	
-	if [ "$user_choice" == "Yes" ]; then
-		echo "Proceeding with the commit."
-		exit 0
-	else
-		echo "Commit aborted by the user."
-		exit 1
-	fi
+  function getActiveEditor() {
+    return vscode.window.activeTextEditor;
+}
 
-else
-	echo "Skipping code review."
-	exit 0
-fi
-	
-    `;
+function getActiveFileUri() {
+    const editor = getActiveEditor();
+    if (editor) {
+        return editor.document.uri;
+    }
+    return null;
+}
+
+function getActiveFilePath() {
+    const fileUri = getActiveFileUri();
+    return fileUri ? fileUri.fsPath : null;
 }
 
 export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
@@ -310,6 +381,95 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._newAPI();
 
 	}
+
+	public applyQuickFixes() {
+		const response = this._response;
+		
+		if (response != null) 
+		{
+			const quickFixStart = response.indexOf('[Fix 1]');
+			const quickFixEnd = response.indexOf('---', quickFixStart);
+
+			if (quickFixStart !== -1 && quickFixEnd !== -1) {
+				const quickFixSection = response.substring(quickFixStart, quickFixEnd);
+				console.log('Quick Fix Section:', quickFixSection);
+				this.applyFixes(quickFixSection);
+			} else {
+				console.log('Quick Fix section not found in the response.');
+			}
+		}
+		else 
+		{
+			console.log('Must run code review command before fixing code.');
+			vscode.window.showErrorMessage('Must run code review command before fixing code.');
+		}
+
+	}
+
+	public applyFixes(quickFixSection: string) {
+		const fixes = quickFixSection.split('[Fix ');
+	
+		for (const fix of fixes) {
+			if (fix.trim() !== '') {
+				const description = this.extractValue(fix, 'Description:');
+				const location = this.extractValue(fix, 'To Be Replaced:');
+				const suggestedFix = this.extractValue(fix, 'Suggested Fix:');
+	
+				// Make each fix to the users file
+				this.applyFixToUserFile(description ? description.value : null, location ? location.value : null, suggestedFix ? suggestedFix.value : null);
+			}
+		}
+	}
+	
+	extractValue(fix: string, label: string) {
+		const startIndex = fix.indexOf(label);
+		if (startIndex !== -1) {
+			const valueStartIndex = startIndex + label.length;
+			const valueEndIndex = fix.indexOf('\n', valueStartIndex);
+			const value = fix.substring(valueStartIndex, valueEndIndex).trim();
+			return { value };
+		}
+		return null;
+	}
+	
+	applyFixToUserFile(description: string | null, location: string | null, suggestedFix: string | null) {
+		if (description && location && suggestedFix) {
+			try {
+				const filePath = getActiveFilePath();
+				if (filePath) {
+					let fileContent = fs.readFileSync(filePath, 'utf-8');
+					console.log(`To Be Replaced: ${location}`);
+	
+					// find the specified text in the file
+					const textToReplace = location.trim();
+					const startIndex = fileContent.indexOf(textToReplace);
+	
+					if (startIndex !== -1) {
+						// Replace the text with the suggested fix
+						fileContent = fileContent.slice(0, startIndex) + suggestedFix + fileContent.slice(startIndex + textToReplace.length);
+	
+						// Write the changes back to the file
+						fs.writeFileSync(filePath, fileContent, 'utf-8');
+	
+						console.log(`Fix applied successfully to the file.`);
+					} else {
+						console.log(`Specified text not found in the file.`);
+					}
+				} else {
+					console.error('File path is null');
+				}
+			} catch (error) {
+				console.error('Error applying fix:', error);
+			}
+		} else {
+			console.error('Invalid fix data.');
+		}
+	}	
+
+	public sendWebviewMessage(type: string, data?: any) {
+		this._view?.webview.postMessage({ type, data });
+	}
+
 
 	public setSettings(settings: Settings) {
 		let changeModel = false;
@@ -358,7 +518,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		};
 
 		// set the HTML for the webview
-		webviewView.webview.html = this._getHtmlForWebview2(webviewView.webview);
+		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
 		// add an event listener for messages received by the webview
 		webviewView.webview.onDidReceiveMessage(async data => {
@@ -381,12 +541,60 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				case 'prompt':
 					{
 						this.search(data.value);
+						let log = 'Search Command: ' + data.value;
+
+						query(log,platform, undefined, undefined, user, email);
 					}
 				case 'learnMore':
 					{
 						vscode.commands.executeCommand("chatgpt.learnMore");
+						let log = 'Learn More Command Triggered';
+						query(log,platform, undefined, undefined, user, email);
 						break;
 					}
+				case 'askGPT':
+					{
+						vscode.commands.executeCommand('chatgpt.ask');
+						break;
+
+					}
+
+				case 'quickFix':
+					{
+						this.applyQuickFixes();
+						break;
+					}
+				case 'checkboxChange':
+					{
+						let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
+						? vscode.workspace.workspaceFolders[0].uri.fsPath
+						: null;
+
+						console.log("Checkbox states have changed:", data.userChanges);
+
+						const userChangesString = data.userChanges.join('\n');
+
+						if(workspacePath){
+							exec('git diff', { cwd: workspacePath }, async (error, stdout, stderr) => {
+								if (error){
+									console.error('error',error);
+									return;
+								}
+	
+								let parsedDiff = stdout.trim() === '' ? 'No git diff detected' : stdout;
+								let log = 'Checkbox Change: ' + userChangesString;
+
+								query(log, platform, parsedDiff, undefined, user, email);
+
+							});
+
+						}
+						break;
+					}
+				case 'findIssue': {
+					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
+					break;
+				}
 			}
 		});
 	}
@@ -472,9 +680,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
-		
 
-		if (this._settings.useServerApi) {
+		// Send the search prompt to the ChatGPTAPI instance and store the response
+		if (this._settings.useServerApi){
+			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 
@@ -487,17 +696,17 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				};
 
 				const res =
-				await axios.post("https://foldychbca36qdwt2zredrtxmm0njxmf.lambda-url.us-east-1.on.aws/api/review",
-				{prompt: this._fullPrompt, model: this._settings.model}
-				
+					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
+					{prompt: this._fullPrompt, model: this._settings.model},
+					config
 				);
+
+					query('Received Prompt: ' + this._fullPrompt, platform, undefined, undefined, user, email);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
 					return;
 				}
 
-
-				
 				response = res.data.text;
 				
 				if (res.data.detail?.usage?.total_tokens) {
@@ -516,19 +725,22 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response += `\n\n---\n[ERROR] ${e}`;
 				}
 			}
-		} 
+			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
+		}
 		else {
 			if (!this._chatGPTAPI) {
 				response = '[ERROR] "API key not set or wrong, please go to extension settings to set it (read README.md for more info)"';
 			} else {
 				// If successfully signed in
 				console.log("sendMessage");
-				
+				platform = "local";
+
 				// Make sure the prompt is shown
 				this._view?.webview.postMessage({ type: 'setPrompt', value: this._prompt });
 				this._view?.webview.postMessage({ type: 'addResponse', value: '...' });
-	
 				
+				query('Received Prompt: ' + this._prompt, platform, undefined, undefined, user, email);
+
 				const agent = this._chatGPTAPI;
 				let numToken;
 
@@ -581,6 +793,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						response += `\n\n---\n[ERROR] ${e}`;
 					}
 				}
+				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
 			}
 		}
 
@@ -606,7 +819,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
-	
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
 
@@ -682,6 +894,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			<body style="display: flex; flex-direction: column; height: 100vh;">
 				<div style="flex: 1;">
 					<input class="h-10 w-full text-white bg-stone-700 p-4 text-sm" placeholder="Welcome to Code Review ChatBot!" id="prompt-input" />
+
 					<div id="response" class="pt-4 text-sm"> 
 
 					</div>
@@ -689,8 +902,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				<!-- Your button at the bottom -->
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>
 
 				<script src="${scriptUri}"></script>
+		
 			</body>
 			</html>`;
 	}
@@ -701,7 +917,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
 		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
 		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-
+	
 		return `<!DOCTYPE html>
 				<html lang="en">
 				<head>
@@ -711,7 +927,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					<title>Chat Bot</title>
 				</head>
 				<body>
-
+	
 					<div class="chatbox_1">
 						<div class="chatbox_header">
 							<div class="chatbox_icon">"icon"</div>
@@ -719,14 +935,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 								<h4>Chat Bot</h4>
 							</div>
 						</div>
-
+	
 						<div class="chatbox_message">
 						
 							<div class="message message_chatGPT">Hi! How Can I help you today?</div>
 							<div class="message message_user"></div>
 							
 						</div>
-
+	
 						<div class="chatbox_footer">
 							<form class="chat_input_form">
 								<input class ="user_input" type="text" placeholder="Write a message">

@@ -50,7 +50,6 @@ const createChatMessageElement = (message) => `
     // else append ``` to the end to make the last code block complete
     return response.concat('\n\`\`\`');
   }
-
   }
 
   function setResponse() {
@@ -100,7 +99,6 @@ const createChatMessageElement = (message) => `
         }
 
         microlight.reset('code');
-
         //document.getElementById("response").innerHTML = document.getElementById("response").innerHTML.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   }
 

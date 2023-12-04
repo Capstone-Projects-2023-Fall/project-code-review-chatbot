@@ -10,7 +10,7 @@
     "url": "https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/"
   },
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.73.0"
   },
   "categories": [
     "Other"
@@ -30,7 +30,7 @@
   "activationEvents": [
     "*",
     "onView:chatgpt.chatView",
-    "onCommand:chatbot.open",
+    "onCommand:chatgpt.ask",
     "onCommand:chatgpt.explain",
     "onCommand:chatgpt.codeReview",
     "onCommand:chatgpt.codeReviewAddComments",
@@ -53,9 +53,8 @@
     ],
     "commands": [
       {
-        "command": "chatbot.open",
-        "title": "ChatBot: Start/Focus the Chatbot now",
-        "category": "Chatbot"
+        "command": "chatgpt.ask",
+        "title": "Ask ChatGPT"
       },
       {
         "command": "chatgpt.explain",
@@ -300,15 +299,14 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
-    "compile": "tsc -watch -p ./",
+    "compile": "webpack",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "lint": "eslint src --ext ts",
     "test": "jest",
-    "update-package-lock": "npm install --package-lock-only",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "update-package-lock": "npm install --package-lock-only"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",
@@ -342,13 +340,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "mysql2": "^3.6.5",
     "node-fetch": "^3.3.0",
-<<<<<<< HEAD
-    "uri": "^0.1.0",
-    "vscode": "^1.1.37",
-    "vscode-uri": "^3.0.8",
-=======
     "uuid": "^9.0.1",
->>>>>>> a3d75d690cd003ca038cb9c4a16001944de90d5b
     "yarn": "^1.22.19"
   }
 }
