@@ -36,11 +36,10 @@ class AdminController extends Controller
     
         $logs = DB::table('log_data')
             ->when($search, function ($query) use ($search) {
-                // Assuming 'logs' is a column in your 'log_data' table
-                // Modify or add conditions based on the columns you want to search
                 return $query->where('logs', 'like', "%{$search}%")
                              ->orWhere('user', 'like', "%{$search}%");
             })
+            ->orderBy('timestamp', 'desc')
             ->get();
     
         return view('log', compact('logs'));
