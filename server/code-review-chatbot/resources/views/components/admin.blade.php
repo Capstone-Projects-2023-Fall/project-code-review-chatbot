@@ -13,39 +13,11 @@
             <!-- Option 1 -->
             <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    <a href="https://laravel.com/docs" class="text-indigo-600 dark:text-indigo-400 hover:underline">OPTION1</a>
+                    <a href="https://status.openai.com/" class="text-indigo-600 dark:text-indigo-400 hover:underline">OpenAI Status</a>
                 </h2>
-                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Discover powerful features and functionalities.
-                </p>
-                <a href="https://capstone-projects-2023-fall.github.io/project-code-review-chatbot/docs/requirements/features-and-requirements" class="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline">
-                    Learn More
-                </a>
+                <!-- No additional text -->
             </div>
-
-            <!-- Option 2 -->
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    <a href="https://laracasts.com" class="text-indigo-600 dark:text-indigo-400 hover:underline">OPTION2</a>
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Dive into an interactive demo showcasing our capabilities.
-                </p>
-                <a href="https://laracasts.com" class="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline">
-                    Watch Demo
-                </a>
-            </div>
-
-            <!-- Option 3 -->
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    <a href="https://tailwindcss.com/" class="text-indigo-600 dark:text-indigo-400 hover:underline">OPTION3</a>
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Explore the documentation and customize your experience.
-                </p>
-                <!-- Add additional content as needed for Option 3 -->
-            </div>
+            <!-- Removed Verification button as it is now automatic on registration -->
         </div>
     </div>
 </body>

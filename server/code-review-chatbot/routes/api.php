@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Http\Controllers\DBLogging;
+use App\Http\Controllers\API\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +18,11 @@ use App\Http\Controllers\DBLogging;
 */
 
 Route::post('/log', [DBLogging::class, 'logData']);
-Route::post('login', 'API\UserController@login');
-Route::post('register', 'API\UserController@register');
+Route::post('login', [UserController::class, 'login']);
+Route::post('register', [UserController::class, 'register']);
 
 Route::group(['middleware' => 'auth:api'], function(){
-    Route::post('details', 'API\UserController@details');
+    Route::post('details', [UserController::class, 'details']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

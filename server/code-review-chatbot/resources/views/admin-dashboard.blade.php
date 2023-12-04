@@ -7,30 +7,24 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg p-6">
-                <!-- Title and Total Number of Users -->
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold">Current User Database</h3>
-                    <p>Total Users: {{ $users->count() }}</p>
-                </div>
+            <div class="flex justify-center space-x-4"> <!-- Flex container with horizontal spacing -->
+                    <!-- User Count Box -->
+                    <a href="{{ route('user-list') }}" class="w-1/4 max-w-sm p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 text-center">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Total Users</h5>
+                        <p class="font-normal text-gray-700">{{ $users->count() }}</p>
+                    </a>
 
-                <!-- User Data Table -->
-                <table class="min-w-full border-collapse block md:table">
-                    <thead class="block md:table-header-group">
-                        <tr class="border border-gray-300 md:border-none block md:table-row absolute -top-full md:static">
-                            <th class="bg-gray-100 p-2 text-gray-600 font-bold md:border md:border-gray-300 block md:table-cell">Name</th>
-                            <th class="bg-gray-100 p-2 text-gray-600 font-bold md:border md:border-gray-300 block md:table-cell">Email</th>
-                        </tr>
-                    </thead>
-                    <tbody class="block md:table-row-group">
-                        @foreach ($users as $user)
-                            <tr class="bg-white border border-gray-300 md:border-none block md:table-row">
-                                <td class="p-2 md:border md:border-gray-300 block md:table-cell">{{ $user->name }}</td>
-                                <td class="p-2 md:border md:border-gray-300 block md:table-cell">{{ $user->email }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    <!-- Live Sessions Box -->
+                    <a href="{{ route('live-sessions') }}" class="w-1/4 max-w-sm p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 text-center">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Current Live Sessions</h5>
+                        <p class="font-normal text-gray-700">{{ $livesessionsCount }}</p>
+                    </a>
+
+                    <!-- Live Sessions Box -->
+                    <a href="{{ route('logs') }}" class="w-1/4 max-w-sm p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 text-center">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Log</h5>
+                        <p class="font-normal text-gray-700">Click to check logs</p>
+                    </a>
                 <x-admin />
             </div>
         </div>
