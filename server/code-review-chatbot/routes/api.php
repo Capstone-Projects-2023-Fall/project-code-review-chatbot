@@ -79,8 +79,10 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
 
     $userMsg = OpenAI::threads()->messages()->create($userThread, [
         'role' => 'user',
-        'content' => ($request->input('prompt')),
+        'content' => $userInput,
     ]); 
+
+
 
     $assistId = AssistantController::get_assist_id();
 
@@ -91,11 +93,11 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
         ],
     );
 
-
+    $out->writeln($userInput);
 
     $lastMsg;
     do {
-        sleep(1);
+        sleep(5);
 
         $msgList = OpenAI::threads()->messages()->list($userThread, [
             'limit' => 1,
@@ -114,7 +116,9 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
         messageId: $lastMsg,
     );
 
+
     foreach ($response->content as $result) {
+        $out->writeln($result->type);
         $out->writeln($result->text->value);
         $finalText .= $result->text->value;
        
@@ -123,9 +127,9 @@ Route::middleware(['auth:sanctum', AfterResponseMiddleware::class])->post('/revi
     $out->writeln($finalText);
 
     return response()->json([
-        'text' => $finaltext,
-        'id' => $response['id'],
-        'usage' => $response['usage']
+        'text' => $finalText,
+        'id' => $response->id,
+        'usage' => $response->metadata
 
     ]);
 

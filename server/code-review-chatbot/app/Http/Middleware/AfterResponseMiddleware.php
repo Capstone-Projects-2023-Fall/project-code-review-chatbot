@@ -13,9 +13,6 @@ class AfterResponseMiddleware
 
     public function terminate($request, $response)
     {
-        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
-
-
-        $out->writeln(print_r($request));
+        
     }
 }
