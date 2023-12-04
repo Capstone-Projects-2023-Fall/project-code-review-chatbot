@@ -18,65 +18,16 @@
     });
   });
 
-  /* for each listItem {
-    createButton('findIssueButton').addEventListener('click', () = > {
-        vscode.postMessage
-      type: 'locateIssue'
-    } 
-    })
-  
-
-    // Data flow: button is clicked next to suggestion 
-                  -> event listener posts message to extension.ts
-                  -> extension.ts receives message in onDidReceiveMessage
-                  -> (registered) findissue command is executed
-                  -> commandHandler executes search(prompt) where prompt is the command
-                  -> search appends document text
-                  !!! in search add a boolean for isFindIssues, which will bypass appending document text
-                  -> instead, the title and description of the listItem needs to be appended
-                  !!! either send this through the message sent to extension.ts, or ???
-    
-    in package.json: 
-
-       {
-        "command": "chatgpt.locateIssue",
-        "title": "Locate Issue"
-      }
-
-
-      "chatgpt.promptPrefix.locateIssue": {
-          "type": "string",
-          "default": "Please provide the sections of my code where this issue is present: ",
-          "description": "locate the particular code review issue",
-          "order": 17
-        }
-    
-     in extension.ts:
-
-        -- This is when the extension receives the findIssue message from main.js postMessage
-        webviewView.webview.onDidReceiveMessage(data => {
-          case 'findIssue':
-          {
-            vscode.commands.executeCommand('chatgpt.findIssue');
-            break;
-
-          }
-
-        context.subscriptions.push {
-    vscode.commands.registerCommand('chatgpt.findIssue', () => commandHandler('promptPrefix.findIssue')),
-        }
-    
-
-    */
-
-
-
+  // put a tag on outputs that are code review and redirect them to main.js
 
   window.addEventListener("message", (event) => {
     const message = event.data;
     switch (message.type) {
+      case "prompt":
+        handlePrompt(message);
+        break;
       case "addResponse":
-        handleResponse(message);
+        //handleResponse(message);
         break;
       case "codeReviewCommandExecuted":
         handleCodeReviewResponse(message);
@@ -92,45 +43,34 @@
       case "loadResponse":
         renderImageResponse(message.value);
         break;
-      case 'updateConversation':
-        console.log("updateconversion message received by webview");
-        const conversationHistory = message.value || [];
-        console.log("message.value after received by webview" , message.value);
-        const responseDiv = document.getElementById('response');
-
-        // Clear existing content
-        responseDiv.innerHTML = '';
-
-        // Append conversation history to the response div
-        conversationHistory.forEach((conversation) => {
-          const p = document.createElement('p');
-          p.textContent = conversation;
-          responseDiv.appendChild(p);
-        });
+      case 'responseDone':
+      case 'responseDone':
+        if (Array.isArray(message.data)) {
+          message.data.forEach(item => {
+            if (item.isCodeReview) {
+              handleCodeReviewResponse(item.text);
+            } else {
+              handleResponse(item.text);
+            }
+          });
+        }
         break;
     }
   });
 
-  /*function fixCodeBlocks(response) {
-    // Use a regular expression to find all occurrences of the substring in the string
-    const REGEX_CODEBLOCK = new RegExp('\`\`\`', 'g');
-    const matches = response.match(REGEX_CODEBLOCK);
-
-    // Return the number of occurrences of the substring in the response, check if even
-    const count = matches ? matches.length : 0;
-    if (count % 2 === 0) {
-      return response;
-    } else {
-      // else append ``` to the end to make the last code block complete
-      return response.concat('\n\`\`\`');
-    }
-
-  }*/
+  function handlePrompt(message) {
+    const prompt = message.value;
+    const input = document.getElementById("prompt-input");
+    input.value = prompt;
+    input.focus();
+  }
 
   function handleResponse(message) {
     console.log("message type received by handleResponse:");
-    console.log(message.type);
-    response = message.value;
+    console.log(message);
+    response = message;
+
+    const output = document.createElement("div");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -140,7 +80,12 @@
     });
     //response = fixCodeBlocks(response);
     const html = converter.makeHtml(response);
-    document.getElementById("response").innerHTML = html;
+    output.innerHTML = html;
+
+    // Append the new content to the response div without clearing existing content
+    document.getElementById("response").appendChild(output);
+    //document.getElementById("response").innerHTML = html;
+
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
@@ -171,17 +116,12 @@
     }
 
 
-    /*if (message.type === "codeReviewCommandExecuted") {
-      console.log(response);
-      console.log("^ before renderSuggestions is called");
-      renderSuggestions(response);
-    }*/
-
     microlight.reset('code');
   }
 
   function handleCodeReviewResponse(message) {
-    response = message.value;
+    response = message;
+    const output = document.createElement("div");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -191,18 +131,11 @@
     });
     //response = fixCodeBlocks(response);
     const html = converter.makeHtml(response);
-    const responseDiv = document.getElementById("response");
+    output.innerHTML = html;
 
-    /*if (responseDiv.innerHTML.trim() !== '') {
-      // If content exists, append the new content
-      const newContent = document.createElement('div');
-      newContent.innerHTML = html;
-      responseDiv.appendChild(newContent);
-    } else {
-      // If no content exists, set the HTML content directly
-      responseDiv.innerHTML = html;
-    }*/
-    document.getElementById("response").innerHTML = html;
+    // Append the new content to the response div without clearing existing content
+    document.getElementById("response").appendChild(output);
+    //document.getElementById("response").innerHTML = html;
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {

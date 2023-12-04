@@ -241,7 +241,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	private _fullPrompt?: string;
 	private _currentMessageNumber = 0;
 
-	private _conversationHistory: string[] = [];
+	private _responseArray: { text: string; isCodeReview: boolean }[] = [];
 
 
 	private _settings: Settings = {
@@ -399,7 +399,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		this._response = '';
 
 
-
 		let documentText: string | undefined;
 		// Get the selected text of the active editor
 		const selection = vscode.window.activeTextEditor?.selection;
@@ -471,7 +470,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					this._conversation = {
 						parentMessageId: res.data.id
 					};
-					this._conversationHistory.push(response);
 				}
 
 			} catch (e: any) {
@@ -528,7 +526,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 					response = res.text;
 					if (res.detail?.usage?.total_tokens) {
-						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
+						// Store the response and whether it is related to a code review in the response array
+						this._responseArray.push({ text: response, isCodeReview });
+
+						// Send the updated response array to the webview
+						this.sendWebviewMessage('responseDone', this._responseArray);
+
+						//response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
 					}
 
 					if (this._settings.keepConversation) {
@@ -536,20 +540,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 							parentMessageId: res.id
 						};
 						response = this._response;
-						this._conversationHistory.push(response);
 
-						if (this._view) {
-							this._view.show?.(true);
-							this._view.webview.postMessage({ type: 'updateConversation', value: this._conversationHistory });
-							console.log("updateconversation message has been posted to webview");
-							/*if (isCodeReview) {
-								this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
-							}
-							else {
-								this._view.webview.postMessage({ type: 'addResponse', value: response });
-							}*/
-				
-						}
 					}
 
 				} catch (e: any) {
@@ -571,18 +562,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Saves the response
 		this._response = response;
 
-		// Show the view and send a message to the webview with the response
-	/* 	if (this._view) {
+		// Update the conversation in the webview
+		if (this._view) {
 			this._view.show?.(true);
-			this._view.webview.postMessage({ type: 'updateConversation', value: this._conversationHistory });
-			if (isCodeReview) {
-				this._view.webview.postMessage({ type: 'codeReviewCommandExecuted', value: response });
-			}
-			else {
-				this._view.webview.postMessage({ type: 'addResponse', value: response });
-			}
-
-		} */
+		}
 	}
 
 
