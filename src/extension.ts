@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (command === 'promptPrefix.quickFix') {
 			provider.applyQuickFixes();
 		} else {
-			provider.search(prompt, useEntireFile, isCodeReview);
+			provider.search(prompt, false,useEntireFile, isCodeReview);
 		}
 	};
 
@@ -224,7 +224,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = `${promptPrefix} ${issueTitle}`;
 
 			// Pass the modified prompt to the search function
-			provider.search(prompt, true, false);
+			provider.search(prompt, false,true, false);
 		})
 
 
@@ -828,6 +828,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
+
+			return response;
 		}
 		else {
 			if (!this._chatGPTAPI) {
@@ -897,7 +899,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
 
-				return this._response;
+				return response;
 			}
 		}
 
