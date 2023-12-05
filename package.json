@@ -109,6 +109,11 @@
           "group": "chatgpt-menu-group@1"
         },
         {
+          "command": "chatgpt.start",
+          "when": "editorTextFocus",
+          "group": "chatgpt-menu-group@1"
+        },
+        {
           "command": "chatgpt.explain",
           "when": "editorHasSelection",
           "group": "chatgpt-menu-group@2"
