@@ -815,7 +815,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
-					response = "The LearnMore & Searchbar ask can only be used after code review related commands.";
+					if(e = "Request failed with status code 500"){
+						response = "The LearnMore & Searchbar Ask can only be used after code review related commands.";
+
+					}else{
+						response = this._response;
+						response += `\n\n---\n[ERROR] ${e}`;
+					}
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
