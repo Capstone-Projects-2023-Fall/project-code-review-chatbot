@@ -33,48 +33,6 @@ var currentServerToken: string;
 
 export async function activate(context: vscode.ExtensionContext) {
 
-	//it could be define or undefine
-	let currentView: vscode.WebviewPanel | undefined = undefined;
-
-	//web view
-	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.start', () => {
-			const columnToShowIn = vscode.window.activeTextEditor
-			? vscode.window.activeTextEditor.viewColumn
-			: undefined;
-	
-		if (currentView) {
-		// If we already have a panel, show it in the target column
-		currentView.reveal(columnToShowIn);
-		} else {
-		// Otherwise, create a new panel
-		currentView = vscode.window.createWebviewPanel(
-			'code review chat bot',
-			'Chat bot',
-			columnToShowIn || vscode.ViewColumn.One,
-			{}
-		);}
-
-		// set options for the webview, allow scripts
-		currentView.webview.options = {
-			enableScripts: true,
-			localResourceRoots: [
-				context.extensionUri
-			]
-		};
-		
-		//set its HTML content
-		currentView.webview.html = getWebviewHtml(currentView,context);
-
-		// Reset when the current panel is closed
-		currentView.onDidDispose(
-		() => {
-			currentView = undefined;
-		},
-		null,
-		context.subscriptions);
-		})
-	);
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -177,6 +135,56 @@ export async function activate(context: vscode.ExtensionContext) {
 			provider.search(prompt, useEntireFile, isCodeReview);
 		}
 	};
+
+	//it could be define or undefine
+	let currentView: vscode.WebviewPanel | undefined = undefined;
+
+	//web view
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.start', () => {
+			const columnToShowIn = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (currentView) {
+		// If we already have a panel, show it in the target column
+		currentView.reveal(columnToShowIn);
+		} else {
+		// Otherwise, create a new panel
+		currentView = vscode.window.createWebviewPanel(
+			'code review chat bot',
+			'Chat bot',
+			columnToShowIn || vscode.ViewColumn.One,
+			{}
+		);}
+
+		// set options for the webview, allow scripts
+		currentView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [
+				context.extensionUri
+			]
+		};
+		
+		//set its HTML content
+		currentView.webview.html = getWebviewHtml(currentView,context);
+
+		currentView.webview.onDidReceiveMessage(async data => {
+			console.log("Received message:", data);
+			
+		}),
+
+		// Reset when the current panel is closed
+		currentView.onDidDispose(
+		() => {
+			currentView = undefined;
+		},
+		null,
+		context.subscriptions);
+		})
+	);
+	
+
 	
 
 	context.subscriptions.push(
@@ -342,7 +350,7 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 
 function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.ExtensionContext) {
 	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','chat.js'));
-	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style.css'));
+	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style2.css'));
 
 	return `<!DOCTYPE html>
 			<html lang="en">
@@ -353,23 +361,26 @@ function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.Extensi
 				<link rel="stylesheet" href="${cssUri}">
 			</head>
 			<body>
-				<div class="chatbox_1">
+				<div class="chatbox">
 					<div class="chatbox_header">
 						<div class="chatbox_content">
-							<h4>Chat Bot</h4>
+							<h2>Code Review Chat Bot</h2>
 						</div>
 					</div>
 
-					<div class="chatbox_message">
-						<div class="message message_chatGPT">Hi! How Can I help you today?</div>			
+					<div class="chat-messages">
+						<div class="message message_chatGPT">
+							<div class="message-sender">Chat Bot</div>
+							<div class="message-text">How can I help you today?</div>
+						</div>		
 					</div>
 
-					<div class="chatbox_footer">
-						<form class="chat_input_form">
-							<input class ="user_input" type="text" placeholder="Write a message">
-							<button type='submit' class="enter_button">Send</button>
-						</form>
-					</div>
+					
+					<form class="chat_input_form">
+						<input class ="user_input" type="text" placeholder="Write a message">
+						<button type='submit' class="button enter_button">Send</button>
+					</form>
+				
 				</div>
 
 				<script src="${scriptUri}"></script>

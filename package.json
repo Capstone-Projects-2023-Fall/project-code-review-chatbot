@@ -57,6 +57,10 @@
         "title": "Ask ChatGPT"
       },
       {
+        "command": "chatgpt.start",
+        "title": "Have a conversation with ChatGPT"
+      },
+      {
         "command": "chatgpt.explain",
         "title": "ChatGPT: Explain selection"
       },
