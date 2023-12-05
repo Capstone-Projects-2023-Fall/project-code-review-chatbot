@@ -101,8 +101,10 @@ export async function activate(context: vscode.ExtensionContext) {
 					vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
 					return;
 				}
+				let extensionPath = context.extensionPath;
+				let preCommitHookPath = path.join(extensionPath, 'src', 'commitIntervention', 'pre-commit');
 
-				const scriptContent = getScriptContent();
+				const scriptContent = getScriptContent(preCommitHookPath);
 				fs.writeFileSync(scriptPath, scriptContent);
 				fs.chmodSync(scriptPath, '755');
 
@@ -401,10 +403,12 @@ async function query(log: string, platform: string, gitdiff?: string, hash?: str
 	}
 }
 
-function getScriptContent(): string {
+
+function getScriptContent(path:string): string {
 	try {
 		// Resolve the path to the file relative to the current directory
-		const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
+		
+		const filePath = resolve(path);
 
 		// Read the content of the file
 		const content = readFileSync(filePath, { encoding: 'utf-8' });
