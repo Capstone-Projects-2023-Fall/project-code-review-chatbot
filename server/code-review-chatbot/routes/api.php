@@ -37,7 +37,7 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     $conversationId = $request->input('conversation_id');
     $history = Cache::get('conversation_' . $conversationId, []);
 
-    $historyLimit = 3;  
+    $historyLimit = 10;  
     $limitedHistory = array_slice($history, -1 * $historyLimit);
 
     $limitedHistory[] = ['role' => 'user', 'content' => $userInput];
