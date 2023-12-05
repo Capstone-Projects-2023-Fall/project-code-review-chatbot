@@ -11,6 +11,7 @@ import * as mysql from 'mysql2';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
+import { Response } from 'node-fetch';
 
 
 
@@ -153,7 +154,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		// Otherwise, create a new panel
 		currentView = vscode.window.createWebviewPanel(
 			'code review chat bot',
-			'Chat bot',
+			'code review chat bot',
 			columnToShowIn || vscode.ViewColumn.One,
 			{}
 		);}
@@ -169,9 +170,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		//set its HTML content
 		currentView.webview.html = getWebviewHtml(currentView,context);
 
-		currentView.webview.onDidReceiveMessage(async data => {
-			console.log("Received message:", data);
+		currentView.webview.onDidReceiveMessage(async message => {
+			console.log("Received message:", message);
+			const prompt = message.text;
 			
+			//search it get the result
+			const response = "This is a res";
+
+			//send it back to the js and update the view
+			currentView?.webview.postMessage({command: 'response', text: prompt});
 		}),
 
 		// Reset when the current panel is closed
@@ -369,7 +376,7 @@ function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.Extensi
 					</div>
 
 					<div class="chat-messages">
-						<div class="message message_chatGPT">
+						<div class="message message_ChatGPT">
 							<div class="message-sender">Chat Bot</div>
 							<div class="message-text">How can I help you today?</div>
 						</div>		
