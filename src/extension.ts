@@ -176,10 +176,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = message.text;
 			
 			//search it get the result
-			const response = "TODO do the saerch";
+			const response = provider.search(prompt,true,false,false);
 
 			//send it back to the js and update the view
-			currentView?.webview.postMessage({text: prompt});//works
+			currentView?.webview.postMessage({text: response});
 		}),
 
 		// Reset when the current panel is closed
