@@ -788,7 +788,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
-
 				if (!currentServerToken) {
 					currentServerToken = await getAuthSession(true);
 				}
