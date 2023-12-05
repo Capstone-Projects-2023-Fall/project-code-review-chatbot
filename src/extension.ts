@@ -33,6 +33,49 @@ var currentServerToken: string;
 
 export async function activate(context: vscode.ExtensionContext) {
 
+	//it could be define or undefine
+	let currentView: vscode.WebviewPanel | undefined = undefined;
+
+	//web view
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.start', () => {
+			const columnToShowIn = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+	
+		if (currentView) {
+		// If we already have a panel, show it in the target column
+		currentView.reveal(columnToShowIn);
+		} else {
+		// Otherwise, create a new panel
+		currentView = vscode.window.createWebviewPanel(
+			'code review chat bot',
+			'Chat bot',
+			columnToShowIn || vscode.ViewColumn.One,
+			{}
+		);}
+
+		// set options for the webview, allow scripts
+		currentView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [
+				context.extensionUri
+			]
+		};
+		
+		//set its HTML content
+		currentView.webview.html = getWebviewHtml(currentView,context);
+
+		// Reset when the current panel is closed
+		currentView.onDidDispose(
+		() => {
+			currentView = undefined;
+		},
+		null,
+		context.subscriptions);
+		})
+	);
+
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
 			'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
@@ -295,6 +338,43 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 			}
 		}
 	}
+}
+
+function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.ExtensionContext) {
+	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','chat.js'));
+	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style.css'));
+
+	return `<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.5">
+				<title>Chat Bot</title>	
+				<link rel="stylesheet" href="${cssUri}">
+			</head>
+			<body>
+				<div class="chatbox_1">
+					<div class="chatbox_header">
+						<div class="chatbox_content">
+							<h4>Chat Bot</h4>
+						</div>
+					</div>
+
+					<div class="chatbox_message">
+						<div class="message message_chatGPT">Hi! How Can I help you today?</div>			
+					</div>
+
+					<div class="chatbox_footer">
+						<form class="chat_input_form">
+							<input class ="user_input" type="text" placeholder="Write a message">
+							<button type='submit' class="enter_button">Send</button>
+						</form>
+					</div>
+				</div>
+
+				<script src="${scriptUri}"></script>
+			</body>
+		</html>`;
 }
 
 async function query(log: string, platform: string, gitdiff?: string, hash?: string, user?: string, email?: string){
@@ -613,7 +693,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 
-	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false) {
+	public async search(prompt?: string,useWebView ?: boolean, useEntireFile: boolean = false, isCodeReview: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
@@ -625,7 +705,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 		// focus gpt activity from activity bar
-		if (!this._view) {
+		if (useWebView === true){
+			await vscode.commands.executeCommand('chatgpt.start');
+		}
+		else if(!this._view) {
 			await vscode.commands.executeCommand('chatgpt.chatView.focus');
 		} else {
 			this._view?.show?.(true);
@@ -794,6 +877,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					}
 				}
 				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
+
+				return this._response;
 			}
 		}
 
