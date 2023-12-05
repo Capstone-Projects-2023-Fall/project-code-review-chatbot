@@ -179,7 +179,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const response = "TODO do the saerch";
 
 			//send it back to the js and update the view
-			currentView?.webview.postMessage({text: response});//works
+			currentView?.webview.postMessage({text: prompt});//works
 		}),
 
 		// Reset when the current panel is closed

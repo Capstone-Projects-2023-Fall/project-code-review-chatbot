@@ -33,27 +33,25 @@ const sendMessage = (e) =>{
         text: chatInput.value,
     });
 
-    //wait for it to come back
-    updateTheGPTResponse();
     
+
     //auto clear the input box
     chatInputForm.reset();
 };
 
-const updateTheGPTResponse = () =>{
-    window.addEventListener('message', event => {
-        const message = event.data;
+window.addEventListener('message', event => {
+    const message = event.data;
 
-        //get the GPT responce set up
-        const messageGPT={
-            sender : 'ChatGPT',
-            text: message.text,
-        };
-    
-        //update the html when the ChatGPT response back
-        chatMessages.innerHTML += createChatMessageElement(messageGPT);
-    });
-};
+    //get the GPT responce set up
+    const messageGPT={
+        sender : 'ChatGPT',
+        text: message.text,
+    };
+
+    //update the html when the ChatGPT response back
+    chatMessages.innerHTML += createChatMessageElement(messageGPT);
+});
+
 
 //waiting for the user to click the send button
 chatInputForm.addEventListener('submit',sendMessage);
