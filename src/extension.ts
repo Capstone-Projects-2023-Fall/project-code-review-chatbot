@@ -173,14 +173,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		currentView.webview.html = getWebviewHtml(currentView,context);
 
 		currentView.webview.onDidReceiveMessage(async message => {
-			console.log("Received message:", message);
 			const prompt = message.text;
 			
 			//search it get the result
-			//const response = "TODO do the saerch";
+			const response = "TODO do the saerch";
 
 			//send it back to the js and update the view
-			if(currentView !== undefined){ currentView.webview.postMessage({command:'message',text: prompt});}//works
+			currentView?.webview.postMessage({text: response});//works
 		}),
 
 		// Reset when the current panel is closed

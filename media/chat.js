@@ -34,22 +34,18 @@ const sendMessage = (e) =>{
     });
 
     //wait for it to come back
-    updateTheGPTResponse(); 
+    updateTheGPTResponse();
     
     //auto clear the input box
     chatInputForm.reset();
-
-    //scroll down after the search
-    chatMessages.scrollTop = chatMessages.scrollHeight;
 };
 
-const updateTheGPTResponse = () => {
+const updateTheGPTResponse = () =>{
     window.addEventListener('message', event => {
-
-        const message = event.data; // The JSON data our extension sent
+        const message = event.data;
 
         //get the GPT responce set up
-        const messageGPT= {
+        const messageGPT={
             sender : 'ChatGPT',
             text: message.text,
         };
