@@ -56,16 +56,14 @@ export async function activate(context: vscode.ExtensionContext) {
 			columnToShowIn || vscode.ViewColumn.One,
 			{}
 		);}
-		
-		// Get path to resource on disk
-		const scriptLocation = vscode.Uri.joinPath(context.extensionUri, 'media', 'chat.js');
-		// And get the special URI to use with the webview
-		const loadScript = currentView.webview.asWebviewUri(scriptLocation);
 
-		// Get path to resource on disk
-		const cssLocation = vscode.Uri.joinPath(context.extensionUri, 'media', 'style.css');
-		// And get the special URI to use with the webview
-		const loadCss = currentView.webview.asWebviewUri(cssLocation);
+		// set options for the webview, allow scripts
+		currentView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [
+				context.extensionUri
+			]
+		};
 		
 		//set its HTML content
 		currentView.webview.html = getWebviewHtml(currentView,context);
@@ -350,8 +348,8 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 }
 
 function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.ExtensionContext) {
-	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media', 'chat.js'));
-	const cssUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media', 'style.css'));
+	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','chat.js'));
+	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style.css'));
 
 	return `<!DOCTYPE html>
 			<html lang="en">
@@ -364,15 +362,13 @@ function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.Extensi
 			<body>
 				<div class="chatbox_1">
 					<div class="chatbox_header">
-						<div class="chatbox_icon">"icon"</div>
 						<div class="chatbox_content">
 							<h4>Chat Bot</h4>
 						</div>
 					</div>
 
 					<div class="chatbox_message">
-					
-						<div class="message message_chatGPT">Hi! How Can I help you today?</div>				
+						<div class="message message_chatGPT">Hi! How Can I help you today?</div>			
 					</div>
 
 					<div class="chatbox_footer">
@@ -382,8 +378,9 @@ function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.Extensi
 						</form>
 					</div>
 				</div>
+
 				<script src="${scriptUri}"></script>
-				</body>
+			</body>
 		</html>`;
 }
 
@@ -789,7 +786,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				const config = {
-					headers: { Authorization: `Bearer ${currentServerToken}`}
+					headers: { authorization: `Bearer ${currentServerToken}`}
 				};
 
 				const res =

@@ -4,7 +4,7 @@ const chatInputForm = document.querySelector('.chat_input_form');
 const chatInput = document.querySelector('.user_input');
 
 const createChatMessageElement = (message) => `
-    <div class="message message_${message.sender === 'user' ? 'user' : 'chatGPT'}">${message.text}</div>
+    <div class="message_${message.sender === 'user' ? 'user' : 'chatGPT'}">${message.text}</div>
 `;
 
 //from user to ChatGPT
