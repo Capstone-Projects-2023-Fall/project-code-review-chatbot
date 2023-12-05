@@ -725,8 +725,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
-					response = this._response;
-					response += `\n\n---\n[ERROR] ${e}`;
+					response = "The LearnMore & Searchbar ask can only be used after code review related commands.";
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
