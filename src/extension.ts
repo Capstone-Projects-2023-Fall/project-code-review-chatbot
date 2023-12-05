@@ -156,7 +156,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			'code review chat bot',
 			'code review chat bot',
 			columnToShowIn || vscode.ViewColumn.One,
-			{}
+			{
+				enableScripts: true
+			}
 		);}
 
 		// set options for the webview, allow scripts
@@ -175,10 +177,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = message.text;
 			
 			//search it get the result
-			const response = "This is a res";
+			//const response = "TODO do the saerch";
 
 			//send it back to the js and update the view
-			currentView?.webview.postMessage({command: 'response', text: prompt});
+			if(currentView !== undefined){ currentView.webview.postMessage({command:'message',text: prompt});}//works
 		}),
 
 		// Reset when the current panel is closed

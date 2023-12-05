@@ -18,8 +18,6 @@ const createChatMessageElement = (message) =>
 const sendMessage = (e) =>{
     e.preventDefault();
 
-
-
     //from the message
     const messageUser = {
         sender : 'User',
@@ -29,25 +27,14 @@ const sendMessage = (e) =>{
     //update the html when the user enters
     chatMessages.innerHTML += createChatMessageElement(messageUser);
     
-    
     //send a message to the extension
     vscode.postMessage({
         command: 'message',
-        text: chatInput.value
+        text: chatInput.value,
     });
 
-
     //wait for it to come back
-    response = waitForMessage();
-
-    //from the message
-    const messageGPT= {
-        sender : 'ChatGPT',
-        text: chatInput.value,
-    };
-
-    //update the html when the ChatGPT responce back
-    chatMessages.innerHTML += createChatMessageElement(messageGPT);
+    updateTheGPTResponse(); 
     
     //auto clear the input box
     chatInputForm.reset();
@@ -56,12 +43,20 @@ const sendMessage = (e) =>{
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
 
-const sendPromptToExtension = (message) => {
-        
-};
+const updateTheGPTResponse = () => {
+    window.addEventListener('message', event => {
 
-const waitForMessage = () => {
-    window.addEventListener('response', event => {return event.text;});
+        const message = event.data; // The JSON data our extension sent
+
+        //get the GPT responce set up
+        const messageGPT= {
+            sender : 'ChatGPT',
+            text: message.text,
+        };
+    
+        //update the html when the ChatGPT response back
+        chatMessages.innerHTML += createChatMessageElement(messageGPT);
+    });
 };
 
 //waiting for the user to click the send button
