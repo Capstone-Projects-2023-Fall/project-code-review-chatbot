@@ -118,7 +118,7 @@
     microlight.reset('code');
   }
 
-  function handleCodeReviewResponse(message) {
+  function handleCodeReviewResponse(message){
     response = message.value;
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
@@ -129,7 +129,7 @@
     });
     //response = fixCodeBlocks(response);
     const html = converter.makeHtml(response);
-    document.getElementById("response").innerHTML = html;
+    document.getElementById("message_chatGPT").innerHTML = html;
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
@@ -326,7 +326,7 @@
 
     console.log("end parsing suggestions");
     return suggestions;
-  }
+  }              
 
   // Listen for keyup events on the prompt input element
   document.getElementById('prompt-input').addEventListener('keyup', function (e) {

@@ -31,7 +31,54 @@ type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: f
 const BASE_URL = 'https://api.openai.com/v1';
 var currentServerToken: string;
 
+
+
 export async function activate(context: vscode.ExtensionContext) {
+
+	//it could be define or undefine
+	let currentView: vscode.WebviewPanel | undefined = undefined;
+
+	//web view
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.start', () => {
+			const columnToShowIn = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+	
+		if (currentView) {
+		// If we already have a panel, show it in the target column
+		currentView.reveal(columnToShowIn);
+		} else {
+		// Otherwise, create a new panel
+		currentView = vscode.window.createWebviewPanel(
+			'code review chat bot',
+			'Chat bot',
+			columnToShowIn || vscode.ViewColumn.One,
+			{}
+		);}
+		
+		// Get path to resource on disk
+		const scriptLocation = vscode.Uri.joinPath(context.extensionUri, 'media', 'chat.js');
+		// And get the special URI to use with the webview
+		const loadScript = currentView.webview.asWebviewUri(scriptLocation);
+
+		// Get path to resource on disk
+		const cssLocation = vscode.Uri.joinPath(context.extensionUri, 'media', 'style.css');
+		// And get the special URI to use with the webview
+		const loadCss = currentView.webview.asWebviewUri(cssLocation);
+		
+		//set its HTML content
+		currentView.webview.html = getWebviewHtml(currentView,context);
+
+		// Reset when the current panel is closed
+		currentView.onDidDispose(
+		() => {
+			currentView = undefined;
+		},
+		null,
+		context.subscriptions);
+		})
+	);
 
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
@@ -134,6 +181,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			provider.search(prompt, useEntireFile, isCodeReview);
 		}
 	};
+
 	
 
 	context.subscriptions.push(
@@ -147,6 +195,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					query(log, platform,undefined,undefined,user,email);
 				})
 		),
+
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
@@ -154,6 +203,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
+		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.conversation')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
 		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
 			const config = vscode.workspace.getConfiguration('chatgpt');
@@ -297,6 +347,44 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 	}
 }
 
+function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.ExtensionContext) {
+	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media', 'chat.js'));
+	const cssUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media', 'style.css'));
+
+	return `<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.5">
+				<title>Chat Bot</title>	
+				<link rel="stylesheet" href="${cssUri}">
+			</head>
+			<body>
+				<div class="chatbox_1">
+					<div class="chatbox_header">
+						<div class="chatbox_icon">"icon"</div>
+						<div class="chatbox_content">
+							<h4>Chat Bot</h4>
+						</div>
+					</div>
+
+					<div class="chatbox_message">
+					
+						<div class="message message_chatGPT">Hi! How Can I help you today?</div>				
+					</div>
+
+					<div class="chatbox_footer">
+						<form class="chat_input_form">
+							<input class ="user_input" type="text" placeholder="Write a message">
+							<button type='submit' class="enter_button">Send</button>
+						</form>
+					</div>
+				</div>
+				<script src="${scriptUri}"></script>
+				</body>
+		</html>`;
+}
+
 async function query(log: string, platform: string, gitdiff?: string, hash?: string, user?: string, email?: string){
 	try {
 		const response = await axios.post('https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/log', {
@@ -385,6 +473,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public applyQuickFixes() {
 		const response = this._response;
 		
+		// eslint-disable-next-line eqeqeq
 		if (response != null) 
 		{
 			const quickFixStart = response.indexOf('[Fix 1]');
@@ -595,6 +684,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 					break;
 				}
+
+				case 'conversation' : {
+					vscode.commands.executeCommand('chatgpt.start', data.issueTitle);
+				}
 			}
 		});
 	}
@@ -692,7 +785,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				const config = {
-					headers: { Authorization: `Bearer ${currentServerToken}` }
+					headers: { Authorization: `Bearer ${currentServerToken}`}
 				};
 
 				const res =
@@ -815,7 +908,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			else {
 				this._view.webview.postMessage({ type: 'addResponse', value: response });
 			}
-
 		}
 	}
 
@@ -910,7 +1002,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>`;
 	}
+
+	
+	
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() { }
+
+
+export function deactivate() {}
