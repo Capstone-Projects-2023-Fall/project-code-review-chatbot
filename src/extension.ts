@@ -32,6 +32,8 @@ type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: f
 const BASE_URL = 'https://api.openai.com/v1';
 var currentServerToken: string;
 
+
+
 export async function activate(context: vscode.ExtensionContext) {
 
 
@@ -56,8 +58,10 @@ export async function activate(context: vscode.ExtensionContext) {
 					vscode.window.showErrorMessage('Git is not initialized in this workspace, or it is not the root of the workspace.');
 					return;
 				}
+				let extensionPath = context.extensionPath;
+				let preCommitHookPath = path.join(extensionPath, 'src', 'commitIntervention', 'pre-commit');
 
-				const scriptContent = getScriptContent();
+				const scriptContent = getScriptContent(preCommitHookPath);
 				fs.writeFileSync(scriptPath, scriptContent);
 				fs.chmodSync(scriptPath, '755');
 
@@ -222,6 +226,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					query(log, platform,undefined,undefined,user,email);
 				})
 		),
+
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
@@ -229,6 +234,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
+		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.conversation')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
 		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
 			const config = vscode.workspace.getConfiguration('chatgpt');
@@ -428,10 +434,12 @@ async function query(log: string, platform: string, gitdiff?: string, hash?: str
 	}
 }
 
-function getScriptContent(): string {
+
+function getScriptContent(path:string): string {
 	try {
 		// Resolve the path to the file relative to the current directory
-		const filePath = resolve(__dirname, '..', 'src', 'commitIntervention/pre-commit');
+		
+		const filePath = resolve(path);
 
 		// Read the content of the file
 		const content = readFileSync(filePath, { encoding: 'utf-8' });
@@ -500,6 +508,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 	public applyQuickFixes() {
 		const response = this._response;
 		
+		// eslint-disable-next-line eqeqeq
 		if (response != null) 
 		{
 			const quickFixStart = response.indexOf('[Fix 1]');
@@ -710,6 +719,10 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 					break;
 				}
+
+				case 'conversation' : {
+					vscode.commands.executeCommand('chatgpt.start', data.issueTitle);
+				}
 			}
 		});
 	}
@@ -806,7 +819,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				const config = {
-					headers: { Authorization: `Bearer ${currentServerToken}` }
+					headers: { authorization: `Bearer ${currentServerToken}`}
 				};
 
 				const res =
@@ -835,8 +848,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
-					response = this._response;
-					response += `\n\n---\n[ERROR] ${e}`;
+					if(e = "Request failed with status code 500"){
+						response = "The LearnMore & Searchbar Ask can only be used after code review related commands.";
+
+					}else{
+						response = this._response;
+						response += `\n\n---\n[ERROR] ${e}`;
+					}
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
@@ -933,7 +951,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			else {
 				this._view.webview.postMessage({ type: 'addResponse', value: response });
 			}
-
 		}
 	}
 
@@ -1028,51 +1045,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>`;
 	}
-
-	private _getHtmlForWebview2(webview: vscode.Webview) {
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'chat.js'));
-		const scriptStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'style.css'));
-		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'microlight.min.js'));
-		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'showdown.min.js'));
-		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'scripts', 'tailwind.min.js'));
-	
-		return `<!DOCTYPE html>
-				<html lang="en">
-				<head>
-					<meta charset="UTF-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1.5">
-					<link rel="stylesheet" href="${scriptStyleUri}">
-					<title>Chat Bot</title>
-				</head>
-				<body>
-	
-					<div class="chatbox_1">
-						<div class="chatbox_header">
-							<div class="chatbox_icon">"icon"</div>
-							<div class="chatbox_content">
-								<h4>Chat Bot</h4>
-							</div>
-						</div>
-	
-						<div class="chatbox_message">
-						
-							<div class="message message_chatGPT">Hi! How Can I help you today?</div>
-							<div class="message message_user"></div>
-							
-						</div>
-	
-						<div class="chatbox_footer">
-							<form class="chat_input_form">
-								<input class ="user_input" type="text" placeholder="Write a message">
-								<button type='submit' class="enter_button">Send</button>
-							</form>
-						</div>
-					</div>
-					<script src="${scriptUri}"></script>
-					</body>
-				</html>`;
-	}
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() { }
+
+
+export function deactivate() {}

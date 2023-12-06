@@ -37,11 +37,14 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     $conversationId = $request->input('conversation_id');
     $history = Cache::get('conversation_' . $conversationId, []);
 
-    $history[] = ['role' => 'user', 'content' => $userInput];
+    $historyLimit = 10;  
+    $limitedHistory = array_slice($history, -1 * $historyLimit);
+
+    $limitedHistory[] = ['role' => 'user', 'content' => $userInput];
 
     $response = OpenAI::chat()->create([
         'model' => $model,
-        'messages' => $history,
+        'messages' => $limitedHistory,
     ]);
 
     $finaltext = "";
@@ -49,10 +52,10 @@ Route::middleware('auth:sanctum')->post('/review', function (Request $request) {
     foreach ($response->choices as $result) {
         $out->writeln($result->message->content);
         $finaltext .= $result->message->content;
-        $history[] = ['role' => 'assistant', 'content' => $result->message->content]; 
+        $limitedHistory[] = ['role' => 'assistant', 'content' => $result->message->content];
     }
 
-    Cache::put('conversation_' . $conversationId, $history);
+    Cache::put('conversation_' . $conversationId, $limitedHistory);
 
     $out->writeln($finaltext);
 
