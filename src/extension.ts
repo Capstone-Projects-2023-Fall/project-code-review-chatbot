@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (command === 'promptPrefix.quickFix') {
 			provider.applyQuickFixes();
 		} else {
-			provider.search(prompt, false,useEntireFile, isCodeReview);
+			provider.search(prompt,useEntireFile, isCodeReview);
 		}
 	};
 
@@ -160,9 +160,11 @@ export async function activate(context: vscode.ExtensionContext) {
 				enableScripts: true
 			});
 
-			//set its HTML content
-			currentView.webview.html = getWebviewHtml(currentView,context);
+			
 		}
+
+		//set its HTML content
+			currentView.webview.html = getWebviewHtml(currentView,context);
 
 		// set options for the webview, allow scripts
 		currentView.webview.options = {
@@ -178,7 +180,8 @@ export async function activate(context: vscode.ExtensionContext) {
 			if(currentServerToken){
 				//get the prompt from user
 				const prompt = message.text;
-				const response = provider.search(prompt,true,false,false);
+
+				const response = await provider.search(prompt,false,false,true);
 				
 				//send it back to the js and update the view
 				currentView?.webview.postMessage({command:'message',text: response});
@@ -237,7 +240,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = `${promptPrefix} ${issueTitle}`;
 
 			// Pass the modified prompt to the search function
-			provider.search(prompt, false,true, false);
+			provider.search(prompt,true, false);
 		})
 
 
@@ -725,7 +728,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 
-	public async search(prompt?: string,useWebView ?: boolean, useEntireFile: boolean = false, isCodeReview: boolean = false) {
+	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false, useWebView : boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
@@ -736,11 +739,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._newAPI();
 		}
 
-		// focus gpt activity from activity bar
-		if (useWebView === true){
-			await vscode.commands.executeCommand('chatgpt.start');
-		}
-		else if(!this._view) {
+		
+		if(!this._view) {
 			await vscode.commands.executeCommand('chatgpt.chatView.focus');
 		} else {
 			this._view?.show?.(true);
