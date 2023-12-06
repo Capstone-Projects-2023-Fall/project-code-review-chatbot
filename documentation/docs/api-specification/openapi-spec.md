@@ -1,5 +1,5 @@
 ---
-title: API 1 - Code ReviewChatBot
+title: CRC API
 description: API Specification from openapi.yml
 hide_table_of_contents: true
 sidebar_position: 4 
