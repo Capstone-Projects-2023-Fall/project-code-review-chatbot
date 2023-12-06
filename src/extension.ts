@@ -804,7 +804,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 
-		if (this._view && useWebView === false) {
+		if (this._view) {
 			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
