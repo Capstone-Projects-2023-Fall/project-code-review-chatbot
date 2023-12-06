@@ -90,6 +90,7 @@ body {
   .enter_button {
     background-color: #1c9bef;
     color: #fff;
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
+    border-radius: 0.5em;
   }
