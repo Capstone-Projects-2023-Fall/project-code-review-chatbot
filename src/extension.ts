@@ -172,6 +172,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		//set its HTML content
 		currentView.webview.html = getWebviewHtml(currentView,context);
 
+		//check if the user has logged in or not here
+		
+
 		currentView.webview.onDidReceiveMessage(async message => {
 			const prompt = message.text;
 			
@@ -179,7 +182,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const response = provider.search(prompt,true,false,false);
 
 			//send it back to the js and update the view
-			currentView?.webview.postMessage({text: response});
+			currentView?.webview.postMessage({command:'message',text: response});
 		}),
 
 		// Reset when the current panel is closed
