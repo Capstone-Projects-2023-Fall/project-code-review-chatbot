@@ -1,99 +1,92 @@
 ---
-title: Design API Intro 
-description: Design API Intro
+title: CRC API Introduction
+description: API Introduction
 hide_table_of_contents: true
 sidebar_position: 3  
 ---
 
-## switch
-* Class Purpose: This class starts the extension or turns it off.
- *Data Fields:
-  * ApiKey
-     * Type: string
-     * Purpose: Store the API key 
-* methods:
+### API Documentation
 
-  **activate()**
-  
-    * Purpose: Activates extension for the user.
-    * pre-condition: Vailded user.
-    * post-condition: None.
-    * Parameters: ApiKey 
-    * Exceptions Thrown: If the extension did not start
+#### **1. Email Verification Routes**
 
-  **deactivate()**
-  
-    * Purpose: Deactivate extension for the user.
-    * pre-condition: It has already started.
-    * post-condition: None.
-    * Parameters: context –> The extension's context.
-    * Exceptions Thrown: If the extension did not end.
+- **Route:** `/email/verify`
+  - **Method:** GET
+  - **Purpose:** Returns the email verification view.
+  - **Pre-condition:** User must be authenticated.
+  - **Post-condition:** Email verification view is returned.
+  - **Responses:**
+    - **200:** Email verification view returned.
+    - **401:** Unauthorized.
 
-## Setting
-* Class Purpose: This class allows the users to change the setting to their own needs.
-* Data Fields:
-   * setting
-      * Type: JSON
-      * Purpose: Display all the current settings of the application
+- **Route:** `/email/verify/{id}/{hash}`
+  - **Method:** GET
+  - **Purpose:** Verifies the user's email.
+  - **Parameters:**
+    - **id:** string (path parameter)
+    - **hash:** string (path parameter)
+  - **Pre-condition:** User must be authenticated and URL must be signed.
+  - **Post-condition:** Redirects to dashboard upon successful verification.
+  - **Responses:**
+    - **302:** Redirect to dashboard.
+    - **401:** Unauthorized.
 
-* methods:
+- **Route:** `/email/verification-notification`
+  - **Method:** POST
+  - **Purpose:** Sends a new email verification notification.
+  - **Pre-condition:** User must be authenticated and request rate limited.
+  - **Post-condition:** Verification link is sent to user.
+  - **Responses:**
+    - **200:** Verification link sent.
+    - **401:** Unauthorized.
 
-   **getSettings()**
-  
-    * Purpose: get the current setting for the user.
-    * pre-condition: Vailded user.
-    * post-condition: None.
-    * Parameters: None.
-    * Exceptions Thrown: None.
+#### **2. Authentication and User Management Routes**
 
-    **setSettings()**
-  
-    * Purpose: apply changes to the current setting for the user.
-    * pre-condition: Vailded user.
-    * post-condition: None.
-    * Parameters: None.
-    * Exceptions Thrown: None.
+- **Route:** `/log`
+  - **Method:** POST
+  - **Purpose:** Endpoint to log data.
+  - **Post-condition:** Data is logged.
+  - **Responses:**
+    - **200:** Data logged successfully.
 
-## ChatGPTHandler
-* Class Purpose: This class will handle generating the web view from chatGPT
-* Data Fields:
-   * responseFromChatGPT
-    * Type: String.
-    * Purpose: Store the input from ChatGpt.
-      
-* methods:
-  
-  **_getHtmlForWebview()**
-  
-    * Purpose: generate web view from the GPT response.
-    * pre-condition: Vaild input.
-    * post-condition: None.
-    * Parameters: None.
-    * Exceptions Thrown: Null input from ChatGPT
-    * Return Valid: HTML web view.
- 
-## Search
-* Class Purpose: This class will provide the capability for the user to type in questions to search.
-* Data Fields:
-  * inputForChatGPT
-   * Type: String.
-   * Purpose: Store the input from the user.
- 
-* methods:
-  
-  **search()**
-  
-    * Purpose: provide the ability for the user to type in whatever they want into the ChatGPT.
-    * pre-condition: Vaild input.
-    * post-condition: None.
-    * Parameters: None.
-    * Exceptions Thrown: Null input from the user.
-    * Return Valid: Response from the ChatGPT.
-      
-   **resetConversation()**
-  
-    * Purpose: provide the ability for the user to erase the previous conversation.
-    * pre-condition: If there were any data.
-    * post-condition: None.
-    * Parameters: None.
-    * Exceptions Thrown: If there weren't any data to delete.
+- **Route:** `/login`
+  - **Method:** POST
+  - **Purpose:** Endpoint for user login.
+  - **Post-condition:** User is logged in.
+  - **Responses:**
+    - **200:** Login successful.
+    - **401:** Unauthorized.
+
+- **Route:** `/register`
+  - **Method:** POST
+  - **Purpose:** Endpoint for user registration.
+  - **Post-condition:** User is registered.
+  - **Responses:**
+    - **200:** Registration successful.
+    - **401:** Unauthorized.
+
+- **Route:** `/details`
+  - **Method:** POST
+  - **Purpose:** Returns user details.
+  - **Pre-condition:** User must be authenticated with API key.
+  - **Post-condition:** User details are returned.
+  - **Responses:**
+    - **200:** User details returned.
+    - **401:** Unauthorized.
+
+- **Route:** `/user`
+  - **Method:** GET
+  - **Purpose:** Returns the authenticated user's details.
+  - **Pre-condition:** User must be authenticated with Sanctum.
+  - **Post-condition:** User details are returned.
+  - **Responses:**
+    - **200:** User details returned.
+    - **401:** Unauthorized.
+
+- **Route:** `/userinfo`
+  - **Method:** GET
+  - **Purpose:** Returns information of the authenticated user.
+  - **Pre-condition:** User must be authenticated with Sanctum.
+  - **Post-condition:** User info is returned.
+  - **Responses:**
+    - **200:** User info returned.
+    - **401:** Unauthorized.
