@@ -51,6 +51,17 @@ function updateHtmlFromGPT(message){
     chatMessages.innerHTML += createChatMessageElement(messageGPT);
 }
 
+function askUserToSignIn(){
+    const response = "We have detected that you have not sign in yet, in order to use our service you must sign in. To sign in, click the ChatGPT icon on your left side of screen then click the learn more button";
+
+    const messageGPT={
+        sender : 'ChatGPT',
+        text: response,
+    };
+
+    chatMessages.innerHTML += createChatMessageElement(messageGPT);
+}
+
 window.addEventListener('message', event => {
     const message = event.data;
 
@@ -58,7 +69,11 @@ window.addEventListener('message', event => {
         case "message":
             updateHtmlFromGPT(message.text);
             break;
+        case "alert":
+            askUserToSignIn();
+            break;
     }
+
 });
 
 //waiting for the user to click the send button

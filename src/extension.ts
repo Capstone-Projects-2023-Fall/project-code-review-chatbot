@@ -159,7 +159,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			{
 				enableScripts: true
 			});
-			
+
 		//set its HTML content
 		currentView.webview.html = getWebviewHtml(currentView,context);
 		}
@@ -171,21 +171,30 @@ export async function activate(context: vscode.ExtensionContext) {
 				context.extensionUri
 			]
 		};
-		
-		
 
-		//check if the user has logged in or not here
 		
-
 		currentView.webview.onDidReceiveMessage(async message => {
 			const prompt = message.text;
 			
-			//search it get the result
-			//const response = provider.search(prompt,true,false,false);
+			//check if the user has logged in or not here
+			if(currentServerToken === undefined){
 
-			//send it back to the js and update the view
-			currentView?.webview.postMessage({command:'message',text: prompt});
-		}),
+				const response = provider.search(prompt,true,false,false);
+				
+				//send it back to the js and update the view
+				currentView?.webview.postMessage({command:'message',text: response});
+			}
+			else
+			{
+				//ask the user to sign in
+				currentView?.webview.postMessage({
+					command:'alert',
+					text: 'We have detected that you have not sign in yet, in order to use our service you must sign in. To sign in '
+				});
+			}
+		});
+		
+		
 
 		// Reset when the current panel is closed
 		currentView.onDidDispose(
@@ -783,7 +792,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 
 
-		if (this._view) {
+		if (this._view && useWebView === false) {
 			const loadingImage = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'extensionIcon.png'));
 			this._view?.webview.postMessage({ type: 'loadResponse', value: loadingImage.toString() });
 		}
