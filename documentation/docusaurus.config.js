@@ -10,7 +10,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
  */
 
 
-const logo = 'https://i.postimg.cc/mDqhQvWR/logo.jpg';
+const logo = 'https://i.postimg.cc/W1svWsV8/logo.jpg';
 
 const main_template_jira_scripts = () => {
   if (process.env.ORG_NAME === 'ApplebaumIan'){
