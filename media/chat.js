@@ -52,7 +52,7 @@ function updateHtmlFromGPT(message){
 }
 
 function askUserToSignIn(){
-    const response = "We have detected that you have not sign in yet, in order to use our service you must sign in.<br> A sign in window prompt will appear shortly";
+    const response = "We have detected that you have not sign in yet, in order to use our service you must sign in.<br> A sign-in window prompt will appear shortly";
 
     const messageGPT={
         sender : 'ChatGPT',

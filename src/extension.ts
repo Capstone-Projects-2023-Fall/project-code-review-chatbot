@@ -174,10 +174,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		//when the js file sends a message back
 		currentView.webview.onDidReceiveMessage(async message => {
-			const prompt = message.text;
-			
 			//check if the user has logged in or not here
 			if(currentServerToken){
+				//get the prompt from user
+				const prompt = message.text;
 				const response = provider.search(prompt,true,false,false);
 				
 				//send it back to the js and update the view
@@ -189,7 +189,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				currentView?.webview.postMessage({
 					command:'alert'
 				});
-
+				
 				//The sign in window will appear
 				currentServerToken = await getAuthSession(true);
 			}
