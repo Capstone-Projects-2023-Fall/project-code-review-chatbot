@@ -52,7 +52,7 @@ function updateHtmlFromGPT(message){
 }
 
 function askUserToSignIn(){
-    const response = "We have detected that you have not sign in yet, in order to use our service you must sign in. To sign in, click the ChatGPT icon on your left side of screen then click the learn more button";
+    const response = "We have detected that you have not sign in yet, in order to use our service you must sign in.<br> A sign in window prompt will appear shortly";
 
     const messageGPT={
         sender : 'ChatGPT',
@@ -73,7 +73,6 @@ window.addEventListener('message', event => {
             askUserToSignIn();
             break;
     }
-
 });
 
 //waiting for the user to click the send button

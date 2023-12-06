@@ -160,8 +160,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				enableScripts: true
 			});
 
-		//set its HTML content
-		currentView.webview.html = getWebviewHtml(currentView,context);
+			//set its HTML content
+			currentView.webview.html = getWebviewHtml(currentView,context);
 		}
 
 		// set options for the webview, allow scripts
@@ -177,7 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = message.text;
 			
 			//check if the user has logged in or not here
-			if(currentServerToken === undefined){
+			if(currentServerToken){
 				const response = provider.search(prompt,true,false,false);
 				
 				//send it back to the js and update the view
@@ -185,16 +185,16 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 			else
 			{
-				//ask the user to sign in
+				//send an alert back to the js file to tell ask the user to sign in 
 				currentView?.webview.postMessage({
-					command:'alert',
-					text: 'We have detected that you have not sign in yet, in order to use our service you must sign in. To sign in '
+					command:'alert'
 				});
+
+				//The sign in window will appear
+				currentServerToken = await getAuthSession(true);
 			}
 		});
 		
-		
-
 		// Reset when the current panel is closed
 		currentView.onDidDispose(
 		() => {
