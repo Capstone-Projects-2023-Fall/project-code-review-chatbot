@@ -6,6 +6,8 @@ const chatInput = document.querySelector('.user_input');
 //getting the Vscode API
 const vscode = acquireVsCodeApi();
 
+
+
 const createChatMessageElement = (message) => 
 `
     <div class="message message_${message.sender === 'User' ? 'user' : 'ChatGPT'}">
@@ -62,6 +64,10 @@ function askUserToSignIn(){
     chatMessages.innerHTML += createChatMessageElement(messageGPT);
 }
 
+function restoreHmtl(){
+
+}
+
 window.addEventListener('message', event => {
     const message = event.data;
 
@@ -72,8 +78,14 @@ window.addEventListener('message', event => {
         case "alert":
             askUserToSignIn();
             break;
+        case "restore":
+            //TODO : restore the content
+            break;
     }
+
 });
+
+
 
 //waiting for the user to click the send button
 chatInputForm.addEventListener('submit',sendMessage);

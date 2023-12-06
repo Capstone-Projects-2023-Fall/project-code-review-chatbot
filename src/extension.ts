@@ -185,7 +185,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				//get the prompt from user
 				const prompt = message.text;
 
-				const response = await provider.search(prompt,false,false,true);
+				const response = await provider.search(prompt,false,false);
 				
 				//send it back to the js and update the view
 				currentView?.webview.postMessage({command:'message',text: response});
@@ -741,7 +741,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 
-	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false, useWebView : boolean = false) {
+	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false) {
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
