@@ -24,25 +24,23 @@ const sendMessage = (e) =>{
         text:chatInput.value,
     };
 
-    //update the html when the user enters
-    chatMessages.innerHTML += createChatMessageElement(messageUser);
+    //check for empty enter
+    if(messageUser.text !== undefined && messageUser.text !== ''){
+        //update the html when the user enters
+        chatMessages.innerHTML += createChatMessageElement(messageUser);
+        
+        //send a message to the extension
+        vscode.postMessage({
+            command: 'message',
+            text: chatInput.value,
+        });
     
-    //send a message to the extension
-    vscode.postMessage({
-        command: 'message',
-        text: chatInput.value,
-    });
-
-    //auto clear the input box
-    chatInputForm.reset();
+        //clear the input box
+        chatInputForm.reset();
+    }
 };
 
-window.addEventListener('message', event => {
-    const message = event.data;
-    receiveMessage(message.text);
-});
-
-function receiveMessage(message){
+function updateHtmlFromGPT(message){
     //get the GPT responce set up
     const messageGPT={
         sender : 'ChatGPT',
@@ -52,6 +50,16 @@ function receiveMessage(message){
     //update the html when the ChatGPT response back
     chatMessages.innerHTML += createChatMessageElement(messageGPT);
 }
+
+window.addEventListener('message', event => {
+    const message = event.data;
+
+    switch (message.command) {
+        case "message":
+            updateHtmlFromGPT(message.text);
+            break;
+    }
+});
 
 //waiting for the user to click the send button
 chatInputForm.addEventListener('submit',sendMessage);

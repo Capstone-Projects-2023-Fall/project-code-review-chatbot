@@ -158,8 +158,11 @@ export async function activate(context: vscode.ExtensionContext) {
 			columnToShowIn || vscode.ViewColumn.One,
 			{
 				enableScripts: true
-			}
-		);}
+			});
+			
+		//set its HTML content
+		currentView.webview.html = getWebviewHtml(currentView,context);
+		}
 
 		// set options for the webview, allow scripts
 		currentView.webview.options = {
@@ -169,8 +172,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			]
 		};
 		
-		//set its HTML content
-		currentView.webview.html = getWebviewHtml(currentView,context);
+		
 
 		//check if the user has logged in or not here
 		
@@ -179,10 +181,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = message.text;
 			
 			//search it get the result
-			const response = provider.search(prompt,true,false,false);
+			//const response = provider.search(prompt,true,false,false);
 
 			//send it back to the js and update the view
-			currentView?.webview.postMessage({command:'message',text: response});
+			currentView?.webview.postMessage({command:'message',text: prompt});
 		}),
 
 		// Reset when the current panel is closed
