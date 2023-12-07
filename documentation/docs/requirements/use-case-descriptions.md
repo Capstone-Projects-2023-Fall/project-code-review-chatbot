@@ -77,3 +77,13 @@ As a temple student, a long-term user of the extension. They wanted to do a revi
 5. Click the ChatGPT: Legibiliity Suggestions.
 6. Then the extension would print out all the suggestions that they can make to the given code.
 
+### **Case 9:**
+The user wants an instance of ChatGPT in their vs code. So they don't have to go out of vs code to talk to chatGPT.
+
+1. start VS code
+2. log in to the server if they haven't.
+3. Right-click any open window, or type in the command palette: chatgpt.start.
+4. Then a window will persist in the vs code tab until the user decides to close it.
+5. Then the user can type in anything that they want to ask chatGPT.
+6. Once they hit enter or click the submit button, the entry will be sent to the server API.
+
