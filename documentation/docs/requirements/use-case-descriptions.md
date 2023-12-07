@@ -66,3 +66,14 @@ As a temple student, a long-term user of the extension. They wanted to do a writ
 3. Select the code where the user wants to write the test.
 4. Right-click then click ChatGPT.TestSuggestions.
 5. The extension will show all the functions to which they can add the test in.
+
+### **Case 8:**
+As a temple student, a long-term user of the extension. They wanted to do a review of the code to make it less complex, but they had no idea where to start.
+
+1. Start Vscode
+2. select the code that the user wants to review.
+3. Log in if they haven't.
+4. Then right-click the selected code.
+5. Click the ChatGPT: Legibiliity Suggestions.
+6. Then the extension would print out all the suggestions that they can make to the given code.
+
