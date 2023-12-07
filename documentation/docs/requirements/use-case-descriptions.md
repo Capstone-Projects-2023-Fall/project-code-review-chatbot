@@ -4,9 +4,6 @@ sidebar_position: 5
 
 # Use-case descriptions
 
-
-## Use Cases
-
 ### **Case 1:**
 As a temple student taking coding classes, I want a convenient way to check their code to see if they did it correctly.
 1. Student wrote some code, which looks reasonable. Then they tried to build it. It failed
