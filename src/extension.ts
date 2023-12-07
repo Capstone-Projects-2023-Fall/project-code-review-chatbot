@@ -473,7 +473,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 	public applyQuickFixes() {
 		const response = this._response;
-		
+		console.log("please work");
 		// eslint-disable-next-line eqeqeq
 		if (response != null) 
 		{
@@ -485,6 +485,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				console.log('Quick Fix Section:', quickFixSection);
 				this.applyFixes(quickFixSection);
 			} else {
+				console.log("Reponse:", response);
 				console.log('Quick Fix section not found in the response.');
 			}
 		}
