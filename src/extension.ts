@@ -11,7 +11,6 @@ import * as mysql from 'mysql2';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
-import { Response } from 'node-fetch';
 
 
 
@@ -35,8 +34,6 @@ var currentServerToken: string;
 
 
 export async function activate(context: vscode.ExtensionContext) {
-
-
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
 			'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
@@ -127,20 +124,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-
-	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
-		console.log("command handler");
-		const config = vscode.workspace.getConfiguration('chatgpt');
-		const prompt = config.get(command) as string;
-	
-		// Check if the command is promptPrefix.quickFix
-		if (command === 'promptPrefix.quickFix') {
-			provider.applyQuickFixes();
-		} else {
-			provider.search(prompt,useEntireFile, isCodeReview);
-		}
-	};
-
 	//it could be define or undefine
 	let currentView: vscode.WebviewPanel | undefined = undefined;
 
@@ -198,17 +181,19 @@ export async function activate(context: vscode.ExtensionContext) {
 				//get the prompt from user
 				const prompt = message.text;
 				const promptToStore = JSON.stringify({command:'user',text: prompt}); //getting ready to be stored
-				const test = JSON.parse(promptToStore);
 				storeChange(promptToStore); //stored
 				
+				//tell the user chatGPT is working on it
+				currentView?.webview.postMessage({command:'tell'});
 				
-				//const response = await provider.search(prompt); //getting the response from ChatGPT
-				//const responseToStore = JSON.stringify({command:'ChatGPT',text: prompt}); //getting ready to be stored
-				//storeChange(responseToStore); //stored
+				const response = await provider.searchForWebView(prompt); //getting the response from ChatGPT
+				const responseToStore = JSON.stringify({command:'ChatGPT',text: response}); //getting ready to be stored
+				storeChange(responseToStore); //stored
+
+				const responseToJsFile = JSON.parse(responseToStore);
 				
 				//send it back to the js and update the view
-				//currentView?.webview.postMessage(test);
-				currentView?.webview.postMessage({command:'ChatGPT',text: prompt});
+				currentView?.webview.postMessage(responseToJsFile);
 			}
 			else
 			{
@@ -231,7 +216,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				let sendMessage : string;
 				for(let i = 0; messageStorage.length; i++){
 					message = messageStorage[i];
-					const sendMessage = JSON.parse(message);
+					sendMessage = JSON.parse(message);
 
 					currentView?.webview.postMessage(sendMessage);
 				}
@@ -250,7 +235,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		context.subscriptions);
 		})
 	);
+
+
+	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
+		console.log("command handler");
+		const config = vscode.workspace.getConfiguration('chatgpt');
+		const prompt = config.get(command) as string;
 	
+		// Check if the command is promptPrefix.quickFix
+		if (command === 'promptPrefix.quickFix') {
+			provider.applyQuickFixes();
+		} else {
+			provider.search(prompt, useEntireFile, isCodeReview);
+		}
+	};
+
+	
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () =>
 			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
@@ -282,7 +283,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const prompt = `${promptPrefix} ${issueTitle}`;
 
 			// Pass the modified prompt to the search function
-			provider.search(prompt,true, false);
+			provider.search(prompt, true, false);
 		})
 
 
@@ -419,39 +420,39 @@ function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.Extensi
 	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style2.css'));
 
 	return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.5">
-				<title>Chat Bot</title>	
-				<link rel="stylesheet" href="${cssUri}">
-			</head>
-			<body>
-				<div class="chatbox">
-					<div class="chatbox_header">
-						<div class="chatbox_content">
-							<h2>Code Review Chat Bot</h2>
-						</div>
-					</div>
-
-					<div class="chat-messages">
-						<div class="message message_ChatGPT">
-							<div class="message-sender">Chat Bot</div>
-							<div class="message-text">How can I help you today?</div>
-						</div>		
-					</div>
-
-					
-					<form class="chat_input_form">
-						<input class ="user_input" type="text" placeholder="Write a message">
-						<button type='submit' class="button enter_button">Send</button>
-					</form>
-				
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.5">
+		<title>Chat Bot</title>	
+		<link rel="stylesheet" href="${cssUri}">
+	</head>
+	<body>
+		<div class="chatbox">
+			<div class="chatbox_header">
+				<div class="chatbox_content">
+					<h2>Code Review Chat Bot</h2>
 				</div>
+			</div>
 
-				<script src="${scriptUri}"></script>
-			</body>
-		</html>`;
+			<div class="chat-messages">
+				<div class="message message_ChatGPT">
+					<div class="message-sender">Chat Bot</div>
+					<div class="message-text">How can I help you today?</div>
+				</div>		
+			</div>
+
+			
+			<form class="chat_input_form">
+				<input class ="user_input" type="text" placeholder="Write a message">
+				<button type='submit' class="button enter_button">Send</button>
+			</form>
+		
+		</div>
+
+		<script src="${scriptUri}"></script>
+	</body>
+</html>`;
 }
 
 async function query(log: string, platform: string, gitdiff?: string, hash?: string, user?: string, email?: string){
@@ -788,8 +789,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			this._newAPI();
 		}
 
-		
-		if(!this._view) {
+		// focus gpt activity from activity bar
+		if (!this._view) {
 			await vscode.commands.executeCommand('chatgpt.chatView.focus');
 		} else {
 			this._view?.show?.(true);
@@ -850,6 +851,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
+
 				if (!currentServerToken) {
 					currentServerToken = await getAuthSession(true);
 				}
@@ -894,8 +896,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
-
-			return response;
 		}
 		else {
 			if (!this._chatGPTAPI) {
@@ -964,8 +964,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					}
 				}
 				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
-
-				return response;
 			}
 		}
 
@@ -1081,8 +1079,75 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			</body>
 			</html>`;
 	}
+
+	//From the webview the only API it can use is the server API
+	public async searchForWebView(prompt: string) {
+		this._prompt = prompt;
+		
+		// Check if the ChatGPTAPI instance is defined
+		if (!this._chatGPTAPI && !this._settings.useServerApi) {
+			this._newAPI();
+		}
+
+		let response = '';
+		this._response = '';
+
+		// Get the language id of the selected text of the active editor
+		// If a user does not want to append this information to their prompt, leave it as an empty string
+		const languageId = (this._settings.codeblockWithLanguageId ? vscode.window.activeTextEditor?.document?.languageId : undefined) || "";
+		let searchPrompt = prompt;
+
+		// Increment the message number
+		this._currentMessageNumber++;
+		let currentMessageNumber = this._currentMessageNumber;
+
+		// Send the search prompt to the ChatGPTAPI instance and store the response
+		if (this._settings.useServerApi){
+			platform = 'Server API';
+			try {
+				// Send the search prompt to the ChatGPTAPI instance and store the response
+				if (!currentServerToken) {
+					currentServerToken = await getAuthSession(true);
+				}
+
+				const config = {
+					headers: { authorization: `Bearer ${currentServerToken}`}
+				};
+
+				const res =
+					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
+					{prompt: searchPrompt, model: this._settings.model},
+					config
+				);
+
+					query('Received Prompt: ' + searchPrompt, platform, undefined, undefined, user, email);
+
+				if (this._currentMessageNumber !== currentMessageNumber) {
+					return;
+				}
+
+				response = res.data.text;
+				
+				if (res.data.detail?.usage?.total_tokens) {
+					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
+				}
+
+				if (this._settings.keepConversation) {
+					this._conversation = {
+						parentMessageId: res.data.id
+					};
+				}
+			} catch (e: any) {
+				console.error(e);
+				if (this._currentMessageNumber === currentMessageNumber) {
+						response = this._response;
+						response += `\n\n---\n[ERROR] ${e}`;
+					}
+				}
+			}
+			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
+			return response;
+	}
 }
-
-
 
 export function deactivate() {}

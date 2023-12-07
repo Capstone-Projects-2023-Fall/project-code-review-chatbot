@@ -78,21 +78,37 @@ function askUserToSignIn(){
     chatMessages.innerHTML += createChatMessageElement(messageGPT);
 }
 
+function feedbackTOUser(response){
+    const responseToUser = response;
+
+    const messageGPT={
+        sender : 'ChatGPT',
+        text: responseToUser,
+    };
+
+    chatMessages.innerHTML += createChatMessageElement(messageGPT);
+}
+
 function restoreHmtl(){
 
 }
 
 window.addEventListener('message', event => {
     const message = event.data;
+    const messageToUser ="ChatGPT response will appear shortly";
+    const messageToUserAlert = "We have detected that you have not sign in yet, in order to use our service you must sign in.<br> A sign-in window prompt will appear shortly";
     switch (message.command) {
         case "ChatGPT":
             updateHtmlFromExtension(message.text,'ChatGPT');
             break;
         case "alert":
-            askUserToSignIn();
+            feedbackTOUser(messageToUserAlert);
             break;
         case "user":
             updateHtmlFromExtension(message.text,'user');
+            break;
+        case "tell":
+            feedbackTOUser(messageToUser);
             break;
     }
 });
