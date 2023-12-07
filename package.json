@@ -93,10 +93,6 @@
         "title": "Retry ChatGPT request"
       },
       {
-        "command": "chatgpt.learnMore",
-        "title": "Learn More"
-      },
-      {
         "command": "chatgpt.findIssue",
         "title": "Find Issue"
       }
@@ -285,23 +281,17 @@
           "description": "The prompt prefix used for the bot to suggest ways to improve legibility and make code less complex.",
           "order": 15
         },
-        "chatgpt.promptPrefix.learnMore": {
-          "type": "string",
-          "default": "Would like to learn More about the previous suggestion.",
-          "description": "LearnMore function for the responses",
-          "order": 16
-        },
         "chatgpt.promptPrefix.quickFix": {
           "type": "string",
           "default": "Look for basic errors in the code such as missing semicolons and misspelled variables. Explain where these errors are in the code and how you would fix them.",
           "description": "Search for simple areas in the code that can be easily modified.",
-          "order": 17
+          "order": 16
         },
         "chatgpt.promptPrefix.findIssue": {
           "type": "string",
           "default": "Show me all of the code snippets where you identified this issue within your code review:",
           "description": "The prompt prefix used for the bot to show the user where code improvments can be made.",
-          "order": 18
+          "order": 17
         }
       }
     }

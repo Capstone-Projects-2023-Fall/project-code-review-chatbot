@@ -7,6 +7,7 @@
   let response = '';
 
   document.getElementById('learn-more-button').addEventListener('click', () => {
+    event.stopPropagation(); 
     vscode.postMessage({
       type: 'learnMore'
     });
