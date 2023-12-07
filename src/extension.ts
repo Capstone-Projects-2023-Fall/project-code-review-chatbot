@@ -901,11 +901,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
 					if(e = "Request failed with status code 500"){
-						response = "The LearnMore & Searchbar Ask can only be used after code review related commands.";
+						response = "Error. Check The Status of Your OPEN API TOKEN";
 
 					}else{
 						response = this._response;
-						response += `\n\n---\n[ERROR] ${e}`;
+						response += `\n\n---\n[ERROR] ${response}`;
 					}
 				}
 			}
@@ -973,8 +973,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				} catch (e: any) {
 					console.error(e);
 					if (this._currentMessageNumber === currentMessageNumber) {
-						response = this._response;
-						response += `\n\n---\n[ERROR] ${e}`;
+						if(e = "Request failed with status code 500"){
+							response = "Error. Check The Status of Your OPEN API TOKEN";
+	
+						}else{
+							response = this._response;
+							response += `\n\n---\n[ERROR] ${response}`;
+						}
 					}
 				}
 				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
@@ -1155,9 +1160,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
+					if(e = "Request failed with status code 500"){
+						response = "Error. Check The Status of Your OPEN API TOKEN";
+
+					}else{
 						response = this._response;
-						response += `\n\n---\n[ERROR] ${e}`;
+						response += `\n\n---\n[ERROR] ${response}`;
 					}
+				}
 				}
 			}
 			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
