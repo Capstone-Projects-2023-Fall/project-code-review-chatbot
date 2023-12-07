@@ -26,6 +26,13 @@
     });
   });
 
+  document.getElementById('conversationWithChatGPT').addEventListener('click', () => {
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'conversationWithChatGPT'
+    });
+  });
+
   window.addEventListener("message", (event) => {
     const message = event.data;
     switch (message.type) {

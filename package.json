@@ -58,7 +58,7 @@
       },
       {
         "command": "chatgpt.start",
-        "title": "Start a conversation with chatGPT"
+        "title": "ChatGPT: Start a conversation"
       },
       {
         "command": "chatgpt.explain",
@@ -105,6 +105,11 @@
       "editor/context": [
         {
           "command": "chatgpt.ask",
+          "when": "editorTextFocus",
+          "group": "chatgpt-menu-group@1"
+        },
+        {
+          "command": "chatgpt.start",
           "when": "editorTextFocus",
           "group": "chatgpt-menu-group@1"
         },
