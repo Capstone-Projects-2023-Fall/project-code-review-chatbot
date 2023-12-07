@@ -57,5 +57,3 @@ As a temple student, they wanted to figure out what this code does, which they h
 4. Then the server will turn an answer for the given code that they had selected.
 5. The extension displays the explanation in the window.
 6. The user reads it and then can follow along with the code.
-
-
