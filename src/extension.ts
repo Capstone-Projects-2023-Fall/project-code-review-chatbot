@@ -185,17 +185,23 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.ask', () =>
-			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-				.then((value) => {
-					if (value) {
-						provider.search(value);
-					}
-					let log = "Ask Command: " + value ;
-					query(log, platform,undefined,undefined,user,email);
-				})
-		),
-
+		vscode.commands.registerCommand('chatgpt.ask', (searchValue?: string) => {
+			const performSearch = (value?: string) => {
+				if (value) {
+					provider.search(value);
+					let log = "Ask Command: " + value;
+					query(log, platform, undefined, undefined, user, email);
+				}
+			};
+	
+			if (searchValue) {
+				performSearch(searchValue);
+			} else {
+				vscode.window.showInputBox({ prompt: 'What do you want to do?' })
+					.then(performSearch);
+			}
+		}),
+	
 		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
 		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
 		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
@@ -203,23 +209,22 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
 		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
 		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.conversation')),
+		vscode.commands.registerCommand('chatgpt.conversation', () => commandHandler('promptPrefix.conversation')),
 		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
 		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			const promptPrefix = config.get('promptPrefix.findIssue') as string;
 			console.log('Received issueTitle:', issueTitle);
-			query('findIssue :'+ issueTitle, platform,undefined,undefined,user,email);
-
+			query('findIssue :'+ issueTitle, platform, undefined, undefined, user, email);
+	
 			// Modify the prompt to include the issueTitle received from the webview
 			const prompt = `${promptPrefix} ${issueTitle}`;
-
+	
 			// Pass the modified prompt to the search function
 			provider.search(prompt, true, false);
 		})
-
-
 	);
+	
 
 
 	// Change the extension's session token or settings when configuration is changed
@@ -634,10 +639,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						let log = 'Search Command: ' + data.value;
 
 						query(log,platform, undefined, undefined, user, email);
+						break;
 					}
 				case 'learnMore':
-					{
-						vscode.commands.executeCommand("chatgpt.learnMore");
+					{	
+						console.log("learnmore");
+						let searchString = 'Would like to learn More about the previous suggestion.';
+						vscode.commands.executeCommand('chatgpt.ask', searchString);
 						let log = 'Learn More Command Triggered';
 						query(log,platform, undefined, undefined, user, email);
 						break;
