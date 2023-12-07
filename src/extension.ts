@@ -207,7 +207,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				//storeChange(responseToStore); //stored
 				
 				//send it back to the js and update the view
-				currentView?.webview.postMessage(test);
+				//currentView?.webview.postMessage(test);
+				currentView?.webview.postMessage({command:'ChatGPT',text: prompt});
 			}
 			else
 			{
@@ -227,11 +228,12 @@ export async function activate(context: vscode.ExtensionContext) {
 			  const view = e.webviewPanel;
 			  if (view.visible && messageStorage !== undefined) {
 				let message : string;
+				let sendMessage : string;
 				for(let i = 0; messageStorage.length; i++){
 					message = messageStorage[i];
-					const storedMessage = JSON.parse(message);
+					const sendMessage = JSON.parse(message);
 
-					currentView?.webview.postMessage(storedMessage);
+					currentView?.webview.postMessage(sendMessage);
 				}
 			  }
 			},
@@ -249,9 +251,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	);
 	
-
-	
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.ask', () =>
 			vscode.window.showInputBox({ prompt: 'What do you want to do?' })

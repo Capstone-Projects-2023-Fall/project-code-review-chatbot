@@ -43,7 +43,7 @@ const sendMessage = (e) =>{
 };
 
 function updateHtmlFromExtension(message,sender){
-    if(sender = 'ChatGPT')
+    if(sender === 'ChatGPT')
     {
         //get the GPT responce set up
         const messageResponse={
@@ -63,7 +63,7 @@ function updateHtmlFromExtension(message,sender){
         };
 
         //update the html when the ChatGPT response back
-    chatMessages.innerHTML += createChatMessageElement(messageResponse);
+        chatMessages.innerHTML += createChatMessageElement(messageResponse);
     }
 }
 
