@@ -57,3 +57,12 @@ As a temple student, they wanted to figure out what this code does, which they h
 4. Then the server will turn an answer for the given code that they had selected.
 5. The extension displays the explanation in the window.
 6. The user reads it and then can follow along with the code.
+
+### **Case 7:**
+As a temple student, a long-term user of the extension. They wanted to do a write some test for the code that they just wrote but they got no idea where to begin.
+
+1. Start Vscode going back to the working environment.
+2. Checking the code out.
+3. Select the code where the user wants to write the test.
+4. Right-click then click ChatGPT.TestSuggestions.
+5. The extension will show all the functions to which they can add the test in.
