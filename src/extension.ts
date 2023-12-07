@@ -725,6 +725,9 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						this.applyQuickFixes();
 						break;
 					}
+				case 'conversationWithChatGPT':{
+
+				}
 				case 'checkboxChange':
 					{
 						let workspacePath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
@@ -758,7 +761,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				case 'conversation' : {
-					vscode.commands.executeCommand('chatgpt.start', data.issueTitle);
+					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
 				}
 			}
 		});
@@ -1073,6 +1076,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="Conversation">Conversation with GPT</button>
 
 				<script src="${scriptUri}"></script>
 		
