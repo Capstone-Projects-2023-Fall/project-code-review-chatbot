@@ -14,6 +14,7 @@
   });*/
 
   document.getElementById('learn-more-button').addEventListener('click', () => {
+    event.stopPropagation(); 
     vscode.postMessage({
       type: 'learnMore'
     });
@@ -30,6 +31,13 @@
     console.log("button clicked in view");
     vscode.postMessage({
       type: 'quickFix'
+    });
+  });
+
+  document.getElementById('conversationWithChatGPT').addEventListener('click', () => {
+    console.log("button clicked in view");
+    vscode.postMessage({
+      type: 'conversationWithChatGPT'
     });
   });
 

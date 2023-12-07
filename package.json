@@ -1,8 +1,8 @@
 {
-  "name": "chatgpt",
+  "name": "CRC-CIS4398-Fall2023",
   "displayName": "Code Review Chatbot",
   "description": "Use ChatGPT and GPT4 right inside the IDE to enhance and automate your coding with AI-powered assistance",
-  "version": "1.1.2",
+  "version": "1.2.1",
   "publisher": "CIS4398",
   "icon": "resources/extensionIcon.png",
   "license": "MIT",
@@ -57,6 +57,10 @@
         "title": "Ask ChatGPT"
       },
       {
+        "command": "chatgpt.start",
+        "title": "ChatGPT: Start a conversation"
+      },
+      {
         "command": "chatgpt.explain",
         "title": "ChatGPT: Explain selection"
       },
@@ -89,10 +93,6 @@
         "title": "Retry ChatGPT request"
       },
       {
-        "command": "chatgpt.learnMore",
-        "title": "Learn More"
-      },
-      {
         "command": "chatgpt.findIssue",
         "title": "Find Issue"
       }
@@ -101,6 +101,11 @@
       "editor/context": [
         {
           "command": "chatgpt.ask",
+          "when": "editorTextFocus",
+          "group": "chatgpt-menu-group@1"
+        },
+        {
+          "command": "chatgpt.start",
           "when": "editorTextFocus",
           "group": "chatgpt-menu-group@1"
         },
@@ -254,7 +259,7 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, Legibility, and a Quick Fix section where we check for ONE LINE errors such as missing semicolons and misspelled variables. The quick fix section must be formatted like this: [Fix 1] Description: Fix the typo in the dequeue function. To Be Replaced: console.log(hi) (put ONLY the entire string of text to be replaced. NO QUOTES unless they are part of the actual text) Suggested Fix: console.log(hi); (put ONLY the text we will be replacing the current text with. NO QUOTES unless they are part of the actual fix.) Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~, ~~~Quick Fix~~~, etc. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'.",
+          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, Legibility, and a Quick Fix section where we check for ONE LINE errors such as missing semicolons and misspelled variables. The quick fix section must be formatted like this: [Fix 1] Description: Fix the typo in the dequeue function. To Be Replaced: console.log(hi) (put ONLY the entire string of text to be replaced. NO QUOTES unless they are part of the actual text) Suggested Fix: console.log(hi); (put ONLY the text we will be replacing the current text with. NO QUOTES unless they are part of the actual fix.). Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~, ~~~Quick Fix~~~, etc. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'. Fianlly at the VERY end of the response AND NO WHERE ELSE, end with 3 dashes exactly like this '---'",
           "description": "Code Review of the whole file.",
           "order": 12
         },
@@ -276,23 +281,17 @@
           "description": "The prompt prefix used for the bot to suggest ways to improve legibility and make code less complex.",
           "order": 15
         },
-        "chatgpt.promptPrefix.learnMore": {
-          "type": "string",
-          "default": "Would like to learn More about the previous suggestion.",
-          "description": "LearnMore function for the responses",
-          "order": 16
-        },
         "chatgpt.promptPrefix.quickFix": {
           "type": "string",
           "default": "Look for basic errors in the code such as missing semicolons and misspelled variables. Explain where these errors are in the code and how you would fix them.",
           "description": "Search for simple areas in the code that can be easily modified.",
-          "order": 17
+          "order": 16
         },
         "chatgpt.promptPrefix.findIssue": {
           "type": "string",
           "default": "Show me all of the code snippets where you identified this issue within your code review:",
           "description": "The prompt prefix used for the bot to show the user where code improvments can be made.",
-          "order": 18
+          "order": 17
         }
       }
     }
@@ -333,6 +332,7 @@
   "dependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/uuid": "^9.0.7",
+    "@vscode/vsce": "^2.22.0",
     "axios": "^1.6.0",
     "chatgpt": "^5.2.5",
     "composer": "^4.1.0",

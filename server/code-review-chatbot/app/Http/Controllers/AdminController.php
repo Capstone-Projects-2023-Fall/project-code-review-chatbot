@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -28,6 +29,22 @@ class AdminController extends Controller
         $sessions = DB::table('sessions')->get(); 
         return view('liveSessions', compact('sessions'));
     }
+
+    public function logs(Request $request)
+    {
+        $search = $request->input('search');
+    
+        $logs = DB::table('log_data')
+            ->when($search, function ($query) use ($search) {
+                return $query->where('logs', 'like', "%{$search}%")
+                             ->orWhere('user', 'like', "%{$search}%");
+            })
+            ->orderBy('timestamp', 'desc')
+            ->get();
+    
+        return view('log', compact('logs'));
+    }
+    
 
     public function destroy($id)
     {

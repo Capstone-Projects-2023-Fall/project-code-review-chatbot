@@ -31,6 +31,8 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
     Route::get('/admin-dashboard/users', [AdminController::class, 'index'])->name('user-list');
     Route::get('/admin-dashboard/live-sessions', [AdminController::class, 'liveSessions'])->name('live-sessions');
+    Route::get('/admin-dashboard/logs', [AdminController::class, 'logs'])->name('logs');
+
 });
 
 Route::delete('/users/{user}', [AdminController::class, 'destroy'])->name('users.destroy');

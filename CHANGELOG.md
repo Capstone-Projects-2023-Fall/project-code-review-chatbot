@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "chatgpt" extension will be documented in this file.
+## [1.2.1] - (2023.12.07)
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- Added Conversation With GPT Feature
+- Fixed Learnmore & Searchbar commands
+- QuickFix changes

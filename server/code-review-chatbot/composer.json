@@ -18,7 +18,9 @@
         "laravel/vapor-ui": "^1.7",
         "livewire/livewire": "^3.0",
         "openai-php/laravel": "^0.7.0",
-        "symfony/mailer": "^6.4"
+        "symfony/http-client": "^7.0",
+        "symfony/mailer": "^6.4",
+        "symfony/mailgun-mailer": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
