@@ -50,5 +50,15 @@ As a temple student, they just downloaded this extension they want to sign up fo
 5. The user types all the information into the box and hits submit.
 6. The website tells the user to verify with their TU email.
 7. The user presses send.
-8. The user went into their TU email account, saw the email and clicked on the link to verify.
+8. The user went into their TU email account, saw the email, and clicked on the link to verify.
+
+### **Case 6:**
+As a temple student, they wanted to figure out what this code does, which they had copied from their professor during class. They had been using this extension for a while now.
+1. The user selects the code that they want to be explained.
+2. Right-click on the vs code window on top of the selected text.
+3. The extension sends the request to the server API.
+4. Then the server will turn an answer for the given code that they had selected.
+5. The extension displays the explanation in the window.
+6. The user reads it and then can follow along with the code.
+
 
