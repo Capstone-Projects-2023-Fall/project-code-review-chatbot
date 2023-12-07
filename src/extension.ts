@@ -144,12 +144,14 @@ export async function activate(context: vscode.ExtensionContext) {
 	//it could be define or undefine
 	let currentView: vscode.WebviewPanel | undefined = undefined;
 
-	//web view
+	//web view - Kroos
 	context.subscriptions.push(
 		vscode.commands.registerCommand('chatgpt.start', () => {
-			const columnToShowIn = vscode.window.activeTextEditor
-			? vscode.window.activeTextEditor.viewColumn
-			: undefined;
+		const columnToShowIn = vscode.window.activeTextEditor
+		? vscode.window.activeTextEditor.viewColumn
+		: undefined;
+
+		let messageStorage: Array<string> | undefined = undefined;
 
 		if (currentView) {
 		// If we already have a panel, show it in the target column
@@ -168,7 +170,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 
 		//set its HTML content
-			currentView.webview.html = getWebviewHtml(currentView,context);
+		currentView.webview.html = getWebviewHtml(currentView,context);
 
 		// set options for the webview, allow scripts
 		currentView.webview.options = {
@@ -184,11 +186,27 @@ export async function activate(context: vscode.ExtensionContext) {
 			if(currentServerToken){
 				//get the prompt from user
 				const prompt = message.text;
+				const promptToStore = {command:'user',text: prompt};
+				
+				const json  = JSON.stringify(promptToStore);
 
-				const response = await provider.search(prompt,false,false);
+				if(messageStorage === undefined){
+					messageStorage = [];
+					messageStorage.push(json);
+				}
+				else{
+					messageStorage.push(json);
+				}
+				
+				const test = messageStorage[0];
+				if( test !==undefined){
+					const parsed = JSON.parse(test);
+					currentView?.webview.postMessage(parsed);
+				}
+				//const response = await provider.search(prompt);
 				
 				//send it back to the js and update the view
-				currentView?.webview.postMessage({command:'message',text: response});
+				
 			}
 			else
 			{
@@ -201,6 +219,18 @@ export async function activate(context: vscode.ExtensionContext) {
 				currentServerToken = await getAuthSession(true);
 			}
 		});
+
+		// Update contents based on view state changes
+		currentView.onDidChangeViewState(
+			e => {
+			  const view = e.webviewPanel;
+			  if (view.visible && messageStorage !== undefined) {
+				// TODO: create a loop then pass it into the JS file
+			  }
+			},
+			null,
+			context.subscriptions
+		);
 		
 		// Reset when the current panel is closed
 		currentView.onDidDispose(

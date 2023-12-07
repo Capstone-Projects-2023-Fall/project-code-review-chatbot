@@ -78,9 +78,6 @@ window.addEventListener('message', event => {
         case "alert":
             askUserToSignIn();
             break;
-        case "restore":
-            //TODO : restore the content
-            break;
     }
 
 });
