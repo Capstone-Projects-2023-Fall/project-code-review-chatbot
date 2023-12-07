@@ -186,7 +186,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if(currentServerToken){
 				//get the prompt from user
 				const prompt = message.text;
-				const promptToStore = {command:'user',text: prompt};
+				const promptToStore = {command:'message',text: prompt};
 				
 				const json  = JSON.stringify(promptToStore);
 
