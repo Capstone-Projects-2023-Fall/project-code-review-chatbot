@@ -42,15 +42,29 @@ const sendMessage = (e) =>{
     }
 };
 
-function updateHtmlFromGPT(message){
-    //get the GPT responce set up
-    const messageGPT={
-        sender : 'ChatGPT',
-        text: message,
-    };
+function updateHtmlFromExtension(message,sender){
+    if(sender = 'ChatGPT')
+    {
+        //get the GPT responce set up
+        const messageResponse={
+            sender : 'ChatGPT',
+            text: message,
+        };
 
-    //update the html when the ChatGPT response back
-    chatMessages.innerHTML += createChatMessageElement(messageGPT);
+        //update the html when the ChatGPT response back
+        chatMessages.innerHTML += createChatMessageElement(messageResponse);
+    }
+    else
+    {
+        //get the user responce set up
+        const messageResponse={
+            sender : 'User',
+            text: message,
+        };
+
+        //update the html when the ChatGPT response back
+    chatMessages.innerHTML += createChatMessageElement(messageResponse);
+    }
 }
 
 function askUserToSignIn(){
@@ -70,16 +84,17 @@ function restoreHmtl(){
 
 window.addEventListener('message', event => {
     const message = event.data;
-
     switch (message.command) {
-        case "message":
-            updateHtmlFromGPT(message.text);
+        case "ChatGPT":
+            updateHtmlFromExtension(message.text,'ChatGPT');
             break;
         case "alert":
             askUserToSignIn();
             break;
+        case "user":
+            updateHtmlFromExtension(message.text,'user');
+            break;
     }
-
 });
 
 

@@ -180,33 +180,34 @@ export async function activate(context: vscode.ExtensionContext) {
 			]
 		};
 
+		//update the JSON array
+		function storeChange(json :string){
+			if(messageStorage === undefined){
+				messageStorage = [];
+				messageStorage.push(json);
+			}
+			else{
+				messageStorage.push(json);
+			}
+		}
+
 		//when the js file sends a message back
 		currentView.webview.onDidReceiveMessage(async message => {
 			//check if the user has logged in or not here
 			if(currentServerToken){
 				//get the prompt from user
 				const prompt = message.text;
-				const promptToStore = {command:'message',text: prompt};
+				const promptToStore = JSON.stringify({command:'user',text: prompt}); //getting ready to be stored
+				const test = JSON.parse(promptToStore);
+				storeChange(promptToStore); //stored
 				
-				const json  = JSON.stringify(promptToStore);
-
-				if(messageStorage === undefined){
-					messageStorage = [];
-					messageStorage.push(json);
-				}
-				else{
-					messageStorage.push(json);
-				}
 				
-				const test = messageStorage[0];
-				if( test !==undefined){
-					const parsed = JSON.parse(test);
-					currentView?.webview.postMessage(parsed);
-				}
-				//const response = await provider.search(prompt);
+				//const response = await provider.search(prompt); //getting the response from ChatGPT
+				//const responseToStore = JSON.stringify({command:'ChatGPT',text: prompt}); //getting ready to be stored
+				//storeChange(responseToStore); //stored
 				
 				//send it back to the js and update the view
-				
+				currentView?.webview.postMessage(test);
 			}
 			else
 			{
@@ -225,7 +226,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			e => {
 			  const view = e.webviewPanel;
 			  if (view.visible && messageStorage !== undefined) {
-				// TODO: create a loop then pass it into the JS file
+				let message : string;
+				for(let i = 0; messageStorage.length; i++){
+					message = messageStorage[i];
+					const storedMessage = JSON.parse(message);
+
+					currentView?.webview.postMessage(storedMessage);
+				}
 			  }
 			},
 			null,
