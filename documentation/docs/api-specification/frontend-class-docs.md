@@ -1,3 +1,10 @@
+---
+title: Front End Class Documentation
+description: Front End Class Documentation
+hide_table_of_contents: true
+sidebar_position: 2
+---
+
 # Frontend Class Documentation
 
 
