@@ -55,7 +55,7 @@ As a temple student, they just downloaded this extension they want to sign up fo
 6. The website tells the user to verify with their TU email.
 7. The user presses send.
 8. The user went into their TU email account, saw the email, and clicked on the link to verify.
-![Uploading image.png…]()
+<img width="855" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/97bf3e79-8740-49ca-ba6d-a48dc5a6785f">
 
 
 ### **Case 5:**
