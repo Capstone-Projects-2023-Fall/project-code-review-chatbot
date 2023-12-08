@@ -1,3 +1,7 @@
+---
+sidebar_position: 5
+---
+
 # Database Diagram
 
 <iframe width="560" height="315" src='https://dbdiagram.io/embed/6511acfaffbf5169f07566e8'> </iframe>
