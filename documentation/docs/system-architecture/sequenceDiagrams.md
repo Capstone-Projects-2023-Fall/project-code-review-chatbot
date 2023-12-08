@@ -42,6 +42,8 @@ As a temple student, he wants quick tools to help him catch small bugs as well a
 6. Then the user was asked if they wanted a review for their code.
 7. The user clicks on Yes, and the extension runs a quick review.
 8. The user is given a list of things that he could improve on.
+   <img width="866" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/e0b1fb28-6b0a-40c7-ab1e-ae5f34831b37">
+
 
 ### **Case 5:**
 As a temple student, they just downloaded this extension they want to sign up for an account.
