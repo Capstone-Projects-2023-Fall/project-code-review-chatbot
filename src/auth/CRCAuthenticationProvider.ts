@@ -5,10 +5,10 @@ import { v4 as uuid } from 'uuid';
 import { PromiseAdapter, promiseFromEvent } from "./util";
 import fetch from 'node-fetch';
 
-export const AUTH_TYPE = `auth0`;
+export const AUTH_TYPE = `CRC`;
 const AUTH_NAME = `Code Review Chatbot Auth`;
-const CLIENT_ID = `3GUryQ7ldAeKEuD2obYnppsnmj58eP5u`;
-const AUTH0_DOMAIN = `https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com`;
+const CLIENT_ID = `cZXtYFnvHlKBnlZUQosEBoeGwPvCU7MA`;
+const CRC_DOMAIN = `https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
 type AuthUserInfo =  { name: string, email: string };
@@ -21,7 +21,7 @@ class UriEventHandler extends EventEmitter<Uri> implements UriHandler {
 	}
 }
 
-export class Auth0AuthenticationProvider implements AuthenticationProvider, Disposable {
+export class CRCAuthenticationProvider implements AuthenticationProvider, Disposable {
 	private _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
   private _disposable: Disposable;
   private _pendingStates: string[] = [];
@@ -79,7 +79,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
     try {
       const token = await this.login(scopes);
       if (!token) {
-        throw new Error(`Auth0 login failure`);
+        throw new Error(`CRC login failure`);
       }
 
       const userinfo : AuthUserInfo = await this.getUserInfo(token);
@@ -140,7 +140,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
   private async login(scopes: string[] = []) {
     return await window.withProgress<string>({
 			location: ProgressLocation.Notification,
-			title: "Signing in to Auth0...",
+			title: "Signing in to CRC...",
 			cancellable: true
 		}, async (_, token) => {
       const stateId = uuid();
@@ -167,7 +167,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
         ['scope', scopes.join(' ')],
         ['prompt', "login"]
       ]);
-      const uri = Uri.parse(`${AUTH0_DOMAIN}/authorize?${searchParams.toString()}`);
+      const uri = Uri.parse(`${CRC_DOMAIN}/authorize?${searchParams.toString()}`);
       await env.openExternal(uri);
 
       let codeExchangePromise = this._codeExchangePromises.get(scopeString);
@@ -191,7 +191,7 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
   }
 
   /**
-   * Handle the redirect to VS Code (after sign in from Auth0)
+   * Handle the redirect to VS Code (after sign in from CRC)
    * @param scopes 
    * @returns 
    */
@@ -221,12 +221,12 @@ export class Auth0AuthenticationProvider implements AuthenticationProvider, Disp
   }
 
   /**
-   * Get the user info from Auth0
+   * Get the user info from CRC
    * @param token 
    * @returns 
    */
   private async getUserInfo(token: string) {
-    const response : any = await fetch(`${AUTH0_DOMAIN}/api/userinfo`, {
+    const response : any = await fetch(`${CRC_DOMAIN}/api/userinfo`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

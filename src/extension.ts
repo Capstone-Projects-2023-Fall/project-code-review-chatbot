@@ -10,7 +10,7 @@ import { resolve } from 'path';
 import * as mysql from 'mysql2';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
+import { CRCAuthenticationProvider } from './auth/CRCAuthenticationProvider';
 
 
 
@@ -141,9 +141,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 
-	//auth0 setup
+	//CRC setup
 	context.subscriptions.push(
-		new Auth0AuthenticationProvider(context)
+		new CRCAuthenticationProvider(context)
 	);
 
 	currentServerToken = await getAuthSession(false);
@@ -162,7 +162,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.authentication.onDidChangeSessions(async e => {
 			console.log(e);
-			if (e.provider.id === "auth0") {
+			if (e.provider.id === "CRC") {
 				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
 			}
 		})
@@ -301,7 +301,7 @@ async function pollForNewCommits() {
 }
 
 const getAuthSession = async (useServerApi: boolean) => {
-	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
+	const session = await vscode.authentication.getSession("CRC", ['profile'], { createIfNone: useServerApi });
 	if (session) {
 		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
 		user = JSON.stringify(session.account.label).replace(/[^a-zA-Z ]/g, '');
@@ -712,6 +712,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		if (!prompt) {
 			prompt = '';
 		};
+
+		//const sessions = await vscode.authentication.getSession("GitHub", ['repo', 'workflow', 'user:email', 'read:user']);
 
 		// Check if the ChatGPTAPI instance is defined
 		if (!this._chatGPTAPI && !this._settings.useServerApi) {
