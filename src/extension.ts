@@ -354,47 +354,8 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
 	setupPreCommitHookIfNecessary();
-	
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.ask', () =>
-			vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-				.then((value) => {
-					if (value) {
-						provider.search(value);
-					}
-					let log = "Ask Command: " + value ;
-					query(log, platform,undefined,undefined,user,email);
-				})
-		),
-
-		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
-		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
-		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
-		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
-		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
-		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
-		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
-		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.conversation')),
-		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
-		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			const promptPrefix = config.get('promptPrefix.findIssue') as string;
-			console.log('Received issueTitle:', issueTitle);
-			query('findIssue :'+ issueTitle, platform,undefined,undefined,user,email);
-
-			// Modify the prompt to include the issueTitle received from the webview
-			const prompt = `${promptPrefix} ${issueTitle}`;
-
-			// Pass the modified prompt to the search function
-			provider.search(prompt, true, false);
-		})
 
 
-	);
-
-
-	
 
 	
 	
@@ -955,8 +916,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				if (this._currentMessageNumber === currentMessageNumber) {
 					if(e.message === "Request failed with status code 500"){
 						response = "Error. Check The Status of Your OPEN API TOKEN";
-
-					}else{
+					
+					} 
+					else if (e.message === "User did not consent to login.") {
+						response = 'Error. You must sign into CRC or provide an API Token in the settings.';
+					} 
+					else {
 						response = this._response;
 						response += `\n\n---\n[ERROR] ${response}`;
 					}
@@ -1179,12 +1144,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
-				if (!currentServerToken) {
-					currentServerToken = await getAuthSession(true);
+				if (!this._settings.serverApiToken || this._settings.serverApiToken === '') {
+					this._settings.serverApiToken = await getAuthSession(true);
 				}
 
 				const config = {
-					headers: { authorization: `Bearer ${currentServerToken}`}
+					headers: { authorization: `Bearer ${this._settings.serverApiToken}`}
 				};
 
 				const res =
