@@ -1,4 +1,8 @@
-# Class Diagram
+---
+sidebar_position: 3
+---
+
+# CRC Extension Class Diagram
 
 ![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/main/documentation/static/img/ClassDiagram.png)
 

@@ -33,50 +33,6 @@ const BASE_URL = 'https://api.openai.com/v1';
 
 
 export async function activate(context: vscode.ExtensionContext) {
-
-	//it could be define or undefine
-	let currentView: vscode.WebviewPanel | undefined = undefined;
-
-	//web view
-	context.subscriptions.push(
-		vscode.commands.registerCommand('chatgpt.start', () => {
-			const columnToShowIn = vscode.window.activeTextEditor
-			? vscode.window.activeTextEditor.viewColumn
-			: undefined;
-	
-		if (currentView) {
-		// If we already have a panel, show it in the target column
-		currentView.reveal(columnToShowIn);
-		} else {
-		// Otherwise, create a new panel
-		currentView = vscode.window.createWebviewPanel(
-			'code review chat bot',
-			'Chat bot',
-			columnToShowIn || vscode.ViewColumn.One,
-			{}
-		);}
-
-		// set options for the webview, allow scripts
-		currentView.webview.options = {
-			enableScripts: true,
-			localResourceRoots: [
-				context.extensionUri
-			]
-		};
-		
-		//set its HTML content
-		currentView.webview.html = getWebviewHtml(currentView,context);
-
-		// Reset when the current panel is closed
-		currentView.onDidDispose(
-		() => {
-			currentView = undefined;
-		},
-		null,
-		context.subscriptions);
-		})
-	);
-
 	let disposable = vscode.commands.registerCommand('chatgpt.enablePreCommitHook', async () => {
 		const userApproval = await vscode.window.showInformationMessage(
 			'This extension requires a pre-commit hook to function properly. Do you allow the extension to set it up for you?',
@@ -174,6 +130,118 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
+	//it could be define or undefine
+	let currentView: vscode.WebviewPanel | undefined = undefined;
+
+	//web view - Kroos
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.start', () => {
+		const columnToShowIn = vscode.window.activeTextEditor
+		? vscode.window.activeTextEditor.viewColumn
+		: undefined;
+
+		let messageStorage: Array<string> | undefined = undefined;
+
+		if (currentView) {
+		// If we already have a panel, show it in the target column
+		currentView.reveal(columnToShowIn);
+		} else {
+		// Otherwise, create a new panel
+		currentView = vscode.window.createWebviewPanel(
+			'code review chat bot',
+			'code review chat bot',
+			columnToShowIn || vscode.ViewColumn.One,
+			{
+				enableScripts: true
+			});
+
+			
+		}
+
+		//set its HTML content
+		currentView.webview.html = getWebviewHtml(currentView,context);
+
+		// set options for the webview, allow scripts
+		currentView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [
+				context.extensionUri
+			]
+		};
+
+		//update the JSON array
+		function storeChange(json :string){
+			if(messageStorage === undefined){
+				messageStorage = [];
+				messageStorage.push(json);
+			}
+			else{
+				messageStorage.push(json);
+			}
+		}
+
+		//when the js file sends a message back
+		currentView.webview.onDidReceiveMessage(async message => {
+			//check if the user has logged in or not here
+			if(currentServerToken){
+				//get the prompt from user
+				const prompt = message.text;
+				const promptToStore = JSON.stringify({command:'user',text: prompt}); //getting ready to be stored
+				storeChange(promptToStore); //stored
+				
+				//tell the user chatGPT is working on it
+				currentView?.webview.postMessage({command:'tell'});
+				
+				const response = await provider.searchForWebView(prompt); //getting the response from ChatGPT
+				const responseToStore = JSON.stringify({command:'ChatGPT',text: response}); //getting ready to be stored
+				storeChange(responseToStore); //stored
+
+				const responseToJsFile = JSON.parse(responseToStore);
+				
+				//send it back to the js and update the view
+				currentView?.webview.postMessage(responseToJsFile);
+			}
+			else
+			{
+				//send an alert back to the js file to tell ask the user to sign in 
+				currentView?.webview.postMessage({
+					command:'alert'
+				});
+				
+				//The sign in window will appear
+				currentServerToken = await getAuthSession(true);
+			}
+		});
+
+		// Update contents based on view state changes
+		currentView.onDidChangeViewState(
+			e => {
+			  const view = e.webviewPanel;
+			  if (view.visible && messageStorage !== undefined) {
+				let message : string;
+				let sendMessage : string;
+				for(let i = 0; messageStorage.length; i++){
+					message = messageStorage[i];
+					sendMessage = JSON.parse(message);
+
+					currentView?.webview.postMessage(sendMessage);
+				}
+			  }
+			},
+			null,
+			context.subscriptions
+		);
+		
+		// Reset when the current panel is closed
+		currentView.onDidDispose(
+		() => {
+			currentView = undefined;
+		},
+		null,
+		context.subscriptions);
+		})
+	);
+
 
 	const commandHandler = (command: string, useEntireFile: boolean = false, isCodeReview: boolean = false) => {
 		console.log("command handler");
@@ -187,6 +255,50 @@ export async function activate(context: vscode.ExtensionContext) {
 			provider.search(prompt, useEntireFile, isCodeReview);
 		}
 	};
+
+	
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('chatgpt.ask', (searchValue?: string) => {
+			const performSearch = (value?: string) => {
+				if (value) {
+					provider.search(value);
+					let log = "Ask Command: " + value;
+					query(log, platform, undefined, undefined, user, email);
+				}
+			};
+	
+			if (searchValue) {
+				performSearch(searchValue);
+			} else {
+				vscode.window.showInputBox({ prompt: 'What do you want to do?' })
+					.then(performSearch);
+			}
+		}),
+	
+		vscode.commands.registerCommand('chatgpt.explain', () => commandHandler('promptPrefix.explain')),
+		vscode.commands.registerCommand('chatgpt.codeReview', () => commandHandler('promptPrefix.codeReview', true, true)),
+		vscode.commands.registerCommand('chatgpt.codeReviewAddComments', () => commandHandler('promptPrefix.codeReviewAddComments')),
+		vscode.commands.registerCommand('chatgpt.testSuggestions', () => commandHandler('promptPrefix.testSuggestions')),
+		vscode.commands.registerCommand('chatgpt.legibilitySuggestions', () => commandHandler('promptPrefix.legibilitySuggestions')),
+		vscode.commands.registerCommand('chatgpt.quickFix', () => commandHandler('promptPrefix.quickFix')),
+		vscode.commands.registerCommand('chatgpt.learnMore', () => commandHandler('promptPrefix.LearnMore')),
+		vscode.commands.registerCommand('chatgpt.conversation', () => commandHandler('promptPrefix.conversation')),
+		vscode.commands.registerCommand('chatgpt.resetConversation', () => provider.resetConversation()),
+		vscode.commands.registerCommand('chatgpt.findIssue', (issueTitle: string) => {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const promptPrefix = config.get('promptPrefix.findIssue') as string;
+			console.log('Received issueTitle:', issueTitle);
+			query('findIssue :'+ issueTitle, platform, undefined, undefined, user, email);
+	
+			// Modify the prompt to include the issueTitle received from the webview
+			const prompt = `${promptPrefix} ${issueTitle}`;
+	
+			// Pass the modified prompt to the search function
+			provider.search(prompt, true, false);
+		})
+	);
+	
 
 
 	// Change the extension's session token or settings when configuration is changed
@@ -361,39 +473,42 @@ async function deletePreCommitHookIfNecessary(): Promise<void> {
 
 function getWebviewHtml(currentView: vscode.WebviewPanel,context: vscode.ExtensionContext) {
 	const scriptUri = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','chat.js'));
-	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style.css'));
+	const cssUri    = currentView.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media','style2.css'));
 
 	return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.5">
-				<title>Chat Bot</title>	
-				<link rel="stylesheet" href="${cssUri}">
-			</head>
-			<body>
-				<div class="chatbox_1">
-					<div class="chatbox_header">
-						<div class="chatbox_content">
-							<h4>Chat Bot</h4>
-						</div>
-					</div>
-
-					<div class="chatbox_message">
-						<div class="message message_chatGPT">Hi! How Can I help you today?</div>			
-					</div>
-
-					<div class="chatbox_footer">
-						<form class="chat_input_form">
-							<input class ="user_input" type="text" placeholder="Write a message">
-							<button type='submit' class="enter_button">Send</button>
-						</form>
-					</div>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.5">
+		<title>Chat Bot</title>	
+		<link rel="stylesheet" href="${cssUri}">
+	</head>
+	<body>
+		<div class="chatbox">
+			<div class="chatbox_header">
+				<div class="chatbox_content">
+					<h2>Code Review Chat Bot</h2>
 				</div>
+			</div>
 
-				<script src="${scriptUri}"></script>
-			</body>
-		</html>`;
+			<div class="chat-messages">
+				<div class="message message_ChatGPT">
+					<div class="message-sender">Chat Bot</div>
+					<div class="message-text">How can I help you today?</div>
+				</div>		
+			</div>
+
+			
+			<form class="chat_input_form">
+				<input class ="user_input" type="text" placeholder="Write a message">
+				<button type='submit' class="button enter_button">Send</button>
+			</form>
+		
+		</div>
+
+		<script src="${scriptUri}"></script>
+	</body>
+</html>`;
 }
 
 async function query(log: string, platform: string, gitdiff?: string, hash?: string, user?: string, email?: string){
@@ -485,7 +600,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 	public applyQuickFixes() {
 		const response = this._response;
-		
+		console.log("please work");
 		// eslint-disable-next-line eqeqeq
 		if (response != null) 
 		{
@@ -497,6 +612,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				console.log('Quick Fix Section:', quickFixSection);
 				this.applyFixes(quickFixSection);
 			} else {
+				console.log("Reponse:", response);
 				console.log('Quick Fix section not found in the response.');
 			}
 		}
@@ -646,10 +762,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 						let log = 'Search Command: ' + data.value;
 
 						query(log,platform, undefined, undefined, user, email);
+						break;
 					}
 				case 'learnMore':
-					{
-						vscode.commands.executeCommand("chatgpt.learnMore");
+					{	
+						console.log("learnmore");
+						let searchString = 'Would like to learn More about the previous suggestion.';
+						vscode.commands.executeCommand('chatgpt.ask', searchString);
 						let log = 'Learn More Command Triggered';
 						query(log,platform, undefined, undefined, user, email);
 						break;
@@ -699,7 +818,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				case 'conversation' : {
-					vscode.commands.executeCommand('chatgpt.start', data.issueTitle);
+					vscode.commands.executeCommand('chatgpt.findIssue', data.issueTitle);
+				}
+
+				case 'conversationWithChatGPT':{
+					vscode.commands.executeCommand('chatgpt.start');
+					break;
 				}
 			}
 		});
@@ -830,11 +954,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
 					if(e.message === "Request failed with status code 500"){
-						response = "The LearnMore & Searchbar Ask can only be used after code review related commands.";
+						response = "Error. Check The Status of Your OPEN API TOKEN";
 
 					}else{
 						response = this._response;
-						response += `\n\n---\n[ERROR] ${e}`;
+						response += `\n\n---\n[ERROR] ${response}`;
 					}
 				}
 			}
@@ -902,8 +1026,13 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				} catch (e: any) {
 					console.error(e);
 					if (this._currentMessageNumber === currentMessageNumber) {
-						response = this._response;
-						response += `\n\n---\n[ERROR] ${e}`;
+						if(e = "Request failed with status code 500"){
+							response = "Error. Check The Status of Your OPEN API TOKEN";
+	
+						}else{
+							response = this._response;
+							response += `\n\n---\n[ERROR] ${response}`;
+						}
 					}
 				}
 				query("Response Sent: "+ this._response, platform, undefined, undefined, user, email);
@@ -1016,6 +1145,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="learn-more-button">Learn More About The Previous Suggestion</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="askButton">Talk to GPT</button>
 				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="quickFixButton">Quick Fix Code</button>
+				<button class="h-10 w-full text-white bg-stone-700 p-4 text-sm" id="conversationWithChatGPT">Conversation with GPT</button>
 
 				<script src="${scriptUri}"></script>
 		
@@ -1023,10 +1153,79 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			</html>`;
 	}
 
-	
-	
+	//From the webview the only API it can use is the server API
+	public async searchForWebView(prompt: string) {
+		this._prompt = prompt;
+		
+		// Check if the ChatGPTAPI instance is defined
+		if (!this._chatGPTAPI && !this._settings.useServerApi) {
+			this._newAPI();
+		}
+
+		let response = '';
+		this._response = '';
+
+		// Get the language id of the selected text of the active editor
+		// If a user does not want to append this information to their prompt, leave it as an empty string
+		const languageId = (this._settings.codeblockWithLanguageId ? vscode.window.activeTextEditor?.document?.languageId : undefined) || "";
+		let searchPrompt = prompt;
+
+		// Increment the message number
+		this._currentMessageNumber++;
+		let currentMessageNumber = this._currentMessageNumber;
+
+		// Send the search prompt to the ChatGPTAPI instance and store the response
+		if (this._settings.useServerApi){
+			platform = 'Server API';
+			try {
+				// Send the search prompt to the ChatGPTAPI instance and store the response
+				if (!currentServerToken) {
+					currentServerToken = await getAuthSession(true);
+				}
+
+				const config = {
+					headers: { authorization: `Bearer ${currentServerToken}`}
+				};
+
+				const res =
+					await axios.post("https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com/api/review",
+					{prompt: searchPrompt, model: this._settings.model},
+					config
+				);
+
+					query('Received Prompt: ' + searchPrompt, platform, undefined, undefined, user, email);
+
+				if (this._currentMessageNumber !== currentMessageNumber) {
+					return;
+				}
+
+				response = res.data.text;
+				
+				if (res.data.detail?.usage?.total_tokens) {
+					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
+				}
+
+				if (this._settings.keepConversation) {
+					this._conversation = {
+						parentMessageId: res.data.id
+					};
+				}
+			} catch (e: any) {
+				console.error(e);
+				if (this._currentMessageNumber === currentMessageNumber) {
+					if(e = "Request failed with status code 500"){
+						response = "Error. Check The Status of Your OPEN API TOKEN";
+
+					}else{
+						response = this._response;
+						response += `\n\n---\n[ERROR] ${response}`;
+					}
+				}
+				}
+			}
+			query('Response Sent: ' + response, platform, undefined, undefined, user, email);
+			return response;
+	}
 }
-
-
 
 export function deactivate() {}
