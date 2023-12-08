@@ -55,6 +55,8 @@ As a temple student, they just downloaded this extension they want to sign up fo
 6. The website tells the user to verify with their TU email.
 7. The user presses send.
 8. The user went into their TU email account, saw the email, and clicked on the link to verify.
+![Uploading image.png…]()
+
 
 ### **Case 5:**
 As a temple student, they wanted to figure out what this code does, which they had copied from their professor during class. They had been using this extension for a while now.
