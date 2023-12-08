@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Use-case descriptions
+# Sequence Diagrams
 
 ### **Case 1:**
 As a temple student taking coding classes, I want a convenient way to check their code to see if they did it correctly.
