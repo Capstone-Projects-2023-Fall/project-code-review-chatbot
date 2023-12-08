@@ -14,7 +14,8 @@ As a temple student taking coding classes, I want a convenient way to check thei
 6. The user wrote some more code.
 7. The user decided to build it again then failed, and asked the extension to review their code.
 8. The extension gives a to-do list to the user where they can improve.
-9. <img width="865" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/80407688-8e87-49a1-a4bc-6fc9d26a5655">
+<img width="871" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/d851330a-0f47-497a-90bb-f287d546e598">
+
 
 
 
