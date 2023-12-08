@@ -14,10 +14,7 @@ As a temple student taking coding classes, I want a convenient way to check thei
 6. The user wrote some more code.
 7. The user decided to build it again then failed, and asked the extension to review their code.
 8. The extension gives a to-do list to the user where they can improve.
-<img width="871" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288993546-d851330a-0f47-497a-90bb-f287d546e598.png">
-
-
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288993546-d851330a-0f47-497a-90bb-f287d546e598.png)
 
 ### **Case 2:**
 As a tech hobbyist but not a temple student, I don't want to open another tab outside of VS code to talk to GPT.
@@ -29,8 +26,7 @@ As a tech hobbyist but not a temple student, I don't want to open another tab ou
 6. The user stored the API key locally.
 7. Then right-click on the screen and click Ask chatGPT, type in the question, and hit enter.
 8. This time the question is answered by chatGPT.
-   <img width="853" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288994277-fc91f62f-26cd-4884-b0d7-e28683ee7166.png" />
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288994277-fc91f62f-26cd-4884-b0d7-e28683ee7166.png)
 
 ### **Case 3:**
 As a temple student, he wants quick tools to help him catch small bugs as well as correct the format of their syntax.
@@ -42,7 +38,7 @@ As a temple student, he wants quick tools to help him catch small bugs as well a
 6. Then the user was asked if they wanted a review for their code.
 7. The user clicks on Yes, and the extension runs a quick review.
 8. The user is given a list of things that he could improve on.
-<img width="866" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288996949-e0b1fb28-6b0a-40c7-ab1e-ae5f34831b37.png" />
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288996949-e0b1fb28-6b0a-40c7-ab1e-ae5f34831b37.png)
 
 
 ### **Case 4:**
@@ -55,8 +51,7 @@ As a temple student, they just downloaded this extension they want to sign up fo
 6. The website tells the user to verify with their TU email.
 7. The user presses send.
 8. The user went into their TU email account, saw the email, and clicked on the link to verify.
-<img width="855" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289001156-97bf3e79-8740-49ca-ba6d-a48dc5a6785f.png" />
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289001156-97bf3e79-8740-49ca-ba6d-a48dc5a6785f.png)
 
 ### **Case 5:**
 As a temple student, they wanted to figure out what this code does, which they had copied from their professor during class. They had been using this extension for a while now.
@@ -66,8 +61,7 @@ As a temple student, they wanted to figure out what this code does, which they h
 4. Then the server will turn an answer for the given code that they had selected.
 5. The extension displays the explanation in the window.
 6. The user reads it and then can follow along with the code.
-<img width="874" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289004794-c7dd4545-db20-4c62-944f-3233bd58c1fd.png" />
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289004794-c7dd4545-db20-4c62-944f-3233bd58c1fd.png)
 
 ### **Case 6:**
 As a temple student, a long-term user of the extension. They wanted to do a write some test for the code that they just wrote but they got no idea where to begin.
@@ -77,10 +71,7 @@ As a temple student, a long-term user of the extension. They wanted to do a writ
 3. Select the code where the user wants to write the test.
 4. Right-click then click ChatGPT.TestSuggestions.
 5. The extension will show all the functions to which they can add the test in.
-<img width="856" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005348-143f7db8-4871-47ce-a468-c5a1eba8f662.png" />
-
-
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005348-143f7db8-4871-47ce-a468-c5a1eba8f662.png)
 
 ### **Case 7:**
 As a temple student, a long-term user of the extension. They wanted to do a review of the code to make it less complex, but they had no idea where to start.
@@ -91,7 +82,7 @@ As a temple student, a long-term user of the extension. They wanted to do a revi
 4. Then right-click the selected code.
 5. Click the ChatGPT: Legibiliity Suggestions.
 6. Then the extension would print out all the suggestions that they can make to the given code.
-<img width="877" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005537-48e344df-ae13-4ba2-a763-5cb412871548.png"/>
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005537-48e344df-ae13-4ba2-a763-5cb412871548.png)
 
 ### **Case 8:**
 The user wants an instance of ChatGPT in their vs code. So they don't have to go out of vs code to talk to chatGPT.
@@ -102,5 +93,4 @@ The user wants an instance of ChatGPT in their vs code. So they don't have to go
 4. Then a window will persist in the vs code tab until the user decides to close it.
 5. Then the user can type in anything that they want to ask chatGPT.
 6. Once they hit enter or click the submit button, the entry will be sent to the server API.
-<img width="861" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289006018-02a6c187-719f-4619-acf1-be6c17c574d6.png"/>
-
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289006018-02a6c187-719f-4619-acf1-be6c17c574d6.png)
