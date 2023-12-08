@@ -7,7 +7,6 @@ import fetch from 'node-fetch';
 
 export const AUTH_TYPE = `CRC`;
 const AUTH_NAME = `Code Review Chatbot Auth`;
-const CLIENT_ID = `cZXtYFnvHlKBnlZUQosEBoeGwPvCU7MA`;
 const CRC_DOMAIN = `https://warm-peak-lwbvevmnn7vy.vapor-farm-c1.com`;
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
@@ -161,7 +160,6 @@ export class CRCAuthenticationProvider implements AuthenticationProvider, Dispos
 
       const searchParams = new URLSearchParams([
         ['response_type', "token"],
-        ['client_id', CLIENT_ID],
         ['redirect_uri', this.redirectUri],
         ['state', stateId],
         ['scope', scopes.join(' ')],

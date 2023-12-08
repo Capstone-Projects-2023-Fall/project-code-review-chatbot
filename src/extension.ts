@@ -26,10 +26,9 @@ let user = '';
 let email = '';
 
 type AuthInfo = { apiKey?: string };
-type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
+type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean, serverApiToken?: string };
 
 const BASE_URL = 'https://api.openai.com/v1';
-var currentServerToken: string;
 
 
 
@@ -123,6 +122,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Create a new ChatGPTViewProvider instance and register it with the extension's context
 	const provider = new ChatGPTViewProvider(context.extensionUri);
 
+	//Auth setup
+	context.subscriptions.push(
+		new CRCAuthenticationProvider(context)
+	);
+
+	var currentServerToken = await getAuthSession(false);
+
 	provider.setSettings({
 		selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false,
 		codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false,
@@ -131,7 +137,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
 		model: config.get('model') || 'gpt-4',
-		useServerApi: config.get('useServerApi') || false
+		useServerApi: config.get('useServerApi') || false,
+		serverApiToken: config.get('serverApiToken') || currentServerToken
+
 	});
 	// Put configuration settings into the provider
 	if (!config.get('useServerApi')) {
@@ -141,14 +149,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 
-	//CRC setup
-	context.subscriptions.push(
-		new CRCAuthenticationProvider(context)
-	);
+	
 
-	currentServerToken = await getAuthSession(false);
-
-	if (config.get('useServerApi') && !currentServerToken) {
+	if (config.get('useServerApi') && (config.get('serverApiToken') === '' && !currentServerToken)) {
 		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
 	} 
 
@@ -163,7 +166,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.authentication.onDidChangeSessions(async e => {
 			console.log(e);
 			if (e.provider.id === "CRC") {
-				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
+				provider.setSettings({
+					serverApiToken: await getAuthSession(config.get('useServerApi') || false)
+				});
+				
 			}
 		})
 	);
@@ -182,6 +188,60 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	};
 
+
+	// Change the extension's session token or settings when configuration is changed
+	vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
+		if (event.affectsConfiguration('chatgpt.apiKey')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setAuthenticationInfo({ apiKey: config.get('apiKey') });
+		} else if (event.affectsConfiguration('chatgpt.apiUrl')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			let url = config.get('apiUrl') as string || BASE_URL;
+			provider.setSettings({ apiUrl: url });
+		} else if (event.affectsConfiguration('chatgpt.model')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ model: config.get('model') || 'gpt-4' });
+		} else if (event.affectsConfiguration('chatgpt.selectedInsideCodeblock')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false });
+		} else if (event.affectsConfiguration('chatgpt.codeblockWithLanguageId')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false });
+		} else if (event.affectsConfiguration('chatgpt.pasteOnClick')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ pasteOnClick: config.get('pasteOnClick') || false });
+		} else if (event.affectsConfiguration('chatgpt.keepConversation')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ keepConversation: config.get('keepConversation') || false });
+		} else if (event.affectsConfiguration('chatgpt.timeoutLength')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ timeoutLength: config.get('timeoutLength') || 60 });
+		} else if (event.affectsConfiguration('chatgpt.useServerApi')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ useServerApi: config.get('useServerApi') || false });
+		} else if (event.affectsConfiguration('chatgpt.serverApiToken')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ serverApiToken: config.get('serverApiToken') || '' });
+		} else if (event.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			const enableHook = config.get('enablePreCommitHook', false);
+			if (enableHook) {
+				setupPreCommitHookIfNecessary();
+			} else {
+				deletePreCommitHookIfNecessary();
+			}
+		}
+
+	});
+
+
+	const pollingInterval = setInterval(pollForNewCommits, 3000);
+
+    context.subscriptions.push({
+        dispose: () => clearInterval(pollingInterval)
+    });
+
+	setupPreCommitHookIfNecessary();
 	
 
 	context.subscriptions.push(
@@ -222,58 +282,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	);
 
 
-	// Change the extension's session token or settings when configuration is changed
-	vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
-		if (event.affectsConfiguration('chatgpt.apiKey')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setAuthenticationInfo({ apiKey: config.get('apiKey') });
-		} else if (event.affectsConfiguration('chatgpt.apiUrl')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			let url = config.get('apiUrl') as string || BASE_URL;
-			provider.setSettings({ apiUrl: url });
-		} else if (event.affectsConfiguration('chatgpt.model')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ model: config.get('model') || 'gpt-4' });
-		} else if (event.affectsConfiguration('chatgpt.selectedInsideCodeblock')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false });
-		} else if (event.affectsConfiguration('chatgpt.codeblockWithLanguageId')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false });
-		} else if (event.affectsConfiguration('chatgpt.pasteOnClick')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ pasteOnClick: config.get('pasteOnClick') || false });
-		} else if (event.affectsConfiguration('chatgpt.keepConversation')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ keepConversation: config.get('keepConversation') || false });
-		} else if (event.affectsConfiguration('chatgpt.timeoutLength')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ timeoutLength: config.get('timeoutLength') || 60 });
-		} else if (event.affectsConfiguration('chatgpt.useServerApi')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			provider.setSettings({ useServerApi: config.get('useServerApi') || false });
-		}
-	});
-
-	vscode.workspace.onDidChangeConfiguration(e => {
-		if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
-			const config = vscode.workspace.getConfiguration('chatgpt');
-			const enableHook = config.get('enablePreCommitHook', false);
-			if (enableHook) {
-				setupPreCommitHookIfNecessary();
-			} else {
-				deletePreCommitHookIfNecessary();
-			}
-		}
-	});
 	
-	const pollingInterval = setInterval(pollForNewCommits, 3000);
 
-    context.subscriptions.push({
-        dispose: () => clearInterval(pollingInterval)
-    });
-
-	setupPreCommitHookIfNecessary();
+	
+	
 }
 
 
@@ -783,12 +795,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 
-				if (!currentServerToken) {
-					currentServerToken = await getAuthSession(true);
+				if (!this._settings.serverApiToken || this._settings.serverApiToken === '') {
+					this._settings.serverApiToken = await getAuthSession(true);
 				}
 
 				const config = {
-					headers: { authorization: `Bearer ${currentServerToken}`}
+					headers: { authorization: `Bearer ${this._settings.serverApiToken}`}
 				};
 
 				const res =
@@ -817,7 +829,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
-					if(e = "Request failed with status code 500"){
+					if(e.message === "Request failed with status code 500"){
 						response = "The LearnMore & Searchbar Ask can only be used after code review related commands.";
 
 					}else{
