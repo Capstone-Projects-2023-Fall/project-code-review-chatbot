@@ -29,6 +29,8 @@ As a tech hobbyist but not a temple student, I don't want to open another tab ou
 6. The user stored the API key locally.
 7. Then right-click on the screen and click Ask chatGPT, type in the question, and hit enter.
 8. This time the question is answered by chatGPT.
+   <img width="853" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/fc91f62f-26cd-4884-b0d7-e28683ee7166">
+
 
 ### **Case 3:**
 As a temple student, he wants quick tools to help him catch small bugs as well as correct the format of their syntax.
