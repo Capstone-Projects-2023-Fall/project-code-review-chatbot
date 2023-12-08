@@ -66,6 +66,8 @@ As a temple student, they wanted to figure out what this code does, which they h
 4. Then the server will turn an answer for the given code that they had selected.
 5. The extension displays the explanation in the window.
 6. The user reads it and then can follow along with the code.
+<img width="874" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/c7dd4545-db20-4c62-944f-3233bd58c1fd">
+
 
 ### **Case 6:**
 As a temple student, a long-term user of the extension. They wanted to do a write some test for the code that they just wrote but they got no idea where to begin.
