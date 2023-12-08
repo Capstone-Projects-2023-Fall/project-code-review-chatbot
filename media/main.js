@@ -6,15 +6,12 @@
   const vscode = acquireVsCodeApi();
   let response = '';
 
-  /*
-  document.getElementById('clear-button').addEventListener('click', () => {
-    vscode.postMessage({
-      type: 'clearConversation'
-    });
-  });*/
+  document.getElementById('clearResponseButton').addEventListener('click', () => {
+    vscode.postMessage({ type: 'clearResponseArray' });
+  });
 
   document.getElementById('learn-more-button').addEventListener('click', () => {
-    event.stopPropagation(); 
+    event.stopPropagation();
     vscode.postMessage({
       type: 'learnMore'
     });
@@ -51,10 +48,7 @@
         //handleResponse(message);
         break;
       case "codeReviewCommandExecuted":
-        handleCodeReviewResponse(message);
-        break;
-      case "clearResponse":
-        response = '';
+        //handleCodeReviewResponse(message);
         break;
       case "setPrompt":
         if (message.value !== undefined) {
@@ -80,10 +74,12 @@
           if (lastResponseElement) {
             lastResponseElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
+
+          hideLoadingIcon();
         }
         break;
       case 'clearResponse':
-        document.getElementById('response').innerHTML = '';
+        clearResponse();
         break;
     }
   });
@@ -220,6 +216,19 @@
       </div>`;
   }
 
+  function hideLoadingIcon() {
+    const spinAnimation = document.getElementById('spin-animation');
+    if (spinAnimation) {
+      spinAnimation.style.display = 'none';
+    }
+  }
+
+  function clearResponse() {
+    const responseDiv = document.getElementById('response');
+    if (responseDiv) {
+      responseDiv.innerHTML = '';
+    }
+  }
 
   function renderSuggestions(response) {
     console.log("start renderSuggestions");
