@@ -45,7 +45,7 @@ As a temple student, he wants quick tools to help him catch small bugs as well a
    <img width="866" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/e0b1fb28-6b0a-40c7-ab1e-ae5f34831b37">
 
 
-### **Case 5:**
+### **Case 4:**
 As a temple student, they just downloaded this extension they want to sign up for an account.
 1. The user clicks on the chatGPT icon on the left-hand side of the screen.
 2. The extension prompts them to log in.
@@ -56,7 +56,7 @@ As a temple student, they just downloaded this extension they want to sign up fo
 7. The user presses send.
 8. The user went into their TU email account, saw the email, and clicked on the link to verify.
 
-### **Case 6:**
+### **Case 5:**
 As a temple student, they wanted to figure out what this code does, which they had copied from their professor during class. They had been using this extension for a while now.
 1. The user selects the code that they want to be explained.
 2. Right-click on the vs code window on top of the selected text.
@@ -65,7 +65,7 @@ As a temple student, they wanted to figure out what this code does, which they h
 5. The extension displays the explanation in the window.
 6. The user reads it and then can follow along with the code.
 
-### **Case 7:**
+### **Case 6:**
 As a temple student, a long-term user of the extension. They wanted to do a write some test for the code that they just wrote but they got no idea where to begin.
 
 1. Start Vscode going back to the working environment.
@@ -74,7 +74,7 @@ As a temple student, a long-term user of the extension. They wanted to do a writ
 4. Right-click then click ChatGPT.TestSuggestions.
 5. The extension will show all the functions to which they can add the test in.
 
-### **Case 8:**
+### **Case 7:**
 As a temple student, a long-term user of the extension. They wanted to do a review of the code to make it less complex, but they had no idea where to start.
 
 1. Start Vscode
@@ -84,7 +84,7 @@ As a temple student, a long-term user of the extension. They wanted to do a revi
 5. Click the ChatGPT: Legibiliity Suggestions.
 6. Then the extension would print out all the suggestions that they can make to the given code.
 
-### **Case 9:**
+### **Case 8:**
 The user wants an instance of ChatGPT in their vs code. So they don't have to go out of vs code to talk to chatGPT.
 
 1. start VS code
