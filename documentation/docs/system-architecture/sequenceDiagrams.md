@@ -77,6 +77,10 @@ As a temple student, a long-term user of the extension. They wanted to do a writ
 3. Select the code where the user wants to write the test.
 4. Right-click then click ChatGPT.TestSuggestions.
 5. The extension will show all the functions to which they can add the test in.
+<img width="856" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/143f7db8-4871-47ce-a468-c5a1eba8f662">
+
+
+
 
 ### **Case 7:**
 As a temple student, a long-term user of the extension. They wanted to do a review of the code to make it less complex, but they had no idea where to start.
@@ -87,6 +91,7 @@ As a temple student, a long-term user of the extension. They wanted to do a revi
 4. Then right-click the selected code.
 5. Click the ChatGPT: Legibiliity Suggestions.
 6. Then the extension would print out all the suggestions that they can make to the given code.
+<img width="877" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/48e344df-ae13-4ba2-a763-5cb412871548">
 
 ### **Case 8:**
 The user wants an instance of ChatGPT in their vs code. So they don't have to go out of vs code to talk to chatGPT.
@@ -97,4 +102,5 @@ The user wants an instance of ChatGPT in their vs code. So they don't have to go
 4. Then a window will persist in the vs code tab until the user decides to close it.
 5. Then the user can type in anything that they want to ask chatGPT.
 6. Once they hit enter or click the submit button, the entry will be sent to the server API.
+<img width="861" alt="image" src="https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/42981577/02a6c187-719f-4619-acf1-be6c17c574d6">
 
