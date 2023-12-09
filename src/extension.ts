@@ -10,7 +10,7 @@ import { resolve } from 'path';
 import * as mysql from 'mysql2';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { Auth0AuthenticationProvider } from './auth0/auth0AuthenticationProvider';
+import { CRCAuthenticationProvider } from './auth/CRCAuthenticationProvider';
 
 
 
@@ -26,10 +26,9 @@ let user = '';
 let email = '';
 
 type AuthInfo = { apiKey?: string };
-type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean };
+type Settings = { selectedInsideCodeblock?: boolean, codeblockWithLanguageId?: false, pasteOnClick?: boolean, keepConversation?: boolean, timeoutLength?: number, model?: string, apiUrl?: string, useServerApi?: boolean, serverApiToken?: string };
 
 const BASE_URL = 'https://api.openai.com/v1';
-var currentServerToken: string;
 
 
 
@@ -79,6 +78,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Create a new ChatGPTViewProvider instance and register it with the extension's context
 	const provider = new ChatGPTViewProvider(context.extensionUri);
 
+	//Auth setup
+	context.subscriptions.push(
+		new CRCAuthenticationProvider(context)
+	);
+
+	var currentServerToken = await getAuthSession(false);
+
 	provider.setSettings({
 		selectedInsideCodeblock: config.get('selectedInsideCodeblock') || false,
 		codeblockWithLanguageId: config.get('codeblockWithLanguageId') || false,
@@ -87,7 +93,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		timeoutLength: config.get('timeoutLength') || 60,
 		apiUrl: config.get('apiUrl') || BASE_URL,
 		model: config.get('model') || 'gpt-4',
-		useServerApi: config.get('useServerApi') || false
+		useServerApi: config.get('useServerApi') || false,
+		serverApiToken: config.get('serverApiToken') || currentServerToken
+
 	});
 	// Put configuration settings into the provider
 	if (!config.get('useServerApi')) {
@@ -97,14 +105,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 
-	//auth0 setup
-	context.subscriptions.push(
-		new Auth0AuthenticationProvider(context)
-	);
+	
 
-	currentServerToken = await getAuthSession(false);
-
-	if (config.get('useServerApi') && !currentServerToken) {
+	if (config.get('useServerApi') && (config.get('serverApiToken') === '' && !currentServerToken)) {
 		vscode.window.showInformationMessage('Please login to Code Review Chatbot to use the Server API');
 	} 
 
@@ -118,8 +121,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.authentication.onDidChangeSessions(async e => {
 			console.log(e);
-			if (e.provider.id === "auth0") {
-				currentServerToken = await getAuthSession(config.get('useServerApi') || false);
+			if (e.provider.id === "CRC") {
+				provider.setSettings({
+					serverApiToken: await getAuthSession(config.get('useServerApi') || false)
+				});
+				
 			}
 		})
 	);
@@ -325,11 +331,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		} else if (event.affectsConfiguration('chatgpt.useServerApi')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			provider.setSettings({ useServerApi: config.get('useServerApi') || false });
-		}
-	});
-
-	vscode.workspace.onDidChangeConfiguration(e => {
-		if (e.affectsConfiguration('chatgpt.enablePreCommitHook')) {
+		} else if (event.affectsConfiguration('chatgpt.serverApiToken')) {
+			const config = vscode.workspace.getConfiguration('chatgpt');
+			provider.setSettings({ serverApiToken: config.get('serverApiToken') || '' });
+		} else if (event.affectsConfiguration('chatgpt.enablePreCommitHook')) {
 			const config = vscode.workspace.getConfiguration('chatgpt');
 			const enableHook = config.get('enablePreCommitHook', false);
 			if (enableHook) {
@@ -338,8 +343,10 @@ export async function activate(context: vscode.ExtensionContext) {
 				deletePreCommitHookIfNecessary();
 			}
 		}
+
 	});
-	
+
+
 	const pollingInterval = setInterval(pollForNewCommits, 3000);
 
     context.subscriptions.push({
@@ -347,6 +354,11 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
 	setupPreCommitHookIfNecessary();
+
+
+
+	
+	
 }
 
 
@@ -374,7 +386,7 @@ async function pollForNewCommits() {
 }
 
 const getAuthSession = async (useServerApi: boolean) => {
-	const session = await vscode.authentication.getSession("auth0", ['profile'], { createIfNone: useServerApi });
+	const session = await vscode.authentication.getSession("CRC", ['profile'], { createIfNone: useServerApi });
 	if (session) {
 		vscode.window.showInformationMessage(`Welcome back to Code Review Chatbot, ${session.account.label}`);
 		user = JSON.stringify(session.account.label).replace(/[^a-zA-Z ]/g, '');
@@ -798,6 +810,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			prompt = '';
 		};
 
+		//const sessions = await vscode.authentication.getSession("GitHub", ['repo', 'workflow', 'user:email', 'read:user']);
+
 		// Check if the ChatGPTAPI instance is defined
 		if (!this._chatGPTAPI && !this._settings.useServerApi) {
 			this._newAPI();
@@ -866,12 +880,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 
-				if (!currentServerToken) {
-					currentServerToken = await getAuthSession(true);
+				if (!this._settings.serverApiToken || this._settings.serverApiToken === '') {
+					this._settings.serverApiToken = await getAuthSession(true);
 				}
 
 				const config = {
-					headers: { authorization: `Bearer ${currentServerToken}`}
+					headers: { authorization: `Bearer ${this._settings.serverApiToken}`}
 				};
 
 				const res =
@@ -900,10 +914,14 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			} catch (e: any) {
 				console.error(e);
 				if (this._currentMessageNumber === currentMessageNumber) {
-					if(e = "Request failed with status code 500"){
+					if(e.message === "Request failed with status code 500"){
 						response = "Error. Check The Status of Your OPEN API TOKEN";
-
-					}else{
+					
+					} 
+					else if (e.message === "User did not consent to login.") {
+						response = 'Error. You must sign into CRC or provide an API Token in the settings.';
+					} 
+					else {
 						response = this._response;
 						response += `\n\n---\n[ERROR] ${response}`;
 					}
@@ -1126,12 +1144,12 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 			platform = 'Server API';
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
-				if (!currentServerToken) {
-					currentServerToken = await getAuthSession(true);
+				if (!this._settings.serverApiToken || this._settings.serverApiToken === '') {
+					this._settings.serverApiToken = await getAuthSession(true);
 				}
 
 				const config = {
-					headers: { authorization: `Bearer ${currentServerToken}`}
+					headers: { authorization: `Bearer ${this._settings.serverApiToken}`}
 				};
 
 				const res =

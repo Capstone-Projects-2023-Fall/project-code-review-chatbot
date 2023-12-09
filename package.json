@@ -186,13 +186,19 @@
           "type": "boolean",
           "default": true,
           "description": "Use Server API instead of your own",
+          "order": -2
+        },
+        "chatgpt.serverApiToken": {
+          "type": "string",
+          "description": "Server API Token required to use server API. This is automatically generated, but you can manually generate one from the website and paste your token here.",
           "order": -1
         },
+
         "chatgpt.enablePreCommitHook": {
           "type": "boolean",
           "default": false,
           "description": "Enable automatic setup of the pre-commit hook.",
-          "order": -2
+          "order": -3
         },
         "chatgpt.apiKey": {
           "markdownDescription": "OpenAI API key from [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)",
