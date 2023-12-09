@@ -245,6 +245,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (command === 'promptPrefix.quickFix') {
 			provider.applyQuickFixes();
 		} else {
+			console.log("going to search in command handler");
 			provider.search(prompt, useEntireFile, isCodeReview);
 		}
 	};
@@ -798,6 +799,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 
 	public async search(prompt?: string, useEntireFile: boolean = false, isCodeReview: boolean = false) {
+		console.log("search start");
 		this._prompt = prompt;
 		if (!prompt) {
 			prompt = '';
@@ -869,6 +871,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		// Send the search prompt to the ChatGPTAPI instance and store the response
 		if (this._settings.useServerApi) {
 			platform = 'Server API';
+			console.log("useServerAPI is true");
 			try {
 				// Send the search prompt to the ChatGPTAPI instance and store the response
 
@@ -896,12 +899,16 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				response = res.data.text;
 
+				console.log("in serverAPI, before total_tokens");
+
 				if (res.data.detail?.usage?.total_tokens) {
+					console.log("in serverAPI, after total_tokens");
 					// Store the response and whether it is related to a code review in the response array
 					this._responseArray.push({ userPrompt: prompt, gptResponse: response, isCodeReview });
 
 					// Send the updated response array to the webview
 					this.sendWebviewMessage('responseDone', this._responseArray);
+					console.log("in serverAPI, responseDone message sent");
 					//response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
 				}
 
