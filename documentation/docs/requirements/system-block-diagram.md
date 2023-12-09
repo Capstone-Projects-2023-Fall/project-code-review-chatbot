@@ -4,7 +4,8 @@ sidebar_position: 2
 
 # System Block Diagram
 
-![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/6c6997b9-5961-452e-b98c-71c790bb954d)
+![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/34b05b7d-5eff-422b-b30d-239ce2db6f6a)
+
 
 
 The above diagram depicts the regular usage of the chat code review bot. In the diagram, the user begins with code open in VS Code and the extension installed. 
