@@ -153,6 +153,48 @@ Our idea is to bring this feature directly into users IDE. This way, users can l
             <sub><b>Jason Lee</b></sub>
         </a>
     </td>
+    <td align="center">
+        <a href="https://github.com/trau3">
+            <img src="https://avatars.githubusercontent.com/u/70736675?v=4" width="100;" alt="ThomasRau"/>
+            <br />
+            <sub><b>Thomas Rau</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/kroosvi">
+            <img src=https://avatars.githubusercontent.com/u/42981577?v=4" width="100;" alt="KroosXiang"/>
+            <br />
+            <sub><b>Kroos Xiang</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/joshdeland">
+            <img src="https://avatars.githubusercontent.com/u/97611611?v=4" width="100;" alt="JoshuaDeland"/>
+            <br />
+            <sub><b>Joshua Deland</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/PatrickBrady7">
+            <img src="https://avatars.githubusercontent.com/u/97626904?v=4" width="100;" alt="PatrickBrady"/>
+            <br />
+            <sub><b>Patrick Brady</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/Jshiller26">
+            <img src="https://avatars.githubusercontent.com/u/72032695?v=4" width="100;" alt="JoesphShiller"/>
+            <br />
+            <sub><b>Joseph Shiller</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/DomenicMalinsky">
+            <img src="https://avatars.githubusercontent.com/u/81871640?v=4" width="100;" alt="DomenicMalinsky"/>
+            <br />
+            <sub><b>Domenic Malinsky</b></sub>
+        </a>
+    </td>
 </tr>
 </table>
 
