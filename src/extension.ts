@@ -840,6 +840,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 		}
 		this._fullPrompt = searchPrompt;
 
+		searchPrompt = '';
+
 		// Increment the message number
 		this._currentMessageNumber++;
 		let currentMessageNumber = this._currentMessageNumber;
@@ -880,6 +882,7 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					config
 				);
 
+					console.log(res.data);
 					query('Received Prompt: ' + this._fullPrompt, platform, undefined, undefined, user, email);
 
 				if (this._currentMessageNumber !== currentMessageNumber) {
@@ -887,9 +890,11 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				}
 
 				response = res.data.text;
+
+				this._fullPrompt = '';
 				
-				if (res.data.detail?.usage?.total_tokens) {
-					response += `\n\n---\n*<sub>Tokens used: ${res.data.detail.usage.total_tokens} (${res.data.detail.usage.prompt_tokens}+${res.data.detail.usage.completion_tokens})</sub>*`;
+				if (res.data.usage.total_tokens) {
+					response += `\n\n---\n*<sub>Tokens used: ${res.data.usage.total_tokens} (${res.data.usage.prompt_tokens}+${res.data.usage.completion_tokens})</sub>*`;
 				}
 
 				if (this._settings.keepConversation) {
@@ -926,7 +931,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 				query('Received Prompt: ' + this._prompt, platform, undefined, undefined, user, email);
 
 				const agent = this._chatGPTAPI;
-				let numToken;
 
 				try {
 					// Send the search prompt to the ChatGPTAPI instance and store the response
@@ -961,7 +965,6 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 					response = res.text;
 					if (res.detail?.usage?.total_tokens) {
 						response += `\n\n---\n*<sub>Tokens used: ${res.detail.usage.total_tokens} (${res.detail.usage.prompt_tokens}+${res.detail.usage.completion_tokens})</sub>*`;
-						numToken = res.detail.usage.total_tokens;
 					}
 
 					if (this._settings.keepConversation) {
