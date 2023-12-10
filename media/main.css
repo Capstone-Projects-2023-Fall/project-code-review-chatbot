@@ -101,37 +101,54 @@ li {
 
 
 .prompt-text-button {
-    height: 2.5rem; 
+    height: 2.5rem;
     width: 100%;
     background-color: #333;
-    color: #fff; 
+    color: #fff;
     padding: 10px;
     text-align: center;
-    font-size: 14px; 
+    font-size: 14px;
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    
-  }
-  
-  .prompt-text-button:hover {
-    background-color: #555;
-  }
-  
 
-  #learn-more-button {
-    white-space: normal; 
+}
+
+.prompt-text-button:hover {
+    background-color: #555;
+}
+
+
+#learn-more-button {
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 2; 
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-  }
+}
 
-  .button-container {
+.button-container {
     display: flex;
     flex-direction: column;
-    gap: 10px; 
-    margin-top: 10px; 
-  }
-  
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-prompt {
+    background-color: #493071;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-left: 15px;
+}
+
+.chat-response {
+    background-color: #212449;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 15px;
+}

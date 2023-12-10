@@ -4,85 +4,93 @@ sidebar_position: 2
 
 # Sequence Diagrams
 
-## Use Case 1
-**A student has just started taking coding classes. They are completely new to coding and want to have a convenient way to learn proper code etiquette & styles**
+### **Case 1:**
+As a temple student taking coding classes, I want a convenient way to check their code to see if they did it correctly.
+1. Student wrote some code, which looks reasonable. Then they tried to build it. It failed
+2. They installed the extension from the marketplace in vscode.
+3. The user tried some features which does a explaining what their code does.
+4. Extension prompts the user to sign in to use the server API.
+5. The user sign in, and then the extension shows the user what their code does.
+6. The user wrote some more code.
+7. The user decided to build it again then failed, and asked the extension to review their code.
+8. The extension gives a to-do list to the user where they can improve.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288993546-d851330a-0f47-497a-90bb-f287d546e598.png)
 
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram1.png)
+### **Case 2:**
+As a tech hobbyist but not a temple student, I don't want to open another tab outside of VS code to talk to GPT.
+1. The user installed the extension from the marketplace in vscode.
+2. The user decided to use the extension to send a question to the chatGPT.
+3. The user right-click on the screen and click Ask chatGPT, type in the question, and hit enter.
+4. The extension prompted the user to log in to their server API.
+5. The user decided to use their chatGPT API key, since he is not a temple student, he could not sign up with the server API.
+6. The user stored the API key locally.
+7. Then right-click on the screen and click Ask chatGPT, type in the question, and hit enter.
+8. This time the question is answered by chatGPT.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288994277-fc91f62f-26cd-4884-b0d7-e28683ee7166.png)
 
-1. Student tries their first class assignment and commits the code
-2. Extension finds various issues, but only send the user 2 suggestions
-3. Student receives feedback from extension
-4. Student implements the suggestions
-5. Student repeats process
-6. Student now has a conveinent way to learn on their own time
+### **Case 3:**
+As a temple student, he wants quick tools to help him catch small bugs as well as correct the format of their syntax.
+1. The user wrote some code and debugged them. It looked good.
+2. Then he found the extension on the marketplace, it sounds promising. 
+3. The user agrees to the pre-commit hook since he is working with Git.
+4. Then he used his temple email to sign up for an account, then log in.
+5. He decided to try this commit detection, so he committed the previous code to git.
+6. Then the user was asked if they wanted a review for their code.
+7. The user clicks on Yes, and the extension runs a quick review.
+8. The user is given a list of things that he could improve on.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/288996949-e0b1fb28-6b0a-40c7-ab1e-ae5f34831b37.png)
 
-### Use Case 2
-**A fresh university graduate has landed a job but is concerned about how their new co-workers will judge their code**
 
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram2.png)
+### **Case 4:**
+As a temple student, they just downloaded this extension they want to sign up for an account.
+1. The user clicks on the chatGPT icon on the left-hand side of the screen.
+2. The extension prompts them to log in.
+3. The user clicks on yes to follow to different tab.
+4. The user clicks the sign-up button on the page.
+5. The user types all the information into the box and hits submit.
+6. The website tells the user to verify with their TU email.
+7. The user presses send.
+8. The user went into their TU email account, saw the email, and clicked on the link to verify.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289001156-97bf3e79-8740-49ca-ba6d-a48dc5a6785f.png)
 
-1. Graduate takes their existing, working code and compiles it
-2. CodeReview finds ways to improve readability to professional standards
-3. CodeReview sends suggestions to the user.
-4. User makes changes and takes note of the suggestions so they can not make these mistakes later
-5. User now has a way to make a database of making and maintaining clean code
+### **Case 5:**
+As a temple student, they wanted to figure out what this code does, which they had copied from their professor during class. They had been using this extension for a while now.
+1. The user selects the code that they want to be explained.
+2. Right-click on the vs code window on top of the selected text.
+3. The extension sends the request to the server API.
+4. Then the server will turn an answer for the given code that they had selected.
+5. The extension displays the explanation in the window.
+6. The user reads it and then can follow along with the code.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289004794-c7dd4545-db20-4c62-944f-3233bd58c1fd.png)
 
-### Use Case 3
-**A computer science student who loves to code but has difficulties writing efficient and organized code**
+### **Case 6:**
+As a temple student, a long-term user of the extension. They wanted to do a write some test for the code that they just wrote but they got no idea where to begin.
 
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram3.png)
+1. Start Vscode going back to the working environment.
+2. Checking the code out.
+3. Select the code where the user wants to write the test.
+4. Right-click then click ChatGPT.TestSuggestions.
+5. The extension will show all the functions to which they can add the test in.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005348-143f7db8-4871-47ce-a468-c5a1eba8f662.png)
 
-1. Sarah downloads and installs the ChatGPT Code Review Extension from the Visual Studio Code marketplace. The installation is quick and seamless.
-2. With her assignment code open in Visual Studio Code, Sarah activates the ChatGPT extension by clicking the chat icon in the sidebar. She submits her code for review, specifying the programming language she's using and attaching a brief description of the assignment's requirements.
-3. ChatGPT quickly analyzes her code and provides feedback within seconds. It highlights potential issues, such as inefficient algorithms, naming conventions, and code readability problems.
-4. Sarah engages in an interactive discussion with ChatGPT. She asks specific questions about the highlighted issues to gain a deeper understanding of the recommendations. ChatGPT responds with clear explanations, examples, and links to relevant documentation.
-5. Using the guidance from ChatGPT, Sarah makes iterative improvements to her code. She receives real-time feedback as she implements changes, ensuring she's on the right track.
-6. After several rounds of interaction and code improvements, Sarah is satisfied with her code's quality. She submits her assignment, confident that it meets the required standards.
+### **Case 7:**
+As a temple student, a long-term user of the extension. They wanted to do a review of the code to make it less complex, but they had no idea where to start.
 
-### Use Case 4
-**User gets stuck on an error while coding a perosnal project**
+1. Start Vscode
+2. select the code that the user wants to review.
+3. Log in if they haven't.
+4. Then right-click the selected code.
+5. Click the ChatGPT: Legibiliity Suggestions.
+6. Then the extension would print out all the suggestions that they can make to the given code.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289005537-48e344df-ae13-4ba2-a763-5cb412871548.png)
 
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram4.png)
+### **Case 8:**
+The user wants an instance of ChatGPT in their vs code. So they don't have to go out of vs code to talk to chatGPT.
 
-1. User finds errors in running their code
-2. User searches online for a quick fix, but is having trouble finding a simple fix
-3. User is prompted by extension if they need help
-4. User agrees, and is prompted with a potential fix
-5. Extension informs user of the syntax error and how to solve it
-6. User is given the suggestion on how to write some tests to mitigate these issues in the future
-7. User fixes error and code now compiles, thus saving them time in their busy life
-
-### Use Case 5
-**Experienced programmer uses bot to proof code before pushing**
-
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/main/documentation/static/img/sequenceDiagram5.png)
-
-1. Bob goes to commit work
-2. CodeReviewChatbot catches the commit process, and sends bob feedback on his work
-3. The commit is halted, as now Bob wants to fix his work
-4. Bob commits again, fixing his work. This time he receives little feedback
-5. Bob now feels confident in pushing his work
-
-### Use Case 6
-**Code Review Bot lets user know they are using bad practice by writing all code in main function**
-
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram6.png)
-
-1. Anna works on code for a couple hours and decides to commit her work
-2. CodeReviewChatbot catches the commit process, and sends anna feedback
-3. Specifically, CodeReviewChatbot informs anna of code that she has repeated throughout her program
-4. Then CodeReviewChatbot suggests making some functions
-5. Anna implements this, making her code shorter, more concise, and overall less repetitive
-
-### Use Case 7
-**User converses with chatbot on how to improve code after initial commit**
-
-![image](https://raw.githubusercontent.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/e8e4242aab94a042ef85edc96bacf87f56c8d669/documentation/static/img/SequenceDiagram7.png)
-
-1. Nai writes a couple of comments into pre-existing code to have a commit
-2. CodeReviewChatbot catches the commit process, and sends Nai feedback on their work
-3. The commit is halted and Nai wants further explanations of the feedback
-4. CodeReviewChatbot further explains the suggestions made
-5. Nai now asks again where the suggestions are coming from and if they are alternatives
-6. CodeReviewChatbot answers the additional questions and gives Nai more information
-
+1. start VS code
+2. log in to the server if they haven't.
+3. Right-click any open window, or type in the command palette: chatgpt.start.
+4. Then a window will persist in the vs code tab until the user decides to close it.
+5. Then the user can type in anything that they want to ask chatGPT.
+6. Once they hit enter or click the submit button, the entry will be sent to the server API.
+![image](https://github-production-user-asset-6210df.s3.amazonaws.com/42981577/289006018-02a6c187-719f-4619-acf1-be6c17c574d6.png)

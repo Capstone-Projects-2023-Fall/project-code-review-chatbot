@@ -1,9 +1,11 @@
 # Change Log
 
-All notable changes to the "chatgpt" extension will be documented in this file.
+## [1.2.2] - (2023.12.10)
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- added Chat UI in main webview with conversation retention and clear button
 
-## [Unreleased]
+## [1.2.1] - (2023.12.07)
 
-- Initial release
+- Added Conversation With GPT Feature
+- Fixed Learnmore & Searchbar commands
+- QuickFix changes
