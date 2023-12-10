@@ -901,7 +901,8 @@ export class ChatGPTViewProvider implements vscode.WebviewViewProvider {
 
 				console.log("in serverAPI, before total_tokens");
 
-				if (res.data.detail?.usage?.total_tokens) {
+				
+				if (res.data.usage.total_tokens) {
 					console.log("in serverAPI, after total_tokens");
 					// Store the response and whether it is related to a code review in the response array
 					this._responseArray.push({ userPrompt: prompt, gptResponse: response, isCodeReview });
