@@ -6,8 +6,12 @@
   const vscode = acquireVsCodeApi();
   let response = '';
 
+  document.getElementById('clearResponseButton').addEventListener('click', () => {
+    vscode.postMessage({ type: 'clearResponseArray' });
+  });
+
   document.getElementById('learn-more-button').addEventListener('click', () => {
-    event.stopPropagation(); 
+    event.stopPropagation();
     vscode.postMessage({
       type: 'learnMore'
     });
@@ -37,14 +41,14 @@
   window.addEventListener("message", (event) => {
     const message = event.data;
     switch (message.type) {
+      case "prompt":
+        handlePrompt(message);
+        break;
       case "addResponse":
-        handleResponse(message);
+        //handleResponse(message);
         break;
       case "codeReviewCommandExecuted":
-        handleCodeReviewResponse(message);
-        break;
-      case "clearResponse":
-        response = '';
+        //handleCodeReviewResponse(message);
         break;
       case "setPrompt":
         if (message.value !== undefined) {
@@ -54,29 +58,45 @@
       case "loadResponse":
         renderImageResponse(message.value);
         break;
+      case 'responseDone':
+        if (Array.isArray(message.data)) {
+          message.data.forEach(item => {
+            if (item.isCodeReview) {
+              handleCodeReviewResponse(item.userPrompt, item.gptResponse);
+            } else {
+              handleResponse(item.userPrompt, item.gptResponse);
+            }
+          });
+
+          // Scroll to the bottom of the response div
+          const responseDiv = document.getElementById('response');
+          const lastResponseElement = responseDiv.lastElementChild;
+          if (lastResponseElement) {
+            lastResponseElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+
+          hideLoadingIcon();
+        }
+        break;
+      case 'clearResponse':
+        clearResponse();
+        break;
     }
   });
 
-  /*function fixCodeBlocks(response) {
-    // Use a regular expression to find all occurrences of the substring in the string
-    const REGEX_CODEBLOCK = new RegExp('\`\`\`', 'g');
-    const matches = response.match(REGEX_CODEBLOCK);
 
-    // Return the number of occurrences of the substring in the response, check if even
-    const count = matches ? matches.length : 0;
-    if (count % 2 === 0) {
-      return response;
-    } else {
-      // else append ``` to the end to make the last code block complete
-      return response.concat('\n\`\`\`');
-    }
-
-  }*/
-
-  function handleResponse(message) {
+  function handleResponse(prompt, response) {
     console.log("message type received by handleResponse:");
-    console.log(message.type);
-    response = message.value;
+    console.log(response);
+
+    // Create elements for displaying the prompt and response
+    const promptElement = document.createElement("div");
+    promptElement.classList.add("chat-prompt");
+    promptElement.textContent = prompt;
+
+
+    const output = document.createElement("div");
+    output.classList.add("chat-response");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -86,7 +106,13 @@
     });
     //response = fixCodeBlocks(response);
     const html = converter.makeHtml(response);
-    document.getElementById("response").innerHTML = html;
+    output.innerHTML = html;
+
+    // Append the new content to the response div without clearing existing content
+    document.getElementById("response").appendChild(promptElement);
+    document.getElementById("response").appendChild(output);
+    //document.getElementById("response").innerHTML = html;
+
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
@@ -117,17 +143,17 @@
     }
 
 
-    /*if (message.type === "codeReviewCommandExecuted") {
-      console.log(response);
-      console.log("^ before renderSuggestions is called");
-      renderSuggestions(response);
-    }*/
-
     microlight.reset('code');
   }
 
-  function handleCodeReviewResponse(message) {
-    response = message.value;
+  function handleCodeReviewResponse(prompt, response) {
+
+    const promptElement = document.createElement("div");
+    promptElement.classList.add("chat-prompt");
+    promptElement.textContent = prompt;
+
+    const output = document.createElement("div");
+    output.classList.add("chat-response");
     const converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -135,9 +161,15 @@
       literalMidWordUnderscores: true,
       simpleLineBreaks: true
     });
+
     //response = fixCodeBlocks(response);
+
     const html = converter.makeHtml(response);
-    document.getElementById("response").innerHTML = html;
+    output.innerHTML = html;
+
+    // Append the prompt and response elements to the response div
+    document.getElementById("response").appendChild(promptElement);
+    document.getElementById("response").appendChild(output);
 
     const preCodeBlocks = document.querySelectorAll("pre code");
     for (let i = 0; i < preCodeBlocks.length; i++) {
@@ -184,6 +216,19 @@
       </div>`;
   }
 
+  function hideLoadingIcon() {
+    const spinAnimation = document.getElementById('spin-animation');
+    if (spinAnimation) {
+      spinAnimation.style.display = 'none';
+    }
+  }
+
+  function clearResponse() {
+    const responseDiv = document.getElementById('response');
+    if (responseDiv) {
+      responseDiv.innerHTML = '';
+    }
+  }
 
   function renderSuggestions(response) {
     console.log("start renderSuggestions");
