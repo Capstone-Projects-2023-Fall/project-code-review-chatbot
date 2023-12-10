@@ -45,6 +45,7 @@ jest.mock('vscode', () => {
           _settings: {}, // populate with default settings if necessary
   
           setAuthenticationInfo: jest.fn(),
+          getAuthenticationInfo: jest.fn(),
           setSettings: jest.fn(),
           getSettings: jest.fn(),
           _newAPI: jest.fn(),
@@ -111,6 +112,29 @@ describe('ChatGPTViewProvider', () => {
       expect(chatGPTViewProvider.setSettings).toBeCalledWith(setttings)
       expect(chatGPTViewProvider.setSettings).toBeCalledTimes(1);
 
+    });
+
+    it('Mocked VSCode Commands', () => {
+      // Mocking VSCode commands and execute them
+      vscode.commands.executeCommand('chatgpt.explain');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith('chatgpt.explain');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
+
+      vscode.commands.executeCommand('chatgpt.codeRevuew');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith('chatgpt.codeReview');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
+
+      vscode.commands.executeCommand('chatgpt.quickFix');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith('chatgpt.quickFix');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
+
+      vscode.commands.executeCommand('chatgpt.learnMore');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith('chatgpt.learnMore');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
+
+      vscode.commands.executeCommand('chatgpt.findIssue');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith('chatgpt.findIssuse');
+      expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
     });
 
     /*
