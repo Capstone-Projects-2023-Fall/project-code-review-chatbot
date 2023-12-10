@@ -19,10 +19,10 @@ sidebar_position: 4
 - Laravel 
 
 ### Database
-- SQLite
+- MySQL
 
 ### Server Host
-- GoogieHost
+- Laravel Vapor (AWS)
 
 ### Documentation
 - Docusaurus

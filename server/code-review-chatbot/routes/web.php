@@ -63,7 +63,7 @@ Route::get('/authorize', function(Request $request) {
 
     if (Auth::user()) {
         $user = Auth::user(); 
-        $token = $user->createToken('MyApp')-> plainTextToken;
+        $token = $user->createToken('Code Review Chatbot')-> plainTextToken;
         
 
         $returnquery = array(

@@ -186,13 +186,19 @@
           "type": "boolean",
           "default": true,
           "description": "Use Server API instead of your own",
+          "order": -2
+        },
+        "chatgpt.serverApiToken": {
+          "type": "string",
+          "description": "Server API Token required to use server API. This is automatically generated, but you can manually generate one from the website and paste your token here.",
           "order": -1
         },
+
         "chatgpt.enablePreCommitHook": {
           "type": "boolean",
           "default": false,
           "description": "Enable automatic setup of the pre-commit hook.",
-          "order": -2
+          "order": -3
         },
         "chatgpt.apiKey": {
           "markdownDescription": "OpenAI API key from [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)",
@@ -259,7 +265,7 @@
         },
         "chatgpt.promptPrefix.codeReview": {
           "type": "string",
-          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, Legibility, and a Quick Fix section where we check for ONE LINE errors such as missing semicolons and misspelled variables. The quick fix section must be formatted like this: [Fix 1] Description: Fix the typo in the dequeue function. To Be Replaced: console.log(hi) (put ONLY the entire string of text to be replaced. NO QUOTES unless they are part of the actual text) Suggested Fix: console.log(hi); (put ONLY the text we will be replacing the current text with. NO QUOTES unless they are part of the actual fix.). Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~, ~~~Quick Fix~~~, etc. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'. Fianlly at the VERY end of the response AND NO WHERE ELSE, end with 3 dashes exactly like this '---'",
+          "default": "Please run a Code Review on the following code. The code review must include Variable Naming Conventions, Redundancy Issues, Buggy or broken code, Complexity, Legibility, and a Quick Fix section where we check for ONE LINE errors such as missing semicolons and misspelled variables. The quick fix section must be formatted like this: [Fix 1] Description: Fix the typo in the dequeue function. To Be Replaced: console.log(hi) (put ONLY the entire string of text to be replaced. NO QUOTES unless they are part of the actual text) Suggested Fix: console.log(hi); (put ONLY the text we will be replacing the current text with. NO QUOTES unless they are part of the actual fix.). Do not give me specific answers on how to fix the code, suggestions only based on the review. Your response must have this specific formatting: the first line of each code review topic must only be the title, and the title will have three tilde symbols on each side of it, like this:  ~~~Complexity~~~, ~~~Quick Fix~~~, etc. Under the title will be the description of the topic. Between topics will be a line of ten asterisks, such as '**********'. Finally at the VERY end of the response AND NO WHERE ELSE, end with 3 dashes exactly like this '---'",
           "description": "Code Review of the whole file.",
           "order": 12
         },
