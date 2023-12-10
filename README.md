@@ -8,6 +8,36 @@
 
 </div>
 
+
+
+## Project Abstract
+
+As a group of students, we are actively engaged in developing a project that addresses the importance of code review. Code review plays a pivotal role in software development, especially in larger team settings. However, it often goes overlooked, with team members frequently responding with "LGTM" (Looks Good To Me) without even thoroughly reviewing the code. Our project is created to alleviate this issue by introducing a chatbot within the users' IDE to conduct preliminary code reviews before it is submitted for peer review. This aims to elevate code quality and also educate users on effective code review practices within their teams. 
+
+## High-Level Requirement
+
+Users should be able to install the chatbot in their IDE of choice. The chatbot will live in their IDE and wait for a commit intent. When a user attempts to commit their code, the chatbot will intervene by providing a code review with actionable suggestions. Furthermore, users will have the option to engage in a conversation with the chatbot for additional explanations and insights
+
+For example, the Code Review Chat Bot might examine poorly written code and respond with suggestions like this:
+
+1. Indentation: It appears that there are indentation errors in your code. Proper indentation is crucial for readability and maintaining structure
+
+2. Semicolon Usage: It is generally advisable to use semicolons in your code. Ensure you follow appropriate semicolon conventions!
+
+
+## Background
+
+We are a group of students with an interest in software development. In our experiences, we've noticed that many people overlook an important part of building software which is checking each other's code. 
+
+When people work together on software, they often forget to review each other's code carefully and thoroughly. They might just say "it looks good to me" without really checking. We want to change that. 
+
+Our project is all about making code reviews easier and more helpful. We are creating a helper, a chatbot, that will work inside users IDE. When you want to save your work, this chatbot will check it first and give you tips on how to improve your code. It is like having a coding assistant right by you. 
+
+Our idea is to bring this feature directly into users IDE. This way, users can learn to do better code reviews and the code will be written better.
+
+
+
+
 # Installation Instructions
 
 ## Client Setup
@@ -38,6 +68,25 @@
    ![image](https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/assets/70736675/83d8a75a-95ec-4d9d-9bbf-e349cf6199f3)
 
 
+## Client Setup (dev only)
+
+1. To run this extension from its source code, you must first run `npm i` in the root directory.
+2. ChatGPT's node module does not work correctly running via source code. Run the following commands below if you are on a Linux machine.
+
+   If you are on a machine other than Linux, following the following instructions: https://github.com/Capstone-Projects-2023-Fall/project-code-review-chatbot/blob/trau-update-readme/src/test/Readme.md
+
+   ```
+    sed -i "1i import fetch from 'node-fetch'" node_modules/chatgpt/build/index.js
+    sed -i -e 's/var fetch = globalThis.fetch;//g' node_modules/chatgpt/build/index.js
+    sed -i -e '8,13d' node_modules/chatgpt/build/index.js 
+    sed -i '8i // src/tokenizer.ts\nimport GPT3TokenizerImport from "gpt3-tokenizer";\nvar GPT3Tokenizer = typeof GPT3TokenizerImport === "function" ? GPT3TokenizerImport : GPT3TokenizerImport.default;\nvar tokenizer = new GPT3Tokenizer({ type: "gpt3" });\nfunction encode(input) {\n  return tokenizer.encode(input).bpe;\n}' node_modules/chatgpt/build/index.js
+    sed -i -e "s/import Keyv from 'keyv';/import * as Keyv from 'keyv';/g" node_modules/chatgpt/build/index.d.ts
+    sed -i -e 's/type FetchFn = typeof fetch;/type FetchFn = any;/g' node_modules/chatgpt/build/index.d.ts
+   ```
+
+3. You can run the extension by pressing F5 on VSCode.
+
+
 
 ## Backend Setup (dev only)
 
@@ -51,7 +100,7 @@
 
 3. node, npm, PHP, SQLite, and composer must be installed on your Linux subsystem.
    ```
-   sudo apt-get install npm php php-curl php-xml composer sqlite3 php-sqlite3
+   sudo apt-get install npm php php-curl php-xml composer
    ```
    
 5. After installation, clone the repo into your Linux subsystem. (directory ex: \\\\wsl.localhost\Ubuntu\home\user)
@@ -69,7 +118,7 @@
    php artisan key:generate
    ```
 
-8. Run the following commands to generate the required dependencies:
+8. Run the following commands to generate the required dependencies. You may need to update the .env file to include database credentials.
    ```
    npm install
    npm run build
@@ -83,39 +132,14 @@
    *If you receive a docker error, you may need to modify the docker config file in ~/.docker/config.json and change credsStore to credStore*
 
 
-## Keywords
+## Backend AWS Setup (dev only)
 
+1. To update the AWS login, run the following command within the server/code-review-chatbot directory:
+   
+   `./vendor/bin/vapor provider`
 
+2. Reference the newly created provider for deployments (deletion of the previous provider may be required).
 
-## Project Abstract
-
-As a group of students, we are actively engaged in developing a project that addresses the importance of code review. Code review plays a pivotal role in software development, especially in larger team settings. However, it often goes overlooked, with team members frequently responding with "LGTM" (Looks Good To Me) without even thoroughly reviewing the code. Our project is created to alleviate this issue by introducing a chatbot within the users IDE to conduct preliminary code reviews before it is submitted for peer review. This aims to elevate code quality and also educate users on effective code review practices within their teams. 
-
-## High Level Requirement
-
-Users should be able to install the chatbot in their IDE of choice. The chatbot will live in their IDE and wait for a commit intent. When a user attempts to commit their code, the chatbot will intervene by providing a code review with actionable suggestions. Furthermore, users will have the option to engage in a conversation with the chatbot for additional explanations and insights
-
-For example, the Code Review Chat Bot might examine poorly written code and respond with suggestions like this:
-
-1. Indentation: It appears that there are indentaion errors in your code. Proper indentation is crucial for readability and maintaining structure
-
-2. Semicolon Usage: It is generally advisable to use semicolons in your code. Ensure you follow appropriate semicolon conventions!
-
-## Conceptual Design
-
-To implement this project, we are buliding upon the foundations of the VSCode ChatGPT extension developed by Tim Kmecl. Our modifications to the codebase will enable the chatbot to respond to commit events and generate code review checklists in JSON format. We will also introduce a backend API server to store our OpenAI token, simplifying the user experience. The VSCode extension will then utilized ReactJS to convert the JSON reponse into a checklist format. 
-
-## Background
-
-We are a group of studnets with interest in software development. In our experiences, we've notice that many people overlook an important part of building software which is checking each others code. 
-
-When people work together on a software, they often forget to review each other's code carefully and thoroughly. They might just say "it looks good to me" without really checking. We want to change that. 
-
-Our project is all about making code reviews easier and more helpful. We are creating a helper, a chatbot, that will work inside users IDE. When you want to save your work, this chatbot will check it first and give you tips on how to improve your code. It is like having a coding assistant right by you. 
-
-Our idea is to bring this feature directly into users IDE. This way, users can learn to do better code reviews and the code will be written better.
-
-## Required Resources
 
 ## Collaborators
 
