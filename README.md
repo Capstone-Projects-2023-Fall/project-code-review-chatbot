@@ -162,7 +162,7 @@ Our idea is to bring this feature directly into users IDE. This way, users can l
     </td>
     <td align="center">
         <a href="https://github.com/kroosvi">
-            <img src=https://avatars.githubusercontent.com/u/42981577?v=4" width="100;" alt="KroosXiang"/>
+            <img src="https://avatars.githubusercontent.com/u/42981577?v=4" width="100;" alt="KroosXiang"/>
             <br />
             <sub><b>Kroos Xiang</b></sub>
         </a>
