@@ -86,4 +86,3 @@ The user wants an instance of ChatGPT in their vs code. So they don't have to go
 4. Then a window will persist in the vs code tab until the user decides to close it.
 5. Then the user can type in anything that they want to ask chatGPT.
 6. Once they hit enter or click the submit button, the entry will be sent to the server API.
-
